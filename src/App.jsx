@@ -871,8 +871,8 @@ function App() {
               description="베란다와 세탁실의 기존 도장 상태를 확인하고, 바탕면 정리부터 탄성코트 마감까지 필요한 범위를 안내합니다."
             >
               <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? '1fr 1fr' : '1fr', gap: '20px', marginTop: '20px', textAlign: 'left' }}>
-                <ImagePlaceholder label="ELASTIC_COATING_BEFORE" ratio="4:3" size="Before 이미지" />
-                <ImagePlaceholder label="ELASTIC_COATING_AFTER" ratio="4:3" size="After 이미지" />
+                <ImagePlaceholder label="ELASTIC_COATING_SERVICE_BEFORE" ratio="4:3" size="Before 이미지" />
+                <ImagePlaceholder label="ELASTIC_COATING_SERVICE_AFTER" ratio="4:3" size="After 이미지" />
               </div>
               <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'left', fontSize: '0.95rem' }}>
                 <p><strong>적용 공간:</strong> 베란다 · 세탁실 · 다용도실</p>

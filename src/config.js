@@ -13,8 +13,10 @@ export const siteConfig = {
 
 export const siteImages = {
   hero: null,
-  elasticBefore: '/closet_before.png',
-  elasticAfter: '/closet_after.png',
+  elasticServiceBefore: '/elastic_before.png',
+  elasticServiceAfter: '/elastic_after.png',
+  elasticClosetBefore: '/closet_before.png',
+  elasticClosetAfter: '/closet_after.png',
   groutHero: '/bathroom_grout_hero.png',
   groutPanel: '/bathroom_grout_panel.png',
   groutBefore: null,

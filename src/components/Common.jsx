@@ -230,6 +230,10 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
     imageSrc = '/closet_before.png';
   } else if (label === 'ELASTIC_COATING_AFTER') {
     imageSrc = '/closet_after.png';
+  } else if (label === 'ELASTIC_COATING_SERVICE_BEFORE') {
+    imageSrc = '/elastic_before.png';
+  } else if (label === 'ELASTIC_COATING_SERVICE_AFTER') {
+    imageSrc = '/elastic_after.png';
   }
 
   if (imageSrc) {
