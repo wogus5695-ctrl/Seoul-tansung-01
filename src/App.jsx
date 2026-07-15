@@ -1088,40 +1088,165 @@ function App() {
         {/* 6. PROCESS SECTION */}
         <SectionContainer id="process" background="sand" padding="80px 20px">
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2>상담부터 마감 확인까지 필요한 과정을 순서대로 진행합니다</h2>
-            <p style={{ opacity: 0.8, marginTop: '8px' }}>각 단계마다 시공 절차 및 주의 의심요소를 사전 소통하여 안전성을 기합니다.</p>
+            <h2 style={{ fontSize: isDesktop ? '2rem' : '1.6rem', color: 'var(--forest-green-main)', marginBottom: '12px', lineHeight: '1.3' }}>
+              상담부터 마감까지<br />5단계로 확인하고 진행합니다
+            </h2>
+            <p style={{ opacity: 0.8, fontSize: '0.95rem', lineHeight: '1.6', color: 'var(--charcoal-text)' }}>
+              공간 상태와 시공 범위를 먼저 확인한 뒤,<br />단계별로 필요한 작업을 진행합니다.
+            </p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isDesktop ? 'repeat(5, 1fr)' : '1fr',
-            gap: '24px'
-          }}>
-            {[
-              { num: '01', title: '사진 상담', desc: '시공을 원하는 공간의 전체 사진과 문제가 있는 부분을 전달해 주세요.', img: 'PROCESS_IMAGE_01' },
-              { num: '02', title: '공간 및 기존 마감 확인', desc: '벽면 및 타일 상태, 기존 도장과 줄눈의 손상 범위를 확인합니다.', img: 'PROCESS_IMAGE_02' },
-              { num: '03', title: '시공 범위·자재·색상 안내', desc: '필요한 작업 범위와 적용 가능한 자재, 색상을 안내합니다.', img: 'PROCESS_IMAGE_03' },
-              { num: '04', title: '바탕면 정리 후 시공', desc: '보양과 기존 마감 정리를 진행한 뒤 공간에 맞는 방식으로 시공합니다.', img: 'PROCESS_IMAGE_04' },
-              { num: '05', title: '최종 검수 및 관리 안내', desc: '마감 상태를 확인하고 건조 시간과 시공 후 관리 방법을 안내합니다.', img: 'PROCESS_IMAGE_05' },
-            ].map((step, idx) => (
-              <div key={idx} style={{
-                backgroundColor: 'var(--white)',
-                padding: '20px',
-                borderRadius: '4px',
-                textAlign: 'left',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px'
-              }}>
-                <ImagePlaceholder label={step.img} ratio="16:9" size="Recommended: 400x225" />
-                <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--forest-green-sub)' }}>
-                  {step.num}
-                </span>
-                <h4 style={{ fontSize: '1rem', color: 'var(--forest-green-main)' }}>{step.title}</h4>
-                <p style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.5 }}>{step.desc}</p>
-              </div>
-            ))}
-          </div>
+          {isDesktop ? (
+            /* PC: 5 steps horizontal flow with circular numbers and connector lines */
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              position: 'relative',
+              width: '100%',
+              padding: '20px 0'
+            }}>
+              {/* Connected Line Background */}
+              <div style={{
+                position: 'absolute',
+                top: '40px',
+                left: '10%',
+                right: '10%',
+                height: '2px',
+                backgroundColor: 'rgba(24, 63, 53, 0.2)',
+                zIndex: 1
+              }}></div>
+
+              {[
+                { num: '01', title: '사진 상담', desc: '공간 전체와 문제가 있는 부분의 사진을 확인합니다.' },
+                { num: '02', title: '기존 상태 확인', desc: '벽면과 타일, 기존 도장과 줄눈의 상태를 점검합니다.' },
+                { num: '03', title: '범위·자재 안내', desc: '필요한 작업 범위와 적용할 자재·색상을 안내합니다.' },
+                { num: '04', title: '바탕 정리·시공', desc: '기존 마감을 정리한 뒤 공간에 맞는 방식으로 시공합니다.' },
+                { num: '05', title: '마감 검수', desc: '완료 상태를 확인하고 건조와 관리 방법을 안내합니다.' }
+              ].map((step, idx) => (
+                <div key={idx} style={{
+                  position: 'relative',
+                  width: '18%',
+                  textAlign: 'center',
+                  zIndex: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}>
+                  {/* Circular Number Element */}
+                  <div style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--forest-green-main)',
+                    color: 'var(--white)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    marginBottom: '16px',
+                    boxShadow: '0 0 0 4px var(--warm-white)'
+                  }}>
+                    {step.num}
+                  </div>
+                  {/* Step Title */}
+                  <h4 style={{
+                    fontSize: '1.05rem',
+                    color: 'var(--forest-green-main)',
+                    fontWeight: '700',
+                    marginBottom: '8px',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {step.title}
+                  </h4>
+                  {/* Step Description */}
+                  <p style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--charcoal-text)',
+                    lineHeight: '1.5',
+                    padding: '0 4px',
+                    wordBreak: 'keep-all'
+                  }}>
+                    {step.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* Mobile: Vertical timeline flow */
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative',
+              paddingLeft: '20px',
+              textAlign: 'left'
+            }}>
+              {/* Vertical Connector Line */}
+              <div style={{
+                position: 'absolute',
+                top: '20px',
+                bottom: '40px',
+                left: '36px',
+                width: '2px',
+                backgroundColor: 'rgba(24, 63, 53, 0.2)',
+                zIndex: 1
+              }}></div>
+
+              {[
+                { num: '01', title: '사진 상담', desc: '공간 전체와 문제가 있는 부분의 사진을 확인합니다.' },
+                { num: '02', title: '기존 상태 확인', desc: '벽면과 타일, 기존 도장과 줄눈의 상태를 점검합니다.' },
+                { num: '03', title: '범위·자재 안내', desc: '필요한 작업 범위와 적용할 자재·색상을 안내합니다.' },
+                { num: '04', title: '바탕 정리·시공', desc: '기존 마감을 정리한 뒤 공간에 맞는 방식으로 시공합니다.' },
+                { num: '05', title: '마감 검수', desc: '완료 상태를 확인하고 건조와 관리 방법을 안내합니다.' }
+              ].map((step, idx, arr) => (
+                <div key={idx} style={{
+                  display: 'flex',
+                  gap: '16px',
+                  marginBottom: idx === arr.length - 1 ? '0' : '36px',
+                  position: 'relative',
+                  zIndex: 2,
+                  alignItems: 'flex-start'
+                }}>
+                  {/* Circular Number Element */}
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--forest-green-main)',
+                    color: 'var(--white)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '0.9rem',
+                    flexShrink: 0,
+                    boxShadow: '0 0 0 3px var(--warm-white)'
+                  }}>
+                    {step.num}
+                  </div>
+                  {/* Title and Description */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '4px' }}>
+                    <h4 style={{
+                      fontSize: '1rem',
+                      color: 'var(--forest-green-main)',
+                      fontWeight: '700'
+                    }}>
+                      {step.title}
+                    </h4>
+                    <p style={{
+                      fontSize: '0.85rem',
+                      color: 'var(--charcoal-text)',
+                      lineHeight: '1.5',
+                      margin: 0,
+                      wordBreak: 'keep-all'
+                    }}>
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </SectionContainer>
 
 
