@@ -19,8 +19,8 @@ export const siteImages = {
   elasticClosetAfter: '/closet_after.png',
   groutHero: '/bathroom_grout_hero.png',
   groutPanel: '/bathroom_grout_panel.png',
-  groutBefore: null,
-  groutAfter: null,
+  groutBefore: '/grout_before.png',
+  groutAfter: '/grout_after.png',
   process01: null,
   portfolio01: null,
 };

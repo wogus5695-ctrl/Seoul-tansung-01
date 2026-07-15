@@ -225,6 +225,10 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
     imageSrc = '/grout_service_before.png';
   } else if (label === 'GROUT_SERVICE_AFTER') {
     imageSrc = '/grout_service_after.png';
+  } else if (label === 'GROUT_BEFORE') {
+    imageSrc = '/grout_before.png';
+  } else if (label === 'GROUT_AFTER') {
+    imageSrc = '/grout_after.png';
   } else if (isElasticKeyword) {
     imageSrc = '/elastic_coating_hero.png';
   } else if (label === 'ELASTIC_COATING_SERVICE_IMAGE') {
