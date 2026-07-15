@@ -227,9 +227,9 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
   } else if (label === 'ELASTIC_COATING_SERVICE_IMAGE') {
     imageSrc = '/elastic_coating_panel.png';
   } else if (label === 'ELASTIC_COATING_BEFORE') {
-    imageSrc = '/elastic_before.png';
+    imageSrc = '/closet_before.png';
   } else if (label === 'ELASTIC_COATING_AFTER') {
-    imageSrc = '/elastic_after.png';
+    imageSrc = '/closet_after.png';
   }
 
   if (imageSrc) {
