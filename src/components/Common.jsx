@@ -233,15 +233,14 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
     imageSrc = '/elastic_before.png';
   } else if (label === 'ELASTIC_COATING_SERVICE_AFTER') {
     imageSrc = '/elastic_after.png';
-  }
-
-  // Map spatial guide images for 탄성코트
-  if (label && (label.endsWith('BALCONY_IMAGE') || label === 'BALCONY_IMAGE')) {
+  } else if (label && (label.endsWith('BALCONY_IMAGE') || label === 'BALCONY_IMAGE')) {
     imageSrc = '/balcony_guide.png';
   } else if (label && (label.endsWith('LAUNDRY_ROOM_IMAGE') || label === 'LAUNDRY_ROOM_IMAGE')) {
     imageSrc = '/laundry_guide.png';
   } else if (label && (label.endsWith('UTILITY_ROOM_IMAGE') || label === 'UTILITY_ROOM_IMAGE')) {
     imageSrc = '/utility_guide.png';
+  } else if (label === 'ELASTIC_CONSULTATION_IMAGE_PATTERN') {
+    imageSrc = '/consultation_peeling.png';
   }
 
   if (imageSrc) {

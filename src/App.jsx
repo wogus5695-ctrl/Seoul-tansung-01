@@ -1401,7 +1401,11 @@ function App() {
               </div>
             </div>
             <div>
-              <ImagePlaceholder label="CONSULTATION_IMAGE_PATTERN" ratio="16:9" size="Recommended: 800x450" />
+              <ImagePlaceholder 
+                label={activeGroup === 'elastic' ? 'ELASTIC_CONSULTATION_IMAGE_PATTERN' : 'CONSULTATION_IMAGE_PATTERN'} 
+                ratio="16:9" 
+                size="Recommended: 800x450" 
+              />
             </div>
           </div>
         </SectionContainer>
