@@ -87,6 +87,9 @@ function App() {
   const [portfolioFilter, setPortfolioFilter] = useState('전체');
   const [selectedPortfolio, setSelectedPortfolio] = useState(null);
 
+  // Main Page Hero Image Auto Slide
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0); // 0: elastic, 1: grout
+
   // Sitemap Hub Search & Filter States
   const [sitemapFilter, setSitemapFilter] = useState('전체'); // '전체' | '탄성코트' | '줄눈시공'
   const [regionSearch, setRegionSearch] = useState('');
@@ -103,6 +106,14 @@ function App() {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Interval hook to slide Hero images on Main Page
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveHeroSlide(prev => (prev === 0 ? 1 : 0));
+    }, 3500); // Swaps every 3.5s
+    return () => clearInterval(interval);
   }, []);
 
   const navigate = (newPath, query = '') => {
@@ -767,7 +778,10 @@ function App() {
 
             <div>
               <ImagePlaceholder 
-                label={parsedKeyword ? parsedKeyword.service.imagePlaceholderKey : 'HERO_IMAGE_PLACEHOLDER'} 
+                label={parsedKeyword 
+                  ? parsedKeyword.service.imagePlaceholderKey 
+                  : (activeHeroSlide === 0 ? 'ELASTIC_COATING_HERO' : 'GROUT_HERO')
+                } 
                 ratio="4:5" 
                 size="Main image (4:5 / Recommended: 800x1000)" 
               />
