@@ -987,7 +987,8 @@ function App() {
         </SectionContainer>
 
         {/* 4. SPACE GUIDE SECTION */}
-        <SectionContainer id="space-guide" background="sand" padding="80px 20px">
+        {activeGroup !== 'grout' && (
+          <SectionContainer id="space-guide" background="sand" padding="80px 20px">
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <h2>공간별 시공 안내 가이드</h2>
             <p style={{ opacity: 0.8, marginTop: '8px' }}>거주 공간별 환경 특징과 확인해야 할 마감 상태를 상세히 안내합니다.</p>
@@ -1050,6 +1051,7 @@ function App() {
             </div>
           </div>
         </SectionContainer>
+        )}
 
         {/* 5. QUALITY STANDARD SECTION */}
         <SectionContainer id="quality-standard" padding="80px 20px">
