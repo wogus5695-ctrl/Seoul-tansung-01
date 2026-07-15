@@ -214,18 +214,27 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
                          label === 'BALCONY_GROUT_IMAGE' || 
                          label === 'TOILET_GROUT_IMAGE';
 
+  const isElasticKeyword = label === 'ELASTIC_COATING_HERO' || 
+                           label === 'BALCONY_ELASTIC_IMAGE' || 
+                           label === 'LAUNDRY_ELASTIC_IMAGE';
+
   if (isGroutKeyword) {
     imageSrc = '/bathroom_grout_hero.png';
   } else if (label === 'GROUT_SERVICE_IMAGE' || label === 'GROUT_PANEL') {
     imageSrc = '/bathroom_grout_panel.png';
+  } else if (isElasticKeyword) {
+    imageSrc = '/elastic_coating_hero.png';
+  } else if (label === 'ELASTIC_COATING_SERVICE_IMAGE') {
+    imageSrc = '/elastic_coating_panel.png';
   }
 
   if (imageSrc) {
+    const isElastic = imageSrc.includes('elastic');
     return (
       <div style={{ ...styles.placeholderContainer, border: 'none', backgroundColor: 'transparent' }}>
         <img 
           src={imageSrc} 
-          alt="바름공간 줄눈시공" 
+          alt={isElastic ? "바름공간 탄성코트 시공" : "바름공간 줄눈시공"} 
           style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px' }} 
         />
       </div>
