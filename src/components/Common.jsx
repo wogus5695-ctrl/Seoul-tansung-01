@@ -204,8 +204,28 @@ export function SecondaryButton({ children, onClick, style = {} }) {
   );
 }
 
-// 6. ImagePlaceholder Component (No image assets created, simple text overlay)
+// 6. ImagePlaceholder Component (Renders real images if configured, otherwise shows placeholder)
 export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 800x450' }) {
+  // Map labels to siteImages keys
+  let imageSrc = null;
+  if (label === 'BATHROOM_GROUT_IMAGE' || label === 'GROUT_HERO') {
+    imageSrc = '/bathroom_grout_hero.png';
+  } else if (label === 'GROUT_SERVICE_IMAGE' || label === 'GROUT_PANEL') {
+    imageSrc = '/bathroom_grout_panel.png';
+  }
+
+  if (imageSrc) {
+    return (
+      <div style={{ ...styles.placeholderContainer, border: 'none', backgroundColor: 'transparent' }}>
+        <img 
+          src={imageSrc} 
+          alt="바름공간 줄눈시공" 
+          style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px' }} 
+        />
+      </div>
+    );
+  }
+
   return (
     <div style={styles.placeholderContainer}>
       <div style={{ ...styles.placeholderRatioBox, paddingBottom: ratio === '16:9' ? '56.25%' : ratio === '4:3' ? '75%' : ratio === '4:5' ? '125%' : ratio === '5:6' ? '120%' : ratio === '1:1' ? '100%' : '56.25%' }}>

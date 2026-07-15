@@ -15,6 +15,8 @@ export const siteImages = {
   hero: null,
   elasticBefore: null,
   elasticAfter: null,
+  groutHero: '/bathroom_grout_hero.png',
+  groutPanel: '/bathroom_grout_panel.png',
   groutBefore: null,
   groutAfter: null,
   process01: null,
