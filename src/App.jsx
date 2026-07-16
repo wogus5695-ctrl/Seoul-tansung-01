@@ -821,9 +821,20 @@ function App() {
                   : '베란다와 세탁실 벽면부터 욕실과 현관의 타일 틈까지, 기존 상태를 확인하고 공간에 필요한 마감 시공을 안내합니다.'
                 }
               </p>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                <PrimaryButton style={{ flex: 1 }} onClick={handleCTA}>사진으로 시공 상담</PrimaryButton>
-                <SecondaryButton style={{ flex: 1 }} onClick={handlePhoneCall}>전화로 바로 문의</SecondaryButton>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '12px',
+                marginTop: '12px'
+              }}>
+                <PrimaryButton onClick={handleCTA}>
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>사진으로 시공 상담</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>사진 상담</span>
+                </PrimaryButton>
+                <SecondaryButton onClick={handlePhoneCall}>
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>전화로 바로 문의</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>전화 문의</span>
+                </SecondaryButton>
               </div>
             </div>
 
@@ -960,9 +971,40 @@ function App() {
             <span style={{ fontSize: '0.85rem', color: 'var(--forest-green-sub)', letterSpacing: '1px', fontWeight: 'bold' }}>
               BEFORE & AFTER
             </span>
-            <h2 style={{ marginTop: '8px' }}>시공 전 상태와 완료 후 마감을 비교해 보세요</h2>
-            <p style={{ opacity: 0.8, marginTop: '12px', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto', fontSize: '0.95rem', lineHeight: 1.6 }}>
-              시공 결과는 기존 벽면과 타일 상태, 보수 범위, 선택한 자재에 따라 달라질 수 있습니다. 실제 시공 전후 사진을 기준으로 필요한 작업 범위를 확인해 주세요.
+            <h2 className="section-title before-after-title" style={{
+              marginTop: '8px',
+              wordBreak: 'keep-all',
+              overflowWrap: 'normal',
+              textWrap: 'balance',
+              lineHeight: '1.25'
+            }}>
+              <span className="title-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>
+                시공 전 상태와 완료 후 마감을 비교해 보세요
+              </span>
+              <span className="title-mobile-only" style={{ display: isDesktop ? 'none' : 'block' }}>
+                시공 전 상태와<br />완료 후 마감을 비교해 보세요
+              </span>
+            </h2>
+            <p style={{
+              opacity: 0.8,
+              marginTop: '12px',
+              maxWidth: '700px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              fontSize: '0.95rem',
+              lineHeight: 1.6,
+              wordBreak: 'keep-all',
+              overflowWrap: 'normal'
+            }}>
+              {isDesktop ? (
+                "시공 결과는 기존 벽면과 타일 상태, 보수 범위, 선택한 자재에 따라 달라질 수 있습니다. 실제 시공 전후 사진을 기준으로 필요한 작업 범위를 확인해 주세요."
+              ) : (
+                <>
+                  시공 결과는 기존 상태와 보수 범위에 따라 달라질 수 있습니다.
+                  <br />
+                  실제 전후 사진으로 필요한 작업 범위를 확인해 주세요.
+                </>
+              )}
             </p>
           </div>
 
@@ -1041,8 +1083,8 @@ function App() {
         {activeGroup !== 'grout' && (
           <SectionContainer id="space-guide" background="sand" padding="80px 20px">
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2>공간별 시공 안내 가이드</h2>
-            <p style={{ opacity: 0.8, marginTop: '8px' }}>거주 공간별 환경 특징과 확인해야 할 마감 상태를 상세히 안내합니다.</p>
+            <h2 style={{ wordBreak: 'keep-all', overflowWrap: 'normal' }}>공간별 시공 안내 가이드</h2>
+            <p style={{ opacity: 0.8, marginTop: '8px', wordBreak: 'keep-all', overflowWrap: 'normal' }}>거주 공간별 환경 특징과 확인해야 할 마감 상태를 상세히 안내합니다.</p>
           </div>
 
           <div style={{
@@ -1107,8 +1149,8 @@ function App() {
         {/* 5. QUALITY STANDARD SECTION */}
         <SectionContainer id="quality-standard" padding="80px 20px">
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2>시공 품질 기준</h2>
-            <p style={{ opacity: 0.8, marginTop: '8px' }}>기초 분석부터 세밀한 확인까지 모든 마감 단계의 품질 기준을 준수합니다.</p>
+            <h2 style={{ wordBreak: 'keep-all', overflowWrap: 'normal' }}>시공 품질 기준</h2>
+            <p style={{ opacity: 0.8, marginTop: '8px', wordBreak: 'keep-all', overflowWrap: 'normal' }}>기초 분석부터 세밀한 확인까지 모든 마감 단계의 품질 기준을 준수합니다.</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
@@ -1307,8 +1349,8 @@ function App() {
         {/* 8. DETAILED INFORMATION SECTION */}
         <SectionContainer id="detailed-information" background="sand" padding="80px 20px">
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2>세부 시공 가이드라인 안내</h2>
-            <p style={{ opacity: 0.8, marginTop: '8px' }}>공간 관리 편의성과 오랜 마감 유지를 위해 사전에 확인해야 할 세부 정보들입니다.</p>
+            <h2 style={{ wordBreak: 'keep-all', overflowWrap: 'normal' }}>세부 시공 가이드라인 안내</h2>
+            <p style={{ opacity: 0.8, marginTop: '8px', wordBreak: 'keep-all', overflowWrap: 'normal' }}>공간 관리 편의성과 오랜 마감 유지를 위해 사전에 확인해야 할 세부 정보들입니다.</p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -1410,8 +1452,8 @@ function App() {
         {/* 9. FAQ SECTION */}
         <SectionContainer id="faq" padding="80px 20px">
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2>자주 묻는 질문 (FAQ)</h2>
-            <p style={{ opacity: 0.8, marginTop: '8px' }}>시공 문의 전에 미리 확인해 보시면 도움이 되는 질문들입니다.</p>
+            <h2 style={{ wordBreak: 'keep-all', overflowWrap: 'normal' }}>자주 묻는 질문 (FAQ)</h2>
+            <p style={{ opacity: 0.8, marginTop: '8px', wordBreak: 'keep-all', overflowWrap: 'normal' }}>시공 문의 전에 미리 확인해 보시면 도움이 되는 질문들입니다.</p>
           </div>
           <Accordion items={currentFaqList} />
         </SectionContainer>
@@ -1429,13 +1471,13 @@ function App() {
               <span style={{ fontSize: '0.85rem', color: 'var(--forest-green-sub)', letterSpacing: '1px', fontWeight: 'bold' }}>
                 CONSULTATION
               </span>
-              <h2 style={{ fontSize: '2rem', margin: '8px 0 16px 0', lineHeight: 1.25 }}>
+              <h2 style={{ fontSize: '2rem', margin: '8px 0 16px 0', lineHeight: 1.25, wordBreak: 'keep-all', overflowWrap: 'normal' }}>
                 {parsedKeyword 
                   ? `${parsedKeyword.region.displayName} 시공 상담 문의`
                   : '사진을 보내주시면 필요한 시공 범위부터 확인합니다'
                 }
               </h2>
-              <p style={{ opacity: 0.9, lineHeight: 1.6, marginBottom: '24px', fontSize: '1.02rem' }}>
+              <p style={{ opacity: 0.9, lineHeight: 1.6, marginBottom: '24px', fontSize: '1.02rem', wordBreak: 'keep-all', overflowWrap: 'normal' }}>
                 공간 전체 사진과 문제가 있는 부분을 함께 보내주세요. 기존 마감 상태를 확인한 뒤 상담에 필요한 내용을 안내합니다.
               </p>
               
@@ -1448,9 +1490,19 @@ function App() {
                 </ul>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <PrimaryButton onClick={handleCTA}>사진 상담하기</PrimaryButton>
-                <SecondaryButton onClick={handlePhoneCall}>전화 상담하기</SecondaryButton>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '12px'
+              }}>
+                <PrimaryButton onClick={handleCTA}>
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>사진 상담하기</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>사진 상담</span>
+                </PrimaryButton>
+                <SecondaryButton onClick={handlePhoneCall}>
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>전화 상담하기</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>전화 문의</span>
+                </SecondaryButton>
               </div>
             </div>
             <div>
