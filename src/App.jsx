@@ -221,6 +221,7 @@ function App() {
     let titleStr = `탄성코트·줄눈시공 전문`;
     let descStr = `베란다·세탁실 탄성코트와 욕실·현관 줄눈시공을 안내합니다. 기존 벽면과 타일 상태를 확인하고 공간에 필요한 시공 범위를 상담해 드립니다.`;
     const defaultSiteUrl = siteConfig.siteUrl;
+    const seoThumbnailUrl = `${siteConfig.siteUrl}/images/seo/bareumgonggan-search-thumbnail-v1.png`;
     
     // Schema generation arrays
     const schemas = [];
@@ -349,7 +350,6 @@ function App() {
     updateMetaTag('meta[property="og:description"]', 'content', descStr);
 
     // Sync SEO Search Thumbnail dynamically for normal dynamic landing pages
-    const seoThumbnailUrl = `${siteConfig.siteUrl}/images/seo/bareumgonggan-search-thumbnail-v1.png`;
     let imageSrcEl = document.querySelector('link[rel="image_src"]');
 
     if (parsedKeyword) {
