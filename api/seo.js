@@ -37,19 +37,30 @@ export default async function handler(req, res) {
     html = html.replace('</head>', `<link rel="canonical" href="${hubCanonical}" />\n<meta property="og:url" content="${hubCanonical}" />\n</head>`);
 
     // Pre-inject visible sitemap components for search engines
+    const uniqueDistricts = Array.from(new Set(seoulRegions.map(r => r.districtName))).sort();
+    const groupedRegions = {};
+    uniqueDistricts.forEach(dist => {
+      groupedRegions[dist] = seoulRegions.filter(r => r.districtName === dist);
+    });
+
     const seoContent = `
       <div style="padding: 40px; max-width: 1200px; margin: 0 auto; font-family: sans-serif;">
-        <h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px;">서울 탄성코트·줄눈시공 서비스 구역 안내</h1>
+        <h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px;">서울 탄성코트·줄눈시공 지역별 페이지 안내</h1>
         <p style="color: #666; margin-bottom: 40px;">서울시 전체 25개 자치구와 행정동 단위의 상세 탄성코트 및 줄눈시공 서비스 연결 리스트입니다.</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
-          ${seoulRegions.filter(r => r.regionType === 'district').map(dist => `
+          ${uniqueDistricts.map(distName => `
             <div style="border: 1px solid #e5e5e5; padding: 20px; border-radius: 4px; background: #fff;">
-              <h2 style="font-size: 1.25rem; color: #183f35; border-bottom: 2px solid #183f35; padding-bottom: 8px; margin-bottom: 12px;">${dist.displayName}</h2>
-              <ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8;">
-                ${serviceKeywords.map(k => `
-                  <li><a href="/?k=${encodeURIComponent(dist.displayName + '-' + k.keyword)}" style="color: #0076ff; text-decoration: none;">${dist.displayName} ${k.keyword} 바로가기</a></li>
-                `).join('')}
-              </ul>
+              <h2 style="font-size: 1.25rem; color: #183f35; border-bottom: 2px solid #183f35; padding-bottom: 8px; margin-bottom: 12px;">${distName}</h2>
+              ${groupedRegions[distName].map(reg => `
+                <div style="margin-bottom: 14px;">
+                  <h3 style="font-size: 0.95rem; color: #555; margin: 4px 0;">${reg.displayName}</h3>
+                  <ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">
+                    ${serviceKeywords.map(k => `
+                      <li><a href="/?k=${encodeURIComponent(reg.displayName + '-' + k.keyword)}" style="color: #0076ff; text-decoration: none;">${reg.displayName} ${k.keyword}</a></li>
+                    `).join('')}
+                  </ul>
+                </div>
+              `).join('')}
             </div>
           `).join('')}
         </div>
