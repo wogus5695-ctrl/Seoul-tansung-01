@@ -276,7 +276,8 @@ function App() {
           '@type': 'AdministrativeArea',
           'name': parsedKeyword.region.districtName
         },
-        'description': descStr
+        'description': descStr,
+        'image': seoThumbnailUrl
       });
 
       // 2. Breadcrumb schema
@@ -346,6 +347,46 @@ function App() {
     updateMetaTag('meta[name="description"]', 'content', descStr);
     updateMetaTag('meta[property="og:title"]', 'content', titleStr);
     updateMetaTag('meta[property="og:description"]', 'content', descStr);
+
+    // Sync SEO Search Thumbnail dynamically for normal dynamic landing pages
+    const seoThumbnailUrl = `${siteConfig.siteUrl}/images/seo/bareumgonggan-search-thumbnail-v1.png`;
+    let imageSrcEl = document.querySelector('link[rel="image_src"]');
+
+    if (parsedKeyword) {
+      updateMetaTag('meta[property="og:image"]', 'content', seoThumbnailUrl);
+      updateMetaTag('meta[property="og:image:width"]', 'content', '1200');
+      updateMetaTag('meta[property="og:image:height"]', 'content', '1200');
+      updateMetaTag('meta[property="og:image:type"]', 'content', 'image/png');
+      updateMetaTag('meta[property="og:image:alt"]', 'content', '바름공간 탄성코트·줄눈시공 전문 업체');
+
+      updateMetaTag('meta[name="twitter:card"]', 'content', 'summary_large_image');
+      updateMetaTag('meta[name="twitter:image"]', 'content', seoThumbnailUrl);
+      updateMetaTag('meta[name="twitter:image:alt"]', 'content', '바름공간 탄성코트·줄눈시공 전문 업체');
+
+      if (!imageSrcEl) {
+        imageSrcEl = document.createElement('link');
+        imageSrcEl.setAttribute('rel', 'image_src');
+        document.head.appendChild(imageSrcEl);
+      }
+      imageSrcEl.setAttribute('href', seoThumbnailUrl);
+    } else {
+      // Revert/Clean up image tags for non-dynamic landing pages
+      const tagsToCleanup = [
+        'meta[property="og:image"]',
+        'meta[property="og:image:width"]',
+        'meta[property="og:image:height"]',
+        'meta[property="og:image:type"]',
+        'meta[property="og:image:alt"]',
+        'meta[name="twitter:card"]',
+        'meta[name="twitter:image"]',
+        'meta[name="twitter:image:alt"]'
+      ];
+      tagsToCleanup.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) el.remove();
+      });
+      if (imageSrcEl) imageSrcEl.remove();
+    }
 
     let canonicalUrl = "";
     if (!isKeywordInvalid) {

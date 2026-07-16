@@ -140,7 +140,38 @@ export default async function handler(req, res) {
 
       // Clean parameter representation (strips tracking tags)
       const cleanCanonical = `https://seoul-tansung-01.vercel.app/?k=${encodeURIComponent(regionName + '-' + taskName)}`;
-      html = html.replace('</head>', `<link rel="canonical" href="${cleanCanonical}" />\n<meta property="og:url" content="${cleanCanonical}" />\n</head>`);
+      const seoThumbnailUrl = "https://seoul-tansung-01.vercel.app/images/seo/bareumgonggan-search-thumbnail-v1.png";
+      
+      const additionalMetaTags = `
+<link rel="canonical" href="${cleanCanonical}" />
+<meta property="og:url" content="${cleanCanonical}" />
+<meta property="og:image" content="${seoThumbnailUrl}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="1200" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content="바름공간 탄성코트·줄눈시공 전문 업체" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="${seoThumbnailUrl}" />
+<meta name="twitter:image:alt" content="바름공간 탄성코트·줄눈시공 전문 업체" />
+<link rel="image_src" href="${seoThumbnailUrl}" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "${title}",
+  "description": "${desc}",
+  "url": "${cleanCanonical}",
+  "primaryImageOfPage": {
+    "@type": "ImageObject",
+    "url": "${seoThumbnailUrl}",
+    "width": 1200,
+    "height": 1200
+  }
+}
+</script>
+</head>`;
+      
+      html = html.replace('</head>', additionalMetaTags);
 
       // 3. Pre-render Content split by Service Group
       let bodyHtml = "";

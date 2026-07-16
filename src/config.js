@@ -14,6 +14,7 @@ export const siteConfig = {
 
 export const siteImages = {
   hero: null,
+  searchThumbnail: '/images/seo/bareumgonggan-search-thumbnail-v1.png',
   elasticServiceBefore: '/elastic_before.png',
   elasticServiceAfter: '/elastic_after.png',
   elasticClosetBefore: '/closet_before.png',
