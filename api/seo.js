@@ -25,11 +25,16 @@ export default async function handler(req, res) {
     const hubTitle = "서울 탄성코트·줄눈시공 서비스 구역 안내 | 바름공간";
     const hubDesc = "서울시 25개 자치구 및 전체 행정동별 탄성코트 및 줄눈시공 동적 랜딩 페이지 리스트를 한눈에 안내해 드립니다.";
     
+    const hubCanonical = "https://seoul-tansung-01.vercel.app/sitemap-seoul";
+
     // Replace Meta Tags
     html = html.replace(/<title>.*?<\/title>/, `<title>${hubTitle}</title>`);
     html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${hubDesc}" />`);
     html = html.replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${hubTitle}" />`);
     html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${hubDesc}" />`);
+
+    // Inject canonical & og:url tags
+    html = html.replace('</head>', `<link rel="canonical" href="${hubCanonical}" />\n<meta property="og:url" content="${hubCanonical}" />\n</head>`);
 
     // Pre-inject visible sitemap components for search engines
     const seoContent = `
@@ -122,6 +127,10 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${title}" />`);
       html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${desc}" />`);
 
+      // Clean parameter representation (strips tracking tags)
+      const cleanCanonical = `https://seoul-tansung-01.vercel.app/?k=${encodeURIComponent(regionName + '-' + taskName)}`;
+      html = html.replace('</head>', `<link rel="canonical" href="${cleanCanonical}" />\n<meta property="og:url" content="${cleanCanonical}" />\n</head>`);
+
       // 3. Pre-render Content split by Service Group
       let bodyHtml = "";
       if (matchedService.serviceGroup === 'elastic') {
@@ -205,6 +214,9 @@ export default async function handler(req, res) {
   }
 
   // Fallback to serving the normal main page HTML
+  const mainCanonical = "https://seoul-tansung-01.vercel.app/";
+  html = html.replace('</head>', `<link rel="canonical" href="${mainCanonical}" />\n<meta property="og:url" content="${mainCanonical}" />\n</head>`);
+
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   return res.status(200).send(html);
 }

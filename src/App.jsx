@@ -218,9 +218,9 @@ function App() {
 
   // Sync title, meta tags, and canonical dynamically on mount/update
   useEffect(() => {
-    let titleStr = `탄성코트·줄눈시공 전문 | ${siteConfig.brandName}`;
+    let titleStr = `탄성코트·줄눈시공 전문`;
     let descStr = `베란다·세탁실 탄성코트와 욕실·현관 줄눈시공을 안내합니다. 기존 벽면과 타일 상태를 확인하고 공간에 필요한 시공 범위를 상담해 드립니다.`;
-    const defaultSiteUrl = 'https://bareum-space.com';
+    const defaultSiteUrl = siteConfig.siteUrl;
     
     // Schema generation arrays
     const schemas = [];
@@ -305,7 +305,7 @@ function App() {
       });
 
     } else if (path === '/sitemap-seoul') {
-      titleStr = `서울 탄성코트·줄눈시공 지역별 안내 | ${siteConfig.brandName}`;
+      titleStr = `서울 탄성코트·줄눈시공 지역별 안내`;
       descStr = `서울 자치구와 동 단위 지역별 탄성코트·줄눈시공 페이지를 확인할 수 있습니다. 지역명과 시공 서비스를 선택해 필요한 정보를 확인해 보세요.`;
 
       // Sitemap Page Schemas
@@ -347,9 +347,22 @@ function App() {
     updateMetaTag('meta[property="og:title"]', 'content', titleStr);
     updateMetaTag('meta[property="og:description"]', 'content', descStr);
 
-    let canonicalUrl = window.location.origin + window.location.pathname;
+    let canonicalUrl = siteConfig.siteUrl + (path === '/' ? '' : path);
     if (kParam && !isKeywordInvalid) {
-      canonicalUrl += `?k=${encodeURIComponent(kParam)}`;
+      // Decode and cleanly re-encode k parameter to ensure safe URL parsing without utm tracking
+      const sortedKeywords = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
+      let matchedService = null;
+      let extractedRegionName = '';
+      for (const s of sortedKeywords) {
+        if (kParam.endsWith(`-${s.keyword}`)) {
+          matchedService = s;
+          extractedRegionName = kParam.substring(0, kParam.length - s.keyword.length - 1);
+          break;
+        }
+      }
+      if (matchedService && extractedRegionName) {
+        canonicalUrl += `?k=${encodeURIComponent(extractedRegionName + '-' + matchedService.keyword)}`;
+      }
     }
     let linkEl = document.querySelector('link[rel="canonical"]');
     if (!linkEl) {
