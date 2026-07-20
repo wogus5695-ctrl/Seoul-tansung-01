@@ -119,24 +119,69 @@ export default async function handler(req, res) {
     for (const metro of metroGroups) {
       seoContent += '<div style="margin-bottom: 50px;">';
       seoContent += '<h2 style="font-size: 1.6rem; color: #183f35; border-bottom: 3px solid #183f35; padding-bottom: 10px; margin-bottom: 24px;">' + metro.label + '</h2>';
-      seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">';
+      // Group regions by hierarchy: 시 단위, 구 단위, 동 단위
+      const regionsInMetro = [];
       for (const distName of metro.districts) {
-        seoContent += '<div style="border: 1px solid #e5e5e5; padding: 20px; border-radius: 4px; background: #fff;">';
-        seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px; margin-bottom: 12px;">' + distName + '</h3>';
-        for (const reg of metro.grouped[distName]) {
-          seoContent += '<div style="margin-bottom: 14px;">';
-          seoContent += '<h4 style="font-size: 0.95rem; color: #555; margin: 4px 0;">' + reg.name + '</h4>';
+        regionsInMetro.push(...metro.grouped[distName]);
+      }
+
+      // Filter and sort by level
+      const cities = regionsInMetro.filter(r => r.type === 'city').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+      const districts = regionsInMetro.filter(r => r.type === 'district').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+      const dongs = regionsInMetro.filter(r => r.type === 'dong' || r.regionType === 'dong').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+
+      seoContent += '<div style="margin-bottom: 30px;">';
+      
+      // 1. 시 단위 키워드 출력
+      if (cities.length > 0) {
+        seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; margin-top: 20px; border-left: 4px solid #183f35; padding-left: 8px;">[시 단위 키워드]</h3>';
+        seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
+        cities.forEach(reg => {
+          seoContent += '<div style="border: 1px solid #e5e5e5; padding: 16px; border-radius: 4px; background: #fff;">';
+          seoContent += '<h4 style="font-size: 0.95rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h4>';
           seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
-          for (const k of serviceKeywords) {
+          serviceKeywords.forEach(k => {
             const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
             seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.name + ' ' + k.keyword + '</a></li>';
-          }
-          seoContent += '</ul>';
-          seoContent += '</div>';
-        }
+          });
+          seoContent += '</ul></div>';
+        });
         seoContent += '</div>';
       }
-      seoContent += '</div>';
+
+      // 2. 구 단위 키워드 출력
+      if (districts.length > 0) {
+        seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; margin-top: 20px; border-left: 4px solid #183f35; padding-left: 8px;">[구 단위 키워드]</h3>';
+        seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
+        districts.forEach(reg => {
+          seoContent += '<div style="border: 1px solid #e5e5e5; padding: 16px; border-radius: 4px; background: #fff;">';
+          seoContent += '<h4 style="font-size: 0.95rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h4>';
+          seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
+          serviceKeywords.forEach(k => {
+            const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
+            seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.name + ' ' + k.keyword + '</a></li>';
+          });
+          seoContent += '</ul></div>';
+        });
+        seoContent += '</div>';
+      }
+
+      // 3. 동·읍·면 단위 키워드 출력
+      if (dongs.length > 0) {
+        seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; margin-top: 20px; border-left: 4px solid #183f35; padding-left: 8px;">[동·읍·면 단위 키워드]</h3>';
+        seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
+        dongs.forEach(reg => {
+          seoContent += '<div style="border: 1px solid #e5e5e5; padding: 16px; border-radius: 4px; background: #fff;">';
+          seoContent += '<h4 style="font-size: 0.95rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h4>';
+          seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
+          serviceKeywords.forEach(k => {
+            const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
+            seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.name + ' ' + k.keyword + '</a></li>';
+          });
+          seoContent += '</ul></div>';
+        });
+        seoContent += '</div>';
+      }
       seoContent += '</div>';
     }
     seoContent += '</div>';
