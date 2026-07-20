@@ -12,6 +12,51 @@ export default async function handler(req, res) {
   const kParam = url.searchParams.get('k')?.trim() || '';
   const pathname = url.pathname;
 
+  // 301 Permanent Redirect logic for old joined error URLs
+  // e.g. 고양시-백석동-탄성코트 -> 백석동-탄성코트
+  if (kParam) {
+    const sortedKeywords = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
+    let matchedService = null;
+    let prefix = '';
+    
+    for (const s of sortedKeywords) {
+      if (kParam.endsWith(`-${s.keyword}`)) {
+        matchedService = s;
+        prefix = kParam.substring(0, kParam.length - s.keyword.length - 1);
+        break;
+      }
+    }
+
+    if (matchedService && prefix) {
+      // If the prefix has spaces or multiple hyphens representing joined parent units (e.g. "고양시-백석동", "계양-작전동")
+      // and we have a clean target URL (using r.officialName/slugKey), let's redirect.
+      // But wait! To prevent breaking same-dong collision resolved targets:
+      // "7단계에서 동일 지역명 또는 URL 충돌로 보류된 항목은 임의로 리디렉션하지 마."
+      // So if the prefix belongs to a collision dong (e.g. "계양-작전동", "부천-중동"), we DO NOT redirect because they need to retain their unique URL.
+      // But for normal dongs like "고양시-백석동" where "백석동" has no other collisions, we redirect "고양시-백석동-탄성코트" to "백석동-탄성코트"!
+      
+      const activeList = getActiveRegions();
+      // Find the region matching current urlRegion prefix
+      const currentReg = activeList.find(r => r.urlRegion === prefix);
+      
+      if (currentReg && currentReg.metro !== '서울') {
+        const isCollisionDong = currentReg.collisionResolved && currentReg.duplicateWithinIncheon || currentReg.duplicateWithinGyeonggi || currentReg.collisionReason;
+        
+        // If it is NOT a collision dong, and prefix is joined (has multiple parts like city-dong)
+        // e.g. currentReg.urlRegion has '-' and is not a collision dong, we redirect to clean officialName slug.
+        // Wait, for 김포-고촌읍, 고촌읍 is not a collision, but urlRegion is 'gochon-eup'.
+        // If the user accessed using an old joined URL like 'gimpo-gochon-eup-탄성코트', redirect it!
+        // Let's check if the URL is different from the clean canonical URL format:
+        const expectedCanonicalSlug = currentReg.urlRegion;
+        if (prefix !== expectedCanonicalSlug && !isCollisionDong) {
+          const redirectUrl = `https://www.barumspace.co.kr/?k=${encodeURIComponent(expectedCanonicalSlug + '-' + matchedService.keyword)}`;
+          res.setHeader('Location', redirectUrl);
+          return res.status(301).end();
+        }
+      }
+    }
+  }
+
   // Read index.html compiled template from the deployment output
   // Vercel routes index.html as a static asset, we can read it from the relative build output path
   let htmlPath = path.join(process.cwd(), 'dist', 'index.html');
@@ -26,7 +71,7 @@ export default async function handler(req, res) {
     const hubTitle = "서울·인천·경기 탄성코트·줄눈시공 지역별 페이지 | 바름공간";
     const hubDesc = "서울·인천·경기 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지를 확인할 수 있습니다.";
     
-    const hubCanonical = "https://seoul-tansung-01.vercel.app/sitemap-seoul";
+    const hubCanonical = "https://www.barumspace.co.kr/sitemap-seoul";
 
     // Replace Meta Tags
     html = html.replace(/<title>.*?<\/title>/, "<title>" + hubTitle + "</title>");
@@ -158,8 +203,8 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${desc}" />`);
 
       // Clean parameter representation (strips tracking tags)
-      const cleanCanonical = `https://seoul-tansung-01.vercel.app/?k=${encodeURIComponent(matchedRegion.urlRegion + '-' + taskName)}` + (usePreview ? '&preview=true' : '');
-      const seoThumbnailUrl = "https://seoul-tansung-01.vercel.app/images/seo/bareumgonggan-search-thumbnail-v1.png";
+      const cleanCanonical = `https://www.barumspace.co.kr/?k=${encodeURIComponent(matchedRegion.urlRegion + '-' + taskName)}` + (usePreview ? '&preview=true' : '');
+      const seoThumbnailUrl = "https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v1.png";
       
       const additionalMetaTags = `
 <link rel="canonical" href="${cleanCanonical}" />
@@ -305,7 +350,7 @@ export default async function handler(req, res) {
   }
 
   // Fallback to serving the normal main page HTML
-  const mainCanonical = "https://seoul-tansung-01.vercel.app/";
+  const mainCanonical = "https://www.barumspace.co.kr/";
   html = html.replace('</head>', `<link rel="canonical" href="${mainCanonical}" />\n<meta property="og:url" content="${mainCanonical}" />\n</head>`);
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
