@@ -92,8 +92,18 @@ function buildIndexes() {
     const slug = normalizeKeywordParam(r.slugKey);
     if (!slug || slug.includes('--') || slug.startsWith('-') || slug.endsWith('-')) return;
 
+    // Determine parentId based on type. 광역시 -> 구 -> 동
+    const type = r.regionType === 'district' ? 'district' : 'dong';
+    const parentId = r.regionType === 'district' ? 'incheon' : `incheon-${r.groupName}`;
+    const uniqueId = r.regionType === 'district' ? `incheon-${r.groupName}` : `incheon-${r.groupName}-${r.officialName}`;
+
     const entry = {
       ...r,
+      id: uniqueId,
+      name: r.displayName, // name field mapping
+      type: type,
+      parentId: parentId,
+      generateKeyword: true,
       city: '인천시',
       urlRegion: r.slugKey
     };
@@ -116,8 +126,29 @@ function buildIndexes() {
     const slug = normalizeKeywordParam(r.slugKey);
     if (!slug || slug.includes('--') || slug.startsWith('-') || slug.endsWith('-')) return;
 
+    // Determine type and parent hierarchy:
+    // 경기 -> 시 -> (일반구 있을 시 구) -> 동
+    let type = 'dong';
+    let parentId = 'gyeonggi';
+    if (r.regionType === 'district') {
+      type = r.officialName.endsWith('구') ? 'district' : 'city';
+      parentId = r.officialName.endsWith('구') ? `gyeonggi-${r.city}` : 'gyeonggi';
+    } else {
+      // For dongs, parent is the city or district
+      parentId = r.groupName ? `gyeonggi-${r.groupName}` : `gyeonggi-${r.city}`;
+    }
+
+    const uniqueId = r.regionType === 'district' 
+      ? `gyeonggi-${r.officialName}` 
+      : `gyeonggi-${r.city}-${r.groupName || ''}-${r.officialName}`;
+
     const entry = {
       ...r,
+      id: uniqueId,
+      name: r.displayName,
+      type: type,
+      parentId: parentId,
+      generateKeyword: true,
       urlRegion: r.slugKey
     };
 
