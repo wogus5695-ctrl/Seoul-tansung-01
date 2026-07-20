@@ -85,7 +85,7 @@ function buildIndexes() {
   incheonRegions.forEach(r => {
     // 운영 활성화 대상 검증 필터링
     if (!r.officialName || !r.displayName || !r.slugKey) return;
-    if (r.requiresCollisionReview || r.collisionResolved === false) return; // 충돌 검토 및 해소 여부 확인
+    if (r.regionType !== 'district' && (r.requiresCollisionReview || r.collisionResolved === false)) return; // 동 단위에만 충돌 제한 적용
     if (r.requiresOfficialReview) return;
     
     // URL 적합성 검사
@@ -109,8 +109,8 @@ function buildIndexes() {
     };
 
     previewRegionIndex.set(slug, entry);
-    // 원래 active: false 로 비활성 상태로 들어간 인천구 데이터 중 collisionResolved가 완료된 항목은 운영에 포함
-    if (r.active || ENABLE_CAPITAL_REGION_EXPANSION) {
+    // 원래 active: false 로 비활성 상태로 들어간 인천구 데이터 중 collisionResolved가 완료된 항목 혹은 구 단위인 경우 운영에 활성 노출
+    if (r.active || r.regionType === 'district' || ENABLE_CAPITAL_REGION_EXPANSION) {
       activeRegionIndex.set(slug, entry);
     }
   });
@@ -119,7 +119,7 @@ function buildIndexes() {
   gyeonggiRegions.forEach(r => {
     // 운영 활성화 대상 검증 필터링
     if (!r.officialName || !r.displayName || !r.slugKey) return;
-    if (r.requiresCollisionReview || r.collisionResolved === false) return; // 충돌 검토 및 해소 여부 확인
+    if (r.regionType !== 'district' && (r.requiresCollisionReview || r.collisionResolved === false)) return;
     if (r.requiresOfficialReview) return;
 
     // URL 적합성 검사
@@ -153,7 +153,7 @@ function buildIndexes() {
     };
 
     previewRegionIndex.set(slug, entry);
-    if (r.active || ENABLE_CAPITAL_REGION_EXPANSION) {
+    if (r.active || r.regionType === 'district' || ENABLE_CAPITAL_REGION_EXPANSION) {
       activeRegionIndex.set(slug, entry);
     }
   });
