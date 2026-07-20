@@ -1,5 +1,6 @@
-import { seoulRegions } from '../src/data/seoulRegions.js';
+import { parseAndValidateK, getActiveRegions } from '../src/data/regionResolver.js';
 import { serviceKeywords } from '../src/data/serviceKeywords.js';
+import { seoulRegions } from '../src/data/seoulRegions.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -103,23 +104,12 @@ export default async function handler(req, res) {
 
   // Handle Dynamic SEO pages (?k=지역명-작업명)
   if (kParam) {
-    const sortedKeywords = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
-    let matchedService = null;
-    let extractedRegionName = '';
+    const usePreview = url.searchParams.get('preview') === 'true';
+    const parseResult = parseAndValidateK(kParam, usePreview);
 
-    for (const s of sortedKeywords) {
-      if (kParam.endsWith(`-${s.keyword}`)) {
-        matchedService = s;
-        extractedRegionName = kParam.substring(0, kParam.length - s.keyword.length - 1);
-        break;
-      }
-    }
-
-    const matchedRegion = matchedService ? seoulRegions.find(
-      r => r.displayName === extractedRegionName || r.normalizedName === extractedRegionName
-    ) : null;
-
-    if (matchedService && matchedRegion) {
+    if (parseResult.isValid) {
+      const matchedRegion = parseResult.region;
+      const matchedService = parseResult.service;
       const regionName = matchedRegion.displayName;
       const taskName = matchedService.keyword;
 
@@ -156,7 +146,7 @@ export default async function handler(req, res) {
       // 2. Dynamic Meta Description Mapping
       let desc = "";
       if (matchedService.serviceGroup === 'elastic') {
-        desc = `${regionName} ${taskName} 시공 전 기존 벽면의 들뜸과 오염 상태를 확인하고, 베란다·세탁실 바탕면 정리부터 필요한 마감 범위를 안내합니다.`;
+        desc = `${regionName} ${taskName} 시공 전 기존 벽면의 들뜸 and 오염 상태를 확인하고, 베란다·세탁실 바탕면 정리부터 필요한 마감 범위를 안내합니다.`;
       } else {
         desc = `${regionName} ${taskName} 전 기존 줄눈의 오염과 갈라짐을 확인하고, 필요한 제거 범위와 욕실 환경에 맞는 자재·색상을 안내합니다.`;
       }
@@ -168,7 +158,7 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${desc}" />`);
 
       // Clean parameter representation (strips tracking tags)
-      const cleanCanonical = `https://seoul-tansung-01.vercel.app/?k=${encodeURIComponent(regionName + '-' + taskName)}`;
+      const cleanCanonical = `https://seoul-tansung-01.vercel.app/?k=${encodeURIComponent(matchedRegion.urlRegion + '-' + taskName)}` + (usePreview ? '&preview=true' : '');
       const seoThumbnailUrl = "https://seoul-tansung-01.vercel.app/images/seo/bareumgonggan-search-thumbnail-v1.png";
       
       const additionalMetaTags = `
