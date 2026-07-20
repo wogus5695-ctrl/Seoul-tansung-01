@@ -80,11 +80,11 @@ export default async function handler(req, res) {
         seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px; margin-bottom: 12px;">' + distName + '</h3>';
         for (const reg of metro.grouped[distName]) {
           seoContent += '<div style="margin-bottom: 14px;">';
-          seoContent += '<h4 style="font-size: 0.95rem; color: #555; margin: 4px 0;">' + reg.displayName + '</h4>';
+          seoContent += '<h4 style="font-size: 0.95rem; color: #555; margin: 4px 0;">' + reg.name + '</h4>';
           seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
           for (const k of serviceKeywords) {
             const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
-            seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.displayName + ' ' + k.keyword + '</a></li>';
+            seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.name + ' ' + k.keyword + '</a></li>';
           }
           seoContent += '</ul>';
           seoContent += '</div>';
