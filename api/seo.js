@@ -1,3 +1,4 @@
+import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { parseAndValidateK, getActiveRegions } from '../src/data/regionResolver.js';
 import { serviceKeywords } from '../src/data/serviceKeywords.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
@@ -12,8 +13,8 @@ export default async function handler(req, res) {
   const kParam = url.searchParams.get('k')?.trim() || '';
   const pathname = url.pathname;
 
-  // 301 Permanent Redirect logic for old joined error URLs
-  // e.g. 고양시-백석동-탄성코트 -> 백석동-탄성코트
+  // 301 Permanent Redirect logic for old joined error URLs and long keywords
+  // e.g. 부평구-산곡동-탄성코트 -> 부평-산곡동-탄성코트, 안양-비산동-탄성코트 -> bisan-dong-탄성코트
   if (kParam) {
     const sortedKeywords = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
     let matchedService = null;
@@ -27,32 +28,41 @@ export default async function handler(req, res) {
       }
     }
 
+
     if (matchedService && prefix) {
-      // If the prefix has spaces or multiple hyphens representing joined parent units (e.g. "고양시-백석동", "계양-작전동")
-      // and we have a clean target URL (using r.officialName/slugKey), let's redirect.
-      // But wait! To prevent breaking same-dong collision resolved targets:
-      // "7단계에서 동일 지역명 또는 URL 충돌로 보류된 항목은 임의로 리디렉션하지 마."
-      // So if the prefix belongs to a collision dong (e.g. "계양-작전동", "부천-중동"), we DO NOT redirect because they need to retain their unique URL.
-      // But for normal dongs like "고양시-백석동" where "백석동" has no other collisions, we redirect "고양시-백석동-탄성코트" to "백석동-탄성코트"!
-      
-      const activeList = getActiveRegions();
-      // Find the region matching current urlRegion prefix
-      const currentReg = activeList.find(r => r.urlRegion === prefix);
-      
-      if (currentReg && currentReg.metro !== '서울') {
-        const isCollisionDong = currentReg.collisionResolved && currentReg.duplicateWithinIncheon || currentReg.duplicateWithinGyeonggi || currentReg.collisionReason;
-        
-        // If it is NOT a collision dong, and prefix is joined (has multiple parts like city-dong)
-        // e.g. currentReg.urlRegion has '-' and is not a collision dong, we redirect to clean officialName slug.
-        // Wait, for 김포-고촌읍, 고촌읍 is not a collision, but urlRegion is 'gochon-eup'.
-        // If the user accessed using an old joined URL like 'gimpo-gochon-eup-탄성코트', redirect it!
-        // Let's check if the URL is different from the clean canonical URL format:
-        const expectedCanonicalSlug = currentReg.urlRegion;
-        if (prefix !== expectedCanonicalSlug && !isCollisionDong) {
-          const redirectUrl = `https://www.barumspace.co.kr/?k=${encodeURIComponent(expectedCanonicalSlug + '-' + matchedService.keyword)}`;
-          res.setHeader('Location', redirectUrl);
-          return res.status(301).end();
+      // Find if prefix matches any clean routeKey
+      const directMatch = keywordMetadata.find(km => km.routeKey === prefix);
+      let targetRouteKey = null;
+
+
+      if (directMatch) {
+        // Already clean or matched
+      } else {
+        // If not direct match, extract parent prefix and clean dong name
+        const parts = prefix.split('-');
+        const dongName = parts[parts.length - 1];
+        const parentPrefix = parts.slice(0, -1).join('-');
+
+        const candidates = keywordMetadata.filter(km => km.displayRegion === dongName && km.type === 'dong');
+        if (candidates.length === 1) {
+          targetRouteKey = candidates[0].routeKey;
+        } else if (candidates.length > 1 && parentPrefix) {
+          const cleanParentPrefix = parentPrefix.replace(/구$/, '').replace(/시$/, '');
+          const matchedTarget = candidates.find(cand => {
+            const parentClean = cand.parentRegion.replace(/구/g, '').replace(/시/g, '').replace(/권/g, '');
+            return parentClean.includes(cleanParentPrefix);
+          });
+          if (matchedTarget) {
+            targetRouteKey = matchedTarget.routeKey;
+          }
         }
+      }
+
+
+      if (targetRouteKey) {
+        const redirectUrl = `https://www.barumspace.co.kr/?k=${encodeURIComponent(targetRouteKey + '-' + matchedService.keyword)}`;
+        res.setHeader('Location', redirectUrl);
+        return res.status(301).end();
       }
     }
   }
@@ -84,102 +94,95 @@ export default async function handler(req, res) {
 
     // Fetch all active production regions
     const activeList = getActiveRegions();
-    const seoulList = activeList.filter(r => r.metro === '서울');
-    const incheonList = activeList.filter(r => r.metro === '인천');
-    const gyeonggiList = activeList.filter(r => r.metro === '경기');
+    
+    // Grouping
+    const metroGroups = {
+      '서울권': { label: '서울권', cities: {} },
+      '경기권': { label: '경기권', cities: {} },
+      '인천권': { label: '인천권', cities: {} }
+    };
 
-    const seoulDistricts = Array.from(new Set(seoulList.map(r => r.districtName))).sort();
-    const seoulGrouped = {};
-    seoulDistricts.forEach(dist => {
-      seoulGrouped[dist] = seoulList.filter(r => r.districtName === dist);
+    activeList.forEach(r => {
+      const metroKey = r.metro === '서울' ? '서울권' : (r.metro === '인천' ? '인천권' : '경기권');
+      const group = metroGroups[metroKey];
+      
+      if (r.metro === '서울' || r.metro === '인천') {
+        const cityKey = r.groupName;
+        if (!group.cities[cityKey]) {
+          group.cities[cityKey] = {
+            name: cityKey,
+            districts: {
+              '전체': { name: '전체', regions: [] }
+            }
+          };
+        }
+        group.cities[cityKey].districts['전체'].regions.push(r);
+      } else {
+        // Gyeonggi
+        const cityKey = r.city;
+        if (!group.cities[cityKey]) {
+          group.cities[cityKey] = {
+            name: cityKey,
+            districts: {}
+          };
+        }
+        
+        const isDistrict = r.groupName && r.groupName.endsWith('구') && r.groupName !== r.city;
+        const distKey = isDistrict ? r.groupName : '시 단위';
+        
+        if (!group.cities[cityKey].districts[distKey]) {
+          group.cities[cityKey].districts[distKey] = {
+            name: distKey,
+            regions: []
+          };
+        }
+        group.cities[cityKey].districts[distKey].regions.push(r);
+      }
     });
-
-    const incheonDistricts = Array.from(new Set(incheonList.map(r => r.groupName))).sort();
-    const incheonGrouped = {};
-    incheonDistricts.forEach(dist => {
-      incheonGrouped[dist] = incheonList.filter(r => r.groupName === dist);
-    });
-
-    const gyeonggiDistricts = Array.from(new Set(gyeonggiList.map(r => r.groupName))).sort();
-    const gyeonggiGrouped = {};
-    gyeonggiDistricts.forEach(dist => {
-      gyeonggiGrouped[dist] = gyeonggiList.filter(r => r.groupName === dist);
-    });
-
-    const metroGroups = [
-      { label: '서울 권역', districts: seoulDistricts, grouped: seoulGrouped },
-      { label: '인천 권역', districts: incheonDistricts, grouped: incheonGrouped },
-      { label: '경기 권역', districts: gyeonggiDistricts, grouped: gyeonggiGrouped }
-    ];
 
     let seoContent = '<div style="padding: 40px; max-width: 1200px; margin: 0 auto; font-family: sans-serif;">';
     seoContent += '<h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px;">서울·인천·경기 탄성코트·줄눈시공 지역별 페이지 안내</h1>';
-    seoContent += '<p style="color: #666; margin-bottom: 40px;">서울·인천·경기 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지안내 목록입니다.</p>';
+    seoContent += '<p style="color: #666; margin-bottom: 40px;">서울·인천·경기 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지 안내 목록입니다.</p>';
 
-    for (const metro of metroGroups) {
+    for (const metroKey of Object.keys(metroGroups)) {
+      const metro = metroGroups[metroKey];
       seoContent += '<div style="margin-bottom: 50px;">';
       seoContent += '<h2 style="font-size: 1.6rem; color: #183f35; border-bottom: 3px solid #183f35; padding-bottom: 10px; margin-bottom: 24px;">' + metro.label + '</h2>';
-      // Group regions by hierarchy: 시 단위, 구 단위, 동 단위
-      const regionsInMetro = [];
-      for (const distName of metro.districts) {
-        regionsInMetro.push(...metro.grouped[distName]);
-      }
 
-      // Filter and sort by level
-      const cities = regionsInMetro.filter(r => r.type === 'city').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-      const districts = regionsInMetro.filter(r => r.type === 'district').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-      const dongs = regionsInMetro.filter(r => r.type === 'dong' || r.regionType === 'dong').sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-
-      seoContent += '<div style="margin-bottom: 30px;">';
-      
-      // 1. 시 단위 키워드 출력
-      if (cities.length > 0) {
-        seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; margin-top: 20px; border-left: 4px solid #183f35; padding-left: 8px;">[시 단위 키워드]</h3>';
-        seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
-        cities.forEach(reg => {
-          seoContent += '<div style="border: 1px solid #e5e5e5; padding: 16px; border-radius: 4px; background: #fff;">';
-          seoContent += '<h4 style="font-size: 0.95rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h4>';
-          seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
-          serviceKeywords.forEach(k => {
-            const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
-            seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.name + ' ' + k.keyword + '</a></li>';
-          });
-          seoContent += '</ul></div>';
+      for (const cityKey of Object.keys(metro.cities)) {
+        const city = metro.cities[cityKey];
+        
+        // Count children
+        let childCount = 0;
+        Object.keys(city.districts).forEach(dk => {
+          childCount += city.districts[dk].regions.length;
         });
-        seoContent += '</div>';
-      }
 
-      // 2. 구 단위 키워드 출력
-      if (districts.length > 0) {
-        seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; margin-top: 20px; border-left: 4px solid #183f35; padding-left: 8px;">[구 단위 키워드]</h3>';
-        seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
-        districts.forEach(reg => {
-          seoContent += '<div style="border: 1px solid #e5e5e5; padding: 16px; border-radius: 4px; background: #fff;">';
-          seoContent += '<h4 style="font-size: 0.95rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h4>';
-          seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
-          serviceKeywords.forEach(k => {
-            const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
-            seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.name + ' ' + k.keyword + '</a></li>';
-          });
-          seoContent += '</ul></div>';
-        });
-        seoContent += '</div>';
-      }
+        seoContent += '<div style="margin-bottom: 30px; border: 1px solid #e5e5e5; padding: 20px; border-radius: 6px; background: #fff;">';
+        seoContent += '<h3 style="font-size: 1.3rem; color: #183f35; margin: 0 0 16px 0; border-bottom: 1px dashed #e5e5e5; padding-bottom: 8px;">' + cityKey + ' <span style="font-size: 0.9rem; color: #666; font-weight: normal;">(하위 지역: ' + childCount + '개)</span></h3>';
 
-      // 3. 동·읍·면 단위 키워드 출력
-      if (dongs.length > 0) {
-        seoContent += '<h3 style="font-size: 1.2rem; color: #183f35; margin-top: 20px; border-left: 4px solid #183f35; padding-left: 8px;">[동·읍·면 단위 키워드]</h3>';
-        seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
-        dongs.forEach(reg => {
-          seoContent += '<div style="border: 1px solid #e5e5e5; padding: 16px; border-radius: 4px; background: #fff;">';
-          seoContent += '<h4 style="font-size: 0.95rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h4>';
-          seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
-          serviceKeywords.forEach(k => {
-            const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
-            seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.name + ' ' + k.keyword + '</a></li>';
+        for (const distKey of Object.keys(city.districts)) {
+          const district = city.districts[distKey];
+          
+          if (distKey !== '전체') {
+            seoContent += '<h4 style="font-size: 1.05rem; color: #183f35; margin-top: 16px; margin-bottom: 8px;">[' + distKey + ']</h4>';
+          }
+
+          seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
+          
+          district.regions.forEach(reg => {
+            seoContent += '<div style="border: 1px solid #eee; padding: 12px; border-radius: 4px; background: #fafafa;">';
+            seoContent += '<h5 style="font-size: 0.9rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h5>';
+            seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
+            serviceKeywords.forEach(k => {
+              const encoded = encodeURIComponent(reg.urlRegion + '-' + k.keyword);
+              seoContent += '<li><a href="/?k=' + encoded + '" style="color: #0076ff; text-decoration: none;">' + reg.displayName + ' ' + k.keyword + '</a></li>';
+            });
+            seoContent += '</ul></div>';
           });
-          seoContent += '</ul></div>';
-        });
+
+          seoContent += '</div>';
+        }
         seoContent += '</div>';
       }
       seoContent += '</div>';
@@ -212,7 +215,7 @@ export default async function handler(req, res) {
       } else if (taskName === '베란다탄성코트') {
         title = `${regionName} 베란다탄성코트 | 벽면 상태 확인과 마감 시공`;
       } else if (taskName === '세탁실탄성코트') {
-        title = `${regionName} 세탁실탄성코트 | 배관 주변과 벽면 마감`;
+        title = `${regionName} 세탁실탄성코트 | 배관 주변 and 벽면 마감`;
       } else if (taskName === '아파트탄성코트') {
         title = `${regionName} 아파트탄성코트 | 베란다·세탁실 시공 안내`;
       } else if (taskName === '탄성코트업체') {
@@ -236,7 +239,7 @@ export default async function handler(req, res) {
       // 2. Dynamic Meta Description Mapping
       let desc = "";
       if (matchedService.serviceGroup === 'elastic') {
-        desc = `${regionName} ${taskName} 시공 전 기존 벽면의 들뜸 and 오염 상태를 확인하고, 베란다·세탁실 바탕면 정리부터 필요한 마감 범위를 안내합니다.`;
+        desc = `${regionName} ${taskName} 시공 전 기존 벽면의 들뜸 및 오염 상태를 확인하고, 베란다·세탁실 바탕면 정리부터 필요한 마감 범위를 안내합니다.`;
       } else {
         desc = `${regionName} ${taskName} 전 기존 줄눈의 오염과 갈라짐을 확인하고, 필요한 제거 범위와 욕실 환경에 맞는 자재·색상을 안내합니다.`;
       }
@@ -248,156 +251,26 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${desc}" />`);
 
       // Clean parameter representation (strips tracking tags)
-      const cleanCanonical = `https://www.barumspace.co.kr/?k=${encodeURIComponent(matchedRegion.urlRegion + '-' + taskName)}` + (usePreview ? '&preview=true' : '');
-      const seoThumbnailUrl = "https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v1.png";
-      
-      const additionalMetaTags = `
-<link rel="canonical" href="${cleanCanonical}" />
-<meta property="og:url" content="${cleanCanonical}" />
-<meta property="og:image" content="${seoThumbnailUrl}" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="1200" />
-<meta property="og:image:type" content="image/png" />
-<meta property="og:image:alt" content="바름공간 탄성코트·줄눈시공 전문 업체" />
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="${seoThumbnailUrl}" />
-<meta name="twitter:image:alt" content="바름공간 탄성코트·줄눈시공 전문 업체" />
-<link rel="image_src" href="${seoThumbnailUrl}" />
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "${title}",
-  "description": "${desc}",
-  "url": "${cleanCanonical}",
-  "primaryImageOfPage": {
-    "@type": "ImageObject",
-    "url": "${seoThumbnailUrl}",
-    "width": 1200,
-    "height": 1200
-  }
-}
-</script>
-</head>`;
-      
-      html = html.replace('</head>', additionalMetaTags);
+      const cleanParam = encodeURIComponent(matchedRegion.urlRegion + '-' + matchedService.keyword);
+      const cleanUrl = `https://www.barumspace.co.kr/?k=${cleanParam}`;
 
-      // 3. Pre-render Content split by Service Group
-      let bodyHtml = "";
-      if (matchedService.serviceGroup === 'elastic') {
-        bodyHtml = `
-          <div style="padding: 20px; font-family: sans-serif; line-height: 1.6;">
-            <h1>${regionName} ${taskName}</h1>
-            <p><strong>공간 구분:</strong> ${matchedService.primarySpace}</p>
-            <h2>히어로 소개</h2>
-            <p>${matchedService.heroTitleTemplate} - ${matchedService.heroDescriptionTemplate}</p>
-            
-            <h2>탄성코트 핵심 마감 설명</h2>
-            <ul>
-              <li>베란다·세탁실·다용도실 벽면 노후 분석</li>
-              <li>기존 페인트 도장막 들뜸 및 곰팡이 유발 부위 긁어내기</li>
-              <li>균열 틈새 실리콘 보강 보수 진행</li>
-              <li>단순 결로 관리와 배관 주위 누수 원인의 선행 구분 검토</li>
-              <li>경화 시점의 자연스러운 건조 및 환기 프로세스</li>
-              <li>친환경 마모 방지 세라믹 펄 색상 선정</li>
-            </ul>
+      // Inject Canonical & OpenGraph URL
+      html = html.replace('</head>', `<link rel="canonical" href="${cleanUrl}" />\n<meta property="og:url" content="${cleanUrl}" />\n</head>`);
 
-            <h2>시공 과정 안내</h2>
-            <ol>
-              <li>사진 상담: 공간 상태와 부식 부위의 사진을 확인합니다.</li>
-              <li>기존 상태 확인: 도막 들뜸과 누수 징후를 판별합니다.</li>
-              <li>범위·자재 안내: 작업 면적과 자재 특성을 공유합니다.</li>
-              <li>바탕 정리·시공: 친환경 탄성코팅재 정밀 스프레이 분사를 진행합니다.</li>
-              <li>마감 검수: 도포 도막 두께 확인 및 세부 양생 가이드를 전송합니다.</li>
-            </ol>
+      // Pre-render content for bots (H1 and localized texts)
+      let botContent = `<div style="display:none;" id="seo-pre-rendered">`;
+      botContent += `<h1>${regionName} ${taskName}</h1>`;
+      botContent += `<p>${desc}</p>`;
+      botContent += `</div>`;
 
-            <h2>자주 묻는 질문 (FAQ)</h2>
-            <dl>
-              ${matchedService.faqSet.map(q => `
-                <dt><strong>Q. ${q}</strong></dt>
-                <dd>A. 시공 전 환경 진단과 전문 전처리를 통해 안전하고 오래 유지되는 시공 품질을 보증합니다.</dd>
-              `).join('')}
-            </dl>
-          </div>
-        `;
-      } else {
-        bodyHtml = `
-          <div style="padding: 20px; font-family: sans-serif; line-height: 1.6;">
-            <h1>${regionName} ${taskName}</h1>
-            <p><strong>공간 구분:</strong> ${matchedService.primarySpace}</p>
-            <h2>히어로 소개</h2>
-            <p>${matchedService.heroTitleTemplate} - ${matchedService.heroDescriptionTemplate}</p>
-            
-            <h2>줄눈시공 핵심 마감 설명</h2>
-            <ul>
-              <li>욕실·화장실·현관·베란다 타일 틈의 시멘트 노화 점검</li>
-              <li>기존 백시멘트 줄눈 균일 깊이(기초 파내기) 홈파기 처리</li>
-              <li>타일 옆면 접착면 확보를 통한 이탈성 탈락 방지</li>
-              <li>습기가 장기 고이는 샤워부스 및 욕실 바닥 친환경 줄눈제 배합</li>
-              <li>현관 및 오염 부위 은펄, 실버 등 맞춤형 인테리어 조색 선택</li>
-              <li>건조 시간 동안의 통행 차단 및 안전 양생 관리</li>
-            </ul>
+      html = html.replace('<div id="root"></div>', `<div id="root"></div>\n${botContent}`);
 
-            <h2>시공 과정 안내</h2>
-            <ol>
-              <li>사진 상담: 타일 간격 및 실리콘 손상부 사진을 분석합니다.</li>
-              <li>기존 상태 확인: 백시멘트 강도와 균열 상태를 진단합니다.</li>
-              <li>범위·자재 안내: 줄눈 홈 깊이 설계와 조색을 의논합니다.</li>
-              <li>바탕 정리·시공: 숙련된 충진기를 사용하여 친환경 줄눈제를 홈에 정밀 주입합니다.</li>
-              <li>마감 검수: 표면 광택 상태 확인 및 양생 완료 시점 안내를 완료합니다.</li>
-            </ol>
-
-            <h2>자주 묻는 질문 (FAQ)</h2>
-            <dl>
-              ${matchedService.faqSet.map(q => `
-                <dt><strong>Q. ${q}</strong></dt>
-                <dd>A. 시공 전 환경 진단과 전문 전처리를 통해 안전하고 오래 유지되는 시공 품질을 보증합니다.</dd>
-              `).join('')}
-            </dl>
-          </div>
-        `;
-      }
-
-      html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(html);
-    } else {
-      // Return HTTP 404 with standard Error HTML and noindex
-      const errorTitle = "페이지를 찾을 수 없습니다";
-      const errorDesc = "요청하신 시공 정보 또는 지역명이 정확하지 않습니다.";
-
-      html = html.replace(/<title>.*?<\/title>/, `<title>${errorTitle}</title>`);
-      html = html.replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${errorDesc}" />`);
-      html = html.replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${errorTitle}" />`);
-      html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${errorDesc}" />`);
-
-      // Inject noindex meta, remove og:url / canonical tags
-      html = html.replace('</head>', `<meta name="robots" content="noindex, follow" />\n</head>`);
-
-      const errorBody = `
-        <div style="padding: 80px 20px; font-family: sans-serif; text-align: center;">
-          <h1 style="font-size: 2rem; color: #183f35; margin-bottom: 16px;">요청한 페이지를 찾을 수 없습니다</h1>
-          <p style="color: #666; margin-bottom: 30px; font-size: 1.05rem; line-height: 1.6;">
-            입력한 지역명 또는 시공 서비스가 등록되어 있지 않습니다.<br />
-            지역별 페이지 안내에서 정상적인 서비스 페이지를 확인해 주세요.
-          </p>
-          <div style="display: flex; justify-content: center; gap: 16px;">
-            <a href="/" style="display: inline-block; padding: 12px 24px; background-color: #183f35; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold;">메인 페이지로 이동</a>
-            <a href="/sitemap-seoul" style="display: inline-block; padding: 12px 24px; border: 1px solid #183f35; color: #183f35; text-decoration: none; border-radius: 4px; font-weight: bold;">서울 지역별 페이지 확인</a>
-          </div>
-        </div>
-      `;
-      html = html.replace('<div id="root"></div>', `<div id="root">${errorBody}</div>`);
-      
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(404).send(html);
     }
   }
 
-  // Fallback to serving the normal main page HTML
-  const mainCanonical = "https://www.barumspace.co.kr/";
-  html = html.replace('</head>', `<link rel="canonical" href="${mainCanonical}" />\n<meta property="og:url" content="${mainCanonical}" />\n</head>`);
-
+  // If page is not matched, return 404
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  return res.status(200).send(html);
+  return res.status(404).send('<h1>페이지를 찾을 수 없습니다. (404 Not Found)</h1>');
 }

@@ -1,10 +1,7 @@
-import { seoulRegions } from './seoulRegions.js';
-import { incheonRegions } from './incheonRegions.js';
-import { gyeonggiRegions } from './gyeonggiRegions.js';
+import { regionMaster } from './regionMaster.js';
+import { keywordMetadata } from './keywordMetadata.js';
 import { serviceKeywords } from './serviceKeywords.js';
 
-// Feature Flag: 활성화 여부에 따라 운영 인덱스에 인천·경기 데이터를 노출할지 결정
-// true로 설정하여 운영 환경(sitemap-seoul 및 일반 접속)에 검증 완료된 인천·경기를 공식 활성화합니다.
 export const ENABLE_CAPITAL_REGION_EXPANSION = true;
 
 // 1. URL 파라미터 정규화 및 안전 디코딩
@@ -26,10 +23,8 @@ export function normalizeKeywordParam(k) {
   }
 }
 
-// 2. 길이가 긴 작업명 순서로 정렬된 서비스 키워드
 const sortedServices = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
 
-// 3. 작업명 Suffix 판별 함수
 export function matchServiceSuffix(normalizedK) {
   if (!normalizedK) return null;
   for (const service of sortedServices) {
@@ -40,141 +35,112 @@ export function matchServiceSuffix(normalizedK) {
   return null;
 }
 
-// 4. 통합 지역 인덱스 캐시
 const activeRegionIndex = new Map();
 const previewRegionIndex = new Map();
 
 function buildIndexes() {
-  // 서울
-  seoulRegions.forEach(r => {
-    const displaySlug = normalizeKeywordParam(r.displayName);
-    const normSlug = normalizeKeywordParam(r.normalizedName);
-    
-    const seoulEntry = {
-      ...r,
-      id: `seoul-${r.displayName}`,
-      name: r.displayName, // name field mapping for SEO page rendering
-      type: r.regionType || 'dong', // type field mapping
-      parentId: `seoul-${r.districtName}`,
+  keywordMetadata.forEach(item => {
+    const displaySlug = normalizeKeywordParam(item.displayRegion);
+    const slug = normalizeKeywordParam(item.routeKey);
+
+    let masterEntity = null;
+    let metro = '';
+    let city = '';
+    let groupName = '';
+    let officialName = item.displayRegion;
+    let type = item.type;
+
+    if (item.regionId.startsWith('seoul')) {
+      metro = '서울';
+      city = '서울시';
+      masterEntity = regionMaster.cities.find(c => c.id === item.regionId) || 
+                     regionMaster.dongs.find(d => d.id === item.regionId);
+      if (masterEntity) {
+        if (masterEntity.level === 'dong') {
+          const parentCity = regionMaster.cities.find(c => c.id === masterEntity.parentId);
+          groupName = parentCity ? parentCity.name : '';
+        } else {
+          const cityEntity = regionMaster.cities.find(c => c.id === item.regionId) || masterEntity;
+          groupName = cityEntity ? cityEntity.name : '';
+        }
+      }
+    } else if (item.regionId.startsWith('incheon')) {
+      metro = '인천';
+      city = '인천시';
+      masterEntity = regionMaster.cities.find(c => c.id === item.regionId) || 
+                     regionMaster.dongs.find(d => d.id === item.regionId);
+      if (masterEntity) {
+        if (masterEntity.level === 'dong') {
+          const parentCity = regionMaster.cities.find(c => c.id === masterEntity.parentId);
+          groupName = parentCity ? parentCity.name : '';
+        } else {
+          const cityEntity = regionMaster.cities.find(c => c.id === item.regionId) || masterEntity;
+          groupName = cityEntity ? cityEntity.name : '';
+        }
+      }
+    } else if (item.regionId.startsWith('gyeonggi')) {
+      metro = '경기';
+      masterEntity = regionMaster.cities.find(c => c.id === item.regionId) || 
+                     regionMaster.districts.find(d => d.id === item.regionId) || 
+                     regionMaster.dongs.find(d => d.id === item.regionId);
+      if (masterEntity) {
+        if (masterEntity.level === 'city') {
+          city = masterEntity.name;
+          groupName = masterEntity.name;
+        } else if (masterEntity.level === 'district') {
+          const pCity = regionMaster.cities.find(c => c.id === masterEntity.parentId);
+          city = pCity ? pCity.name : '';
+          groupName = masterEntity.name;
+        } else {
+          const pCity = regionMaster.cities.find(c => c.id === masterEntity.cityId);
+          city = pCity ? pCity.name : '';
+          const pDist = masterEntity.districtId ? regionMaster.districts.find(di => di.id === masterEntity.districtId) : null;
+          groupName = pDist ? pDist.name : city;
+        }
+      }
+    }
+
+    if (type === 'alias') {
+      type = masterEntity?.level || 'city';
+    }
+
+    const entry = {
+      id: item.type === 'alias' ? `${item.regionId}-alias` : item.regionId,
+      name: item.displayRegion,
+      type: type,
+      parentId: masterEntity?.parentId || metro,
       generateKeyword: true,
-      metro: '서울',
-      city: '서울시',
-      groupName: r.districtName,
-      officialName: r.normalizedName,
-      displayName: r.displayName,
-      urlRegion: r.slugKey || r.displayName,
-      aliases: r.displayName === r.normalizedName ? [] : [r.displayName],
+      metro: metro,
+      city: city,
+      groupName: groupName,
+      officialName: officialName,
+      displayName: item.displayRegion,
+      urlRegion: item.routeKey,
+      aliases: [],
       collisionResolved: true,
       requiresCollisionReview: false,
       active: true
     };
 
     if (displaySlug) {
-      activeRegionIndex.set(displaySlug, seoulEntry);
-      previewRegionIndex.set(displaySlug, seoulEntry);
+      activeRegionIndex.set(displaySlug, entry);
+      previewRegionIndex.set(displaySlug, entry);
     }
-    if (normSlug && normSlug !== displaySlug) {
-      activeRegionIndex.set(normSlug, seoulEntry);
-      previewRegionIndex.set(normSlug, seoulEntry);
-    }
-    if (seoulEntry.slugKey) {
-      const slugNormalized = normalizeKeywordParam(seoulEntry.slugKey);
-      if (slugNormalized && slugNormalized !== displaySlug && slugNormalized !== normSlug) {
-        activeRegionIndex.set(slugNormalized, seoulEntry);
-        previewRegionIndex.set(slugNormalized, seoulEntry);
-      }
-    }
-  });
-
-  // 인천
-  incheonRegions.forEach(r => {
-    // 운영 활성화 대상 검증 필터링
-    if (!r.officialName || !r.displayName || !r.slugKey) return;
-    if (r.regionType !== 'district' && (r.requiresCollisionReview || r.collisionResolved === false)) return; // 동 단위에만 충돌 제한 적용
-    if (r.requiresOfficialReview) return;
-    
-    // URL 적합성 검사
-    const slug = normalizeKeywordParam(r.slugKey);
-    if (!slug || slug.includes('--') || slug.startsWith('-') || slug.endsWith('-')) return;
-
-    // Determine parentId based on type. 광역시 -> 구 -> 동
-    const type = r.regionType === 'district' ? 'district' : 'dong';
-    const parentId = r.regionType === 'district' ? 'incheon' : `incheon-${r.groupName}`;
-    const uniqueId = r.regionType === 'district' ? `incheon-${r.groupName}` : `incheon-${r.groupName}-${r.officialName}`;
-
-    const entry = {
-      ...r,
-      id: uniqueId,
-      name: r.officialName, // name field mapping to clean officialName
-      type: type,
-      parentId: parentId,
-      generateKeyword: true,
-      city: '인천시',
-      urlRegion: r.slugKey
-    };
-
-    previewRegionIndex.set(slug, entry);
-    // 원래 active: false 로 비활성 상태로 들어간 인천구 데이터 중 collisionResolved가 완료된 항목 혹은 구 단위인 경우 운영에 활성 노출
-    if (r.active || r.regionType === 'district' || ENABLE_CAPITAL_REGION_EXPANSION) {
+    if (slug && slug !== displaySlug) {
       activeRegionIndex.set(slug, entry);
-    }
-  });
-
-  // 경기
-  gyeonggiRegions.forEach(r => {
-    // 운영 활성화 대상 검증 필터링
-    if (!r.officialName || !r.displayName || !r.slugKey) return;
-    if (r.regionType !== 'district' && (r.requiresCollisionReview || r.collisionResolved === false)) return;
-    if (r.requiresOfficialReview) return;
-
-    // URL 적합성 검사
-    const slug = normalizeKeywordParam(r.slugKey);
-    if (!slug || slug.includes('--') || slug.startsWith('-') || slug.endsWith('-')) return;
-
-    // Determine type and parent hierarchy:
-    // 경기 -> 시 -> (일반구 있을 시 구) -> 동
-    let type = 'dong';
-    let parentId = 'gyeonggi';
-    if (r.regionType === 'district') {
-      type = r.officialName.endsWith('구') ? 'district' : 'city';
-      parentId = r.officialName.endsWith('구') ? `gyeonggi-${r.city}` : 'gyeonggi';
-    } else {
-      // For dongs, parent is the city or district
-      parentId = r.groupName ? `gyeonggi-${r.groupName}` : `gyeonggi-${r.city}`;
-    }
-
-    const uniqueId = r.regionType === 'district' 
-      ? `gyeonggi-${r.officialName}` 
-      : `gyeonggi-${r.city}-${r.groupName || ''}-${r.officialName}`;
-
-    const entry = {
-      ...r,
-      id: uniqueId,
-      name: r.officialName, // name field mapping to clean officialName
-      type: type,
-      parentId: parentId,
-      generateKeyword: true,
-      urlRegion: r.slugKey
-    };
-
-    previewRegionIndex.set(slug, entry);
-    if (r.active || r.regionType === 'district' || ENABLE_CAPITAL_REGION_EXPANSION) {
-      activeRegionIndex.set(slug, entry);
+      previewRegionIndex.set(slug, entry);
     }
   });
 }
 
 buildIndexes();
 
-// 5. urlRegion 기반 지역 조회 함수
 export function findRegionByUrlToken(urlRegion, usePreview = false) {
   const normToken = normalizeKeywordParam(urlRegion);
   if (!normToken) return null;
-  const index = (usePreview || ENABLE_CAPITAL_REGION_EXPANSION) ? previewRegionIndex : activeRegionIndex;
-  return index.get(normToken) || null;
+  return activeRegionIndex.get(normToken) || null;
 }
 
-// 6. 전체 파서 검증 및 파싱 함수
 export function parseAndValidateK(kParam, usePreview = false) {
   const normK = normalizeKeywordParam(kParam);
   if (!normK) return { region: null, service: null, isValid: false };
@@ -199,15 +165,13 @@ export function parseAndValidateK(kParam, usePreview = false) {
   };
 }
 
-// 7. 현재 활성화된 운영 지역 목록 반환 유틸리티 (통합 sitemap-seoul 및 sitemap.xml용)
 export function getActiveRegions() {
   const list = [];
   const seen = new Set();
   
-  // Map values 순회
   for (const region of activeRegionIndex.values()) {
-    if (seen.has(region.urlRegion)) continue;
-    seen.add(region.urlRegion);
+    if (seen.has(region.id)) continue;
+    seen.add(region.id);
     list.push(region);
   }
   return list;

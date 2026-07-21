@@ -145,17 +145,10 @@ function App() {
 
   // Pre-calculate Hub parameters and metrics for high performance
   const metrics = useMemo(() => {
-    const activeList = getActiveRegions();
-    const isSeoulOnly = !ENABLE_CAPITAL_REGION_EXPANSION;
-
-    // Filter list based on expansion setting
-    const list = isSeoulOnly ? activeList.filter(r => r.metro === '서울') : activeList;
-
-    // Grouping keys: For Seoul, we group by districtName. For Incheon/Gyeonggi, we group by groupName.
-    const uniqueDistricts = Array.from(new Set(list.map(r => r.metro === '서울' ? r.districtName : r.groupName))).sort();
+    const list = getActiveRegions();
     
     // Total Dongs (dong units)
-    const dongsCount = list.filter(r => r.regionType === 'dong').length;
+    const dongsCount = list.filter(r => r.type === 'dong').length;
     
     // Total regions (display names)
     const totalRegionsCount = list.length;
@@ -166,25 +159,65 @@ function App() {
     // Total potential URL combinations
     const totalUrlsCount = totalRegionsCount * totalTasksCount;
 
-    // Filter task categories
-    const elasticTasks = serviceKeywords.filter(k => k.serviceGroup === 'elastic');
-    const groutTasks = serviceKeywords.filter(k => k.serviceGroup === 'grout');
+    // Construct hierarchy
+    const metroGroups = {
+      '서울권': { label: '서울권', cities: {} },
+      '경기권': { label: '경기권', cities: {} },
+      '인천권': { label: '인천권', cities: {} }
+    };
 
-    // Group regions by District/GroupName
-    const groupedRegions = {};
-    uniqueDistricts.forEach(dist => {
-      groupedRegions[dist] = list.filter(r => (r.metro === '서울' ? r.districtName : r.groupName) === dist);
+    list.forEach(r => {
+      const metroKey = r.metro === '서울' ? '서울권' : (r.metro === '인천' ? '인천권' : '경기권');
+      const group = metroGroups[metroKey];
+      
+      if (r.metro === '서울' || r.metro === '인천') {
+        const cityKey = r.groupName;
+        if (!group.cities[cityKey]) {
+          group.cities[cityKey] = {
+            name: cityKey,
+            districts: {
+              '전체': { name: '전체', regions: [] }
+            }
+          };
+        }
+        group.cities[cityKey].districts['전체'].regions.push(r);
+      } else {
+        // Gyeonggi
+        const cityKey = r.city;
+        if (!group.cities[cityKey]) {
+          group.cities[cityKey] = {
+            name: cityKey,
+            districts: {}
+          };
+        }
+        
+        const isDistrict = r.groupName && r.groupName.endsWith('구') && r.groupName !== r.city;
+        const distKey = isDistrict ? r.groupName : '시 단위';
+        
+        if (!group.cities[cityKey].districts[distKey]) {
+          group.cities[cityKey].districts[distKey] = {
+            name: distKey,
+            regions: []
+          };
+        }
+        group.cities[cityKey].districts[distKey].regions.push(r);
+      }
+    });
+
+    const uniqueDistricts = [];
+    Object.keys(metroGroups).forEach(mKey => {
+      Object.keys(metroGroups[mKey].cities).forEach(cKey => {
+        uniqueDistricts.push(cKey);
+      });
     });
 
     return {
-      uniqueDistricts,
       dongsCount,
       totalRegionsCount,
       totalTasksCount,
       totalUrlsCount,
-      elasticTasks,
-      groutTasks,
-      groupedRegions
+      metroGroups,
+      uniqueDistricts
     };
   }, []);
 
@@ -474,6 +507,14 @@ function App() {
     }));
   };
 
+  const handleToggleAll = (val) => {
+    const next = {};
+    metrics.uniqueDistricts.forEach(dist => {
+      next[dist] = val;
+    });
+    setOpenDistricts(next);
+  };
+
   const setAllDistricts = (val) => {
     const next = {};
     metrics.uniqueDistricts.forEach(dist => {
@@ -517,10 +558,10 @@ function App() {
               SEO DIRECTORY
             </span>
             <h1 style={{ marginTop: '8px', marginBottom: '16px', fontSize: '2.5rem' }}>
-              서울 탄성코트·줄눈시공<br />지역별 페이지 안내
+              수도권 탄성코트·줄눈시공<br />지역별 페이지 안내
             </h1>
             <p style={{ opacity: 0.8, maxWidth: '720px', lineHeight: 1.6, fontSize: '1.05rem' }}>
-              서울 자치구와 동 단위 지역별 탄성코트·줄눈시공 페이지를 확인할 수 있습니다. 지역명 또는 시공 서비스를 선택해 필요한 페이지로 이동해 주세요.
+              서울·경기·인천 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지를 확인할 수 있습니다.
             </p>
           </div>
 
@@ -532,7 +573,7 @@ function App() {
             marginBottom: '40px'
           }}>
             {[
-              { label: '등록된 자치구', value: `${metrics.uniqueDistricts.length} 개 구` },
+              { label: '등록된 행정구역', value: `${metrics.uniqueDistricts.length} 개 시/구` },
               { label: '등록된 동 단위', value: `${metrics.dongsCount} 개 동` },
               { label: '등록 전체 지역명', value: `${metrics.totalRegionsCount} 개` },
               { label: '등록 작업명', value: `${metrics.totalTasksCount} 개` },
@@ -640,20 +681,11 @@ function App() {
                 />
               </div>
             </div>
-
-            {(regionSearch || taskSearch) && (
-              <button
-                onClick={() => { setRegionSearch(''); setTaskSearch(''); }}
-                style={{ alignSelf: 'flex-start', fontSize: '0.85rem', color: 'var(--forest-green-sub)', textDecoration: 'underline' }}
-              >
-                검색 조건 초기화
-              </button>
-            )}
           </div>
 
-          {/* Quick jump to districts */}
+          {/* Quick jump to cities */}
           <div style={{ textAlign: 'left', marginBottom: '40px' }}>
-            <h4 style={{ marginBottom: '12px', fontSize: '0.95rem', color: 'var(--forest-green-sub)' }}>자치구 빠른 이동</h4>
+            <h4 style={{ marginBottom: '12px', fontSize: '0.95rem', color: 'var(--forest-green-sub)' }}>시/구 빠른 이동</h4>
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -662,7 +694,7 @@ function App() {
               {metrics.uniqueDistricts.map(dist => (
                 <a
                   key={dist}
-                  href={`#district-${dist}`}
+                  href={`#city-${dist}`}
                   style={{
                     padding: '6px 12px',
                     backgroundColor: 'var(--white)',
@@ -688,107 +720,178 @@ function App() {
             </SecondaryButton>
           </div>
 
-          {/* Accordion Links directory layout (with search filtering processed purely via styles) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {metrics.uniqueDistricts.map(distName => {
-              const regionList = metrics.groupedRegions[distName];
-              
-              const isMetroMatched = metroFilter === '전체' || regionList.some(r => r.metro === metroFilter);
-              
-              // Filter check: are there ANY matching elements in this district?
-              const matchesSearch = isMetroMatched && regionList.some(r => {
-                const regionMatches = r.displayName.includes(regionSearch) || r.normalizedName.includes(regionSearch);
-                const taskMatches = serviceKeywords.some(tk => tk.keyword.includes(taskSearch));
-                return regionMatches && taskMatches;
-              });
+          {/* Hierarchical links listing */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+            {Object.keys(metrics.metroGroups).map(metroKey => {
+              const metroVal = metroFilter === '서울' ? '서울권' : (metroFilter === '경기' ? '경기권' : (metroFilter === '인천' ? '인천권' : '전체'));
+              if (metroFilter !== '전체' && metroKey !== metroVal) return null;
 
+              const metro = metrics.metroGroups[metroKey];
               return (
-                <div
-                  key={distName}
-                  id={`district-${distName}`}
-                  style={{
-                    display: matchesSearch ? 'block' : 'none',
-                    border: '1px solid var(--light-sand)',
-                    backgroundColor: 'var(--white)',
-                    borderRadius: '6px',
-                    overflow: 'hidden',
-                    textAlign: 'left'
-                  }}
-                >
-                  {/* District Title bar */}
-                  <button
-                    onClick={() => toggleDistrict(distName)}
-                    style={{
-                      width: '100%',
-                      padding: '20px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      backgroundColor: 'var(--white)',
-                      border: 'none',
-                      fontWeight: 'bold',
-                      fontSize: '1.1rem',
-                      color: 'var(--forest-green-main)'
-                    }}
-                  >
-                    <span>{distName} ({regionList.length}개 지역)</span>
-                    <span>{openDistricts[distName] ? '−' : '+'}</span>
-                  </button>
+                <div key={metroKey} style={{ textAlign: 'left' }}>
+                  <h2 style={{
+                    fontSize: '1.6rem',
+                    color: 'var(--forest-green-main)',
+                    borderBottom: '2px solid var(--forest-green-main)',
+                    paddingBottom: '8px',
+                    marginBottom: '20px'
+                  }}>{metro.label}</h2>
 
-                  {/* Links loop (Always rendered in DOM, toggled via style displays for crawlers) */}
-                  <div style={{
-                    display: openDistricts[distName] ? 'block' : 'none',
-                    borderTop: '1px solid var(--light-sand)',
-                    padding: '24px',
-                    backgroundColor: 'var(--warm-white)'
-                  }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                      {regionList.map(reg => {
-                        const isRegionMatched = reg.displayName.includes(regionSearch) || reg.normalizedName.includes(regionSearch);
-                        
-                        return (
-                          <div
-                            key={reg.displayName}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {Object.keys(metro.cities).map(cityKey => {
+                      const city = metro.cities[cityKey];
+                      
+                      // Count children
+                      let childCount = 0;
+                      let keywordLinkCount = 0;
+                      Object.keys(city.districts).forEach(dk => {
+                        childCount += city.districts[dk].regions.length;
+                        keywordLinkCount += city.districts[dk].regions.length * 12;
+                      });
+
+                      const isOpen = !!openDistricts[cityKey];
+
+                      return (
+                        <div
+                          key={cityKey}
+                          id={`city-${cityKey}`}
+                          style={{
+                            border: '1px solid var(--light-sand)',
+                            backgroundColor: 'var(--white)',
+                            borderRadius: '6px',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          {/* City header toggle */}
+                          <button
+                            onClick={() => toggleDistrict(cityKey)}
                             style={{
-                              display: isRegionMatched ? 'block' : 'none',
+                              width: '100%',
+                              padding: '20px',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              backgroundColor: 'var(--white)',
+                              border: 'none',
+                              fontWeight: 'bold',
+                              fontSize: '1.1rem',
+                              color: 'var(--forest-green-main)',
+                              cursor: 'pointer'
                             }}
                           >
-                            <h4 style={{ fontSize: '0.95rem', color: 'var(--forest-green-sub)', marginBottom: '10px' }}>
-                              {reg.displayName} 시공 링크 목록
-                            </h4>
-                            
-                            <div style={{
-                              display: 'grid',
-                              gridTemplateColumns: isDesktop ? '1fr 1fr' : '1fr',
-                              gap: '8px'
-                            }}>
-                              {serviceKeywords.map(tk => {
-                                const isFilterMatched = sitemapFilter === '전체' || tk.serviceGroup === (sitemapFilter === '탄성코트' ? 'elastic' : 'grout');
-                                const isTaskSearchMatched = tk.keyword.includes(taskSearch);
-                                
-                                return (
-                                  <a
-                                    key={tk.keyword}
-                                    href={`/?k=${encodeURIComponent(reg.urlRegion + '-' + tk.keyword)}`}
-                                    style={{
-                                      display: (isFilterMatched && isTaskSearchMatched) ? 'inline-block' : 'none',
-                                      padding: '8px 12px',
-                                      border: '1px solid var(--light-sand)',
-                                      borderRadius: '4px',
-                                      backgroundColor: 'var(--white)',
-                                      fontSize: '0.85rem',
-                                      color: 'var(--charcoal-text)'
-                                    }}
-                                  >
-                                    {reg.displayName} {tk.keyword}
-                                  </a>
-                                );
-                              })}
+                            <div>
+                              <span>{cityKey}</span>
+                              <span style={{ fontSize: '0.85rem', fontWeight: 'normal', opacity: 0.7, marginLeft: '10px' }}>
+                                (하위 지역: {childCount}개 / 검색 지역명: {childCount}개 / 최종 링크: {keywordLinkCount.toLocaleString()}개)
+                              </span>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                            <span>{isOpen ? '−' : '+'}</span>
+                          </button>
+
+                          {/* Accordion body */}
+                          {isOpen && (
+                            <div style={{
+                              borderTop: '1px solid var(--light-sand)',
+                              padding: '24px',
+                              backgroundColor: 'var(--warm-white)'
+                            }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                {Object.keys(city.districts).map(distKey => {
+                                  const district = city.districts[distKey];
+                                  return (
+                                    <div key={distKey}>
+                                      {distKey !== '전체' && (
+                                        <h3 style={{
+                                          fontSize: '1.05rem',
+                                          color: 'var(--forest-green-sub)',
+                                          borderLeft: '4px solid var(--forest-green-sub)',
+                                          paddingLeft: '8px',
+                                          marginBottom: '14px',
+                                          fontWeight: 'bold'
+                                        }}>{distKey}</h3>
+                                      )}
+                                      
+                                      <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: isDesktop ? '1fr 1fr' : '1fr',
+                                        gap: '12px'
+                                      }}>
+                                        {district.regions.map(reg => {
+                                          const isRegionMatched = reg.displayName.includes(regionSearch) || reg.officialName.includes(regionSearch);
+                                          if (!isRegionMatched) return null;
+
+                                          const isDongOpen = !!openDistricts[`dong-${reg.id}`];
+
+                                          return (
+                                            <div
+                                              key={reg.id}
+                                              style={{
+                                                border: '1px solid var(--light-sand)',
+                                                borderRadius: '4px',
+                                                backgroundColor: 'var(--white)',
+                                                padding: '12px 16px'
+                                              }}
+                                            >
+                                              <div
+                                                onClick={() => setOpenDistricts(prev => ({ ...prev, [`dong-${reg.id}`]: !prev[`dong-${reg.id}`] }))}
+                                                style={{
+                                                  display: 'flex',
+                                                  justifyContent: 'space-between',
+                                                  alignItems: 'center',
+                                                  cursor: 'pointer',
+                                                  fontWeight: '600',
+                                                  color: 'var(--charcoal-text)',
+                                                  fontSize: '0.9rem'
+                                                }}
+                                              >
+                                                <span>{reg.name}</span>
+                                                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{isDongOpen ? '접기' : '키워드 링크 보기 (12)'}</span>
+                                              </div>
+
+                                              {isDongOpen && (
+                                                <div style={{
+                                                  marginTop: '12px',
+                                                  paddingTop: '12px',
+                                                  borderTop: '1px dashed var(--light-sand)',
+                                                  display: 'flex',
+                                                  flexDirection: 'column',
+                                                  gap: '6px'
+                                                }}>
+                                                  {serviceKeywords.map(tk => {
+                                                    const isFilterMatched = sitemapFilter === '전체' || tk.serviceGroup === (sitemapFilter === '탄성코트' ? 'elastic' : 'grout');
+                                                    const isTaskSearchMatched = tk.keyword.includes(taskSearch);
+                                                    if (!isFilterMatched || !isTaskSearchMatched) return null;
+
+                                                    return (
+                                                      <a
+                                                        key={tk.keyword}
+                                                        href={`/?k=${encodeURIComponent(reg.urlRegion + '-' + tk.keyword)}`}
+                                                        style={{
+                                                          fontSize: '0.85rem',
+                                                          color: 'var(--forest-green-sub)',
+                                                          textDecoration: 'none',
+                                                          padding: '4px 0'
+                                                        }}
+                                                      >
+                                                        {reg.displayName} {tk.keyword}
+                                                      </a>
+                                                    );
+                                                  })}
+                                                </div>
+                                              )}
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -805,7 +908,7 @@ function App() {
       );
     }
 
-    // C: Main Page & Dynamic Landing Page
+    // C: Main Page & Dynamic Landing Page    // C: Main Page & Dynamic Landing Page
     return (
       <>
         {parsedKeyword && (

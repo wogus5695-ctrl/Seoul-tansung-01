@@ -9,7 +9,7 @@ export const siteConfig = {
   operatingHours: '평일 09:00 - 18:00 (토/일 휴무)',
   pricingPlaceholder: '상담 시 안내',
   warrantyPlaceholder: '시공 후 개별 안내',
-  siteUrl: 'https://seoul-tansung-01.vercel.app',
+  siteUrl: 'https://www.barumspace.co.kr',
 };
 
 export const siteImages = {
