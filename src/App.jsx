@@ -64,8 +64,6 @@ function Breadcrumb({ region, task }) {
   return (
     <div style={{ fontSize: '0.85rem', opacity: 0.7, textAlign: 'left', marginBottom: '16px', display: 'flex', gap: '8px' }}>
       <a href="/" style={{ textDecoration: 'underline' }}>홈</a>
-      <span>&gt;</span>
-      <a href="/sitemap-seoul" style={{ textDecoration: 'underline' }}>서울시 시공</a>
       {region && (
         <>
           <span>&gt;</span>
@@ -575,10 +573,8 @@ function App() {
         <SectionContainer padding="80px 20px">
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <h2 style={{ marginBottom: '16px', color: 'var(--forest-green-main)' }}>요청한 지역 또는 시공 서비스를 찾을 수 없습니다.</h2>
-            <p style={{ marginBottom: '24px', opacity: 0.8 }}>등록된 지역과 서비스는 통합 페이지에서 확인해 주세요.</p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
               <PrimaryButton onClick={() => navigate('/')}>메인으로 돌아가기</PrimaryButton>
-              <SecondaryButton onClick={() => navigate('/sitemap-seoul')}>지역 시공안내 보기</SecondaryButton>
             </div>
           </div>
         </SectionContainer>
