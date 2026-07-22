@@ -4,20 +4,20 @@ import { serviceKeywords } from './serviceKeywords.js';
 
 export const ENABLE_CAPITAL_REGION_EXPANSION = true;
 
-// 1. URL 파라미터 정규화 및 안전 디코딩
+// 1. URL 파라미터 정규화 및 안전 디코딩 (일원화된 정규화 공통 함수)
 export function normalizeKeywordParam(k) {
   if (!k) return '';
   try {
-    if (k.includes('%25')) return ''; // 이중 인코딩 차단
-    const decoded = decodeURIComponent(k);
-    
-    return decoded
+    const raw = k.includes('%25') ? '' : decodeURIComponent(k);
+    return raw
       .normalize('NFC')
       .trim()
-      .replace(/[–—−]/g, '-') // 특수 문자 대시 변환
-      .replace(/-+/g, '-')    // 연속 하이픈 축약
-      .replace(/^[-]/, '')    // 시작 하이픈 제거
-      .replace(/[-]$/, '');   // 끝 하이픈 제거
+      .replace(/\s+/g, ' ')   // 연속 공백을 단일 공백으로 치환
+      .replace(/[–—−]/g, '-') // 특수 대시 기호 단일화
+      .replace(/-+/g, '-')    // 연속 하이픈 치환
+      .replace(/^[-]/, '')    // 앞자리 하이픈 제거
+      .replace(/[-]$/, '')    // 뒷자리 하이픈 제거
+      .trim();
   } catch (e) {
     return '';
   }
@@ -122,13 +122,24 @@ function buildIndexes() {
       active: item.isIndexable
     };
 
+    const addIndex = (key, val) => {
+      const existing = activeRegionIndex.get(key);
+      if (existing) {
+        if (Array.isArray(existing)) {
+          existing.push(val);
+        } else {
+          activeRegionIndex.set(key, [existing, val]);
+        }
+      } else {
+        activeRegionIndex.set(key, val);
+      }
+    };
+
     if (displaySlug) {
-      activeRegionIndex.set(displaySlug, entry);
-      previewRegionIndex.set(displaySlug, entry);
+      addIndex(displaySlug, entry);
     }
     if (slug && slug !== displaySlug) {
-      activeRegionIndex.set(slug, entry);
-      previewRegionIndex.set(slug, entry);
+      addIndex(slug, entry);
     }
   });
 }
@@ -138,7 +149,14 @@ buildIndexes();
 export function findRegionByUrlToken(urlRegion, usePreview = false) {
   const normToken = normalizeKeywordParam(urlRegion);
   if (!normToken) return null;
-  return activeRegionIndex.get(normToken) || null;
+  const match = activeRegionIndex.get(normToken);
+  if (!match) return null;
+  if (Array.isArray(match)) {
+    // If it's duplicate, default to first item, or resolve using query logic if extended.
+    // For general URL matching fallback, returning the first matched region object is standard.
+    return match[0];
+  }
+  return match;
 }
 
 export function parseAndValidateK(kParam, usePreview = false) {
@@ -170,9 +188,10 @@ export function getActiveRegions() {
   const seen = new Set();
   
   for (const region of activeRegionIndex.values()) {
-    if (seen.has(region.id)) continue;
-    seen.add(region.id);
-    list.push(region);
+    const item = Array.isArray(region) ? region[0] : region;
+    if (seen.has(item.urlRegion)) continue;
+    seen.add(item.urlRegion);
+    list.push(item);
   }
   return list;
 }

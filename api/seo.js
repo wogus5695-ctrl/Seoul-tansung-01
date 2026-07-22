@@ -44,10 +44,10 @@ export default async function handler(req, res) {
     }
 
     if (matchedService && prefix) {
+      // 1. If prefix matches legacyRedirectMap directly
       if (prefix in legacyRedirectMap) {
         const dest = legacyRedirectMap[prefix];
         if (dest === null) {
-          // Explicitly 404 for untrusted regions
           let htmlPath = path.join(process.cwd(), 'dist', 'index.html');
           if (!fs.existsSync(htmlPath)) htmlPath = path.join(process.cwd(), 'index.html');
           let html = fs.readFileSync(htmlPath, 'utf-8');
@@ -58,6 +58,21 @@ export default async function handler(req, res) {
           return res.status(404).send(html);
         } else {
           const redirectUrl = `https://www.barumspace.co.kr/?k=${encodeURIComponent(dest + '-' + matchedService.keyword)}`;
+          res.setHeader('Location', redirectUrl);
+          return res.status(301).end();
+        }
+      }
+
+      // 2. If it contains a hyphen and is not a valid active key (meaning it's an old combined parent-dong structure, e.g. 일산동-풍산동 or 하남-풍산동)
+      const exactMatch = keywordMetadata.find(km => km.urlRegionKey === prefix && km.isIndexable);
+      if (!exactMatch && prefix.includes('-')) {
+        const tokens = prefix.split('-');
+        const lastToken = tokens[tokens.length - 1]; // e.g. "풍산동"
+        
+        // Find if this target dong exists in keywordMetadata
+        const targetDong = keywordMetadata.find(km => km.urlRegionKey === lastToken && km.isIndexable && km.keywordVariant === 'lowerRegion');
+        if (targetDong) {
+          const redirectUrl = `https://www.barumspace.co.kr/?k=${encodeURIComponent(targetDong.urlRegionKey + '-' + matchedService.keyword)}`;
           res.setHeader('Location', redirectUrl);
           return res.status(301).end();
         }
@@ -235,13 +250,9 @@ export default async function handler(req, res) {
         desc = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
         upperNotice = `${regionName} 지역의 주거 공간에 맞춘 ${taskName} 시공을 안내합니다.`;
       } else {
-        const parentFullName = matchedRegion.officialName;
-        const parentArea = matchedRegion.parentId && matchedRegion.parentId.includes('-') 
-          ? matchedRegion.parentId.split('-')[0] + ' ' + matchedRegion.parentId.split('-')[1]
-          : '';
-        title = `${parentArea ? parentArea + ' ' : ''}${regionName} ${taskName} | 바름공간`;
-        desc = `${parentArea ? parentArea + ' ' : ''}${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
-        upperNotice = `${parentArea ? parentArea + ' ' : ''}${regionName} 지역을 위한 맞춤형 ${taskName} 안내`;
+        title = `${regionName} ${taskName} | 바름공간`;
+        desc = `${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
+        upperNotice = `${regionName} 지역을 위한 맞춤형 ${taskName} 안내`;
       }
 
       // Inject Meta Tags into HTML

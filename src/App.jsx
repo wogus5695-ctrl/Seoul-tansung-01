@@ -341,13 +341,9 @@ function App() {
         }
         descStr = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
       } else {
-        // Dong units
-        const parentFullName = parsedKeyword.region.officialName; // Use officialName which maps target parent full path
-        const parentArea = parsedKeyword.region.parentId && parsedKeyword.region.parentId.includes('-') 
-          ? parsedKeyword.region.parentId.split('-')[0] + ' ' + parsedKeyword.region.parentId.split('-')[1]
-          : '';
-        titleStr = `${parentArea ? parentArea + ' ' : ''}${regionName} ${taskName} | 바름공간`;
-        descStr = `${parentArea ? parentArea + ' ' : ''}${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
+        // Dong units - 동 단위 최종 키워드 규칙에 맞추어 상위 시·구 정보 제외 처리
+        titleStr = `${regionName} ${taskName} | 바름공간`;
+        descStr = `${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
       }
 
       // 1. Service schema
