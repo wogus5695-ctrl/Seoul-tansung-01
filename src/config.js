@@ -16,8 +16,8 @@ export const contactConfig = {
   phoneLabel: '전화문의',
   phoneNumber: '010-8189-6900',
   kakaoLabel: '카카오 문의',
-  kakaoChannelUrl: '',
-  kakaoEnabled: false
+  kakaoChannelUrl: 'http://pf.kakao.com/_LfhxnX',
+  kakaoEnabled: true
 };
 
 export const siteImages = {
