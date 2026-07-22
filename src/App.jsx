@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { siteConfig } from './config';
+import { siteConfig, contactConfig } from './config';
 import {
   Header,
   Footer,
@@ -496,11 +496,15 @@ function App() {
   }, [parsedKeyword, path, kParam, isKeywordInvalid, currentFaqList]);
 
   const handleCTA = () => {
-    window.open(siteConfig.consultationUrl, '_blank', 'noopener,noreferrer');
+    if (contactConfig.kakaoEnabled && contactConfig.kakaoChannelUrl) {
+      window.open(contactConfig.kakaoChannelUrl, '_blank', 'noopener,noreferrer');
+    } else if (siteConfig.consultationUrl) {
+      window.open(siteConfig.consultationUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const handlePhoneCall = () => {
-    window.location.href = `tel:${siteConfig.phoneNumber.replace(/-/g, '')}`;
+    window.location.href = `tel:${contactConfig.phoneNumber.replace(/-/g, '')}`;
   };
 
   const breadcrumbRegion = parsedKeyword ? parsedKeyword.region.displayName : null;
@@ -1015,13 +1019,20 @@ function App() {
                 gap: '12px',
                 marginTop: '12px'
               }}>
-                <PrimaryButton onClick={handleCTA}>
-                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>사진으로 시공 상담</span>
-                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>사진 상담</span>
+                <PrimaryButton 
+                  onClick={contactConfig.kakaoEnabled ? handleCTA : undefined}
+                  style={{
+                    opacity: !contactConfig.kakaoEnabled ? 0.6 : 1,
+                    cursor: !contactConfig.kakaoEnabled ? 'not-allowed' : 'pointer'
+                  }}
+                  aria-disabled={!contactConfig.kakaoEnabled}
+                >
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>{contactConfig.kakaoLabel}</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>{contactConfig.kakaoLabel}</span>
                 </PrimaryButton>
                 <SecondaryButton onClick={handlePhoneCall}>
-                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>전화로 바로 문의</span>
-                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>전화 문의</span>
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>{contactConfig.phoneLabel}</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>{contactConfig.phoneLabel}</span>
                 </SecondaryButton>
               </div>
             </div>
@@ -1362,9 +1373,25 @@ function App() {
                   {SPACE_GUIDE_DATA[activeSpaceKey].desc}
                 </p>
                 <div style={{ marginTop: '8px' }}>
-                  <SecondaryButton onClick={handleCTA} style={{ fontSize: '0.9rem', padding: '10px 20px', minHeight: '48px' }}>
-                    상세 정보 보기
-                  </SecondaryButton>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <SecondaryButton onClick={handlePhoneCall} style={{ fontSize: '0.9rem', padding: '10px 20px', minHeight: '48px', flex: 1 }}>
+                      {contactConfig.phoneLabel}
+                    </SecondaryButton>
+                    <PrimaryButton 
+                      onClick={contactConfig.kakaoEnabled ? handleCTA : undefined} 
+                      style={{ 
+                        fontSize: '0.9rem', 
+                        padding: '10px 20px', 
+                        minHeight: '48px', 
+                        flex: 1,
+                        opacity: contactConfig.kakaoEnabled ? 1 : 0.6,
+                        cursor: contactConfig.kakaoEnabled ? 'pointer' : 'not-allowed'
+                      }}
+                      aria-disabled={!contactConfig.kakaoEnabled}
+                    >
+                      {contactConfig.kakaoLabel}
+                    </PrimaryButton>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1721,13 +1748,20 @@ function App() {
                 gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
                 gap: '12px'
               }}>
-                <PrimaryButton onClick={handleCTA}>
-                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>사진 상담하기</span>
-                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>사진 상담</span>
+                <PrimaryButton 
+                  onClick={contactConfig.kakaoEnabled ? handleCTA : undefined}
+                  style={{
+                    opacity: !contactConfig.kakaoEnabled ? 0.6 : 1,
+                    cursor: !contactConfig.kakaoEnabled ? 'not-allowed' : 'pointer'
+                  }}
+                  aria-disabled={!contactConfig.kakaoEnabled}
+                >
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>{contactConfig.kakaoLabel}</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>{contactConfig.kakaoLabel}</span>
                 </PrimaryButton>
                 <SecondaryButton onClick={handlePhoneCall}>
-                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>전화 상담하기</span>
-                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>전화 문의</span>
+                  <span className="cta-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>{contactConfig.phoneLabel}</span>
+                  <span className="cta-mobile-only" style={{ display: isDesktop ? 'none' : 'inline' }}>{contactConfig.phoneLabel}</span>
                 </SecondaryButton>
               </div>
             </div>
@@ -1819,7 +1853,7 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header onNavigate={navigate} currentPath={path} />
+      <Header onNavigate={navigate} currentPath={path} onPhoneClick={handlePhoneCall} onChatClick={handleCTA} />
       <main style={{ 
         flex: 1,
         paddingBottom: (path !== '/sitemap-seoul' && !isDesktop) ? 'calc(88px + env(safe-area-inset-bottom))' : '0px'

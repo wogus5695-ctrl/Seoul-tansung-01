@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { siteConfig } from '../config';
+import { siteConfig, contactConfig } from '../config';
 
 // 1. Header Component with Mobile Hamburger Menu and Keyboard accessibility
-export function Header({ onNavigate, currentPath }) {
+export function Header({ onNavigate, currentPath, onPhoneClick, onChatClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Close menu on ESC key press
@@ -75,10 +75,24 @@ export function Header({ onNavigate, currentPath }) {
         </nav>
 
         {/* PC Right CTA */}
-        <div style={styles.pcCTA}>
-          <a href="#consultation" onClick={(e) => handleLinkClick(e, '#consultation')} style={styles.headerCTA}>
-            상담하기
-          </a>
+        <div style={{ ...styles.pcCTA, display: styles.pcCTA.display, gap: '8px', alignItems: 'center' }}>
+          <button 
+            onClick={onPhoneClick} 
+            style={styles.headerPhoneCTA}
+          >
+            {contactConfig.phoneLabel}
+          </button>
+          <button 
+            onClick={contactConfig.kakaoEnabled ? onChatClick : undefined} 
+            style={{
+              ...styles.headerKakaoCTA,
+              opacity: contactConfig.kakaoEnabled ? 1 : 0.6,
+              cursor: contactConfig.kakaoEnabled ? 'pointer' : 'not-allowed'
+            }}
+            aria-disabled={!contactConfig.kakaoEnabled}
+          >
+            {contactConfig.kakaoLabel}
+          </button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -109,13 +123,34 @@ export function Header({ onNavigate, currentPath }) {
                   {item.label}
                 </a>
               ))}
-              <a
-                href="#consultation"
-                onClick={(e) => handleLinkClick(e, '#consultation')}
-                style={{ ...styles.drawerLink, color: 'var(--forest-green-main)', fontWeight: '600' }}
+              <button
+                onClick={(e) => { setMenuOpen(false); onPhoneClick(); }}
+                style={{ ...styles.drawerLink, color: 'var(--forest-green-main)', fontWeight: '600', width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
               >
-                상담하기
-              </a>
+                {contactConfig.phoneLabel}
+              </button>
+              <button
+                onClick={(e) => { 
+                  if (contactConfig.kakaoEnabled) {
+                    setMenuOpen(false); 
+                    onChatClick(); 
+                  }
+                }}
+                style={{
+                  ...styles.drawerLink,
+                  color: 'var(--forest-green-main)',
+                  fontWeight: '600',
+                  width: '100%',
+                  textAlign: 'left',
+                  background: 'none',
+                  border: 'none',
+                  opacity: contactConfig.kakaoEnabled ? 1 : 0.6,
+                  cursor: contactConfig.kakaoEnabled ? 'pointer' : 'not-allowed'
+                }}
+                aria-disabled={!contactConfig.kakaoEnabled}
+              >
+                {contactConfig.kakaoLabel}
+              </button>
             </nav>
           </div>
         </div>
@@ -132,7 +167,7 @@ export function Footer({ onNavigate }) {
         <div style={styles.footerGrid}>
           <div>
             <h3 style={styles.footerBrand}>{siteConfig.brandName}</h3>
-            <p style={styles.footerText}>대표번호: {siteConfig.phoneNumber}</p>
+            <p style={styles.footerText}>대표번호: {contactConfig.phoneNumber}</p>
             <p style={styles.footerText}>운영시간: {siteConfig.operatingHours}</p>
           </div>
           <div>
@@ -306,10 +341,18 @@ export function MobileFixedCTA({ onPhoneClick, onChatClick }) {
     <div style={styles.fixedCta}>
       <div style={styles.fixedCtaGrid}>
         <button style={styles.fixedCtaPhone} onClick={onPhoneClick}>
-          전화 문의
+          {contactConfig.phoneLabel}
         </button>
-        <button style={styles.fixedCtaChat} onClick={onChatClick}>
-          사진 상담
+        <button 
+          style={{
+            ...styles.fixedCtaChat,
+            opacity: contactConfig.kakaoEnabled ? 1 : 0.6,
+            cursor: contactConfig.kakaoEnabled ? 'pointer' : 'not-allowed'
+          }} 
+          onClick={contactConfig.kakaoEnabled ? onChatClick : undefined}
+          aria-disabled={!contactConfig.kakaoEnabled}
+        >
+          {contactConfig.kakaoLabel}
         </button>
       </div>
     </div>
@@ -380,6 +423,25 @@ const styles = {
   headerCTA: {
     backgroundColor: 'var(--forest-green-main)',
     color: 'var(--white)',
+    padding: '8px 18px',
+    borderRadius: '4px',
+    fontSize: '0.9rem',
+    fontWeight: '500',
+  },
+  headerPhoneCTA: {
+    backgroundColor: 'transparent',
+    color: 'var(--forest-green-main)',
+    border: '1px solid var(--forest-green-main)',
+    padding: '8px 18px',
+    borderRadius: '4px',
+    fontSize: '0.9rem',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
+  headerKakaoCTA: {
+    backgroundColor: 'var(--forest-green-main)',
+    color: 'var(--white)',
+    border: '1px solid var(--forest-green-main)',
     padding: '8px 18px',
     borderRadius: '4px',
     fontSize: '0.9rem',
@@ -615,22 +677,25 @@ const styles = {
     border: '1px solid var(--forest-green-main)',
     borderRadius: '4px',
     fontWeight: '600',
-    fontSize: '1rem',
+    fontSize: '0.95rem',
     minHeight: '48px',
     display: 'flex',
     alignItems: 'center',
+    
     justifyContent: 'center',
+    whiteSpace: 'nowrap',
   },
   fixedCtaChat: {
     backgroundColor: 'var(--forest-green-main)',
     color: 'var(--white)',
     borderRadius: '4px',
     fontWeight: '600',
-    fontSize: '1rem',
+    fontSize: '0.95rem',
     minHeight: '48px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    whiteSpace: 'nowrap',
   },
   serviceSec: {
     display: 'flex',
@@ -677,7 +742,8 @@ if (typeof window !== 'undefined') {
     if (window.innerWidth >= 1024) {
       styles.pcNav.display = 'flex';
       styles.pcNav.gap = '32px';
-      styles.pcCTA.display = 'block';
+      styles.pcCTA.display = 'flex';
+      styles.pcCTA.gap = '8px';
       styles.hamburger.display = 'none';
       styles.footerGrid.flexDirection = 'row';
       styles.footerGrid.justifyContent = 'space-between';

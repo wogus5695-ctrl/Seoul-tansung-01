@@ -12,6 +12,14 @@ export const siteConfig = {
   siteUrl: 'https://www.barumspace.co.kr',
 };
 
+export const contactConfig = {
+  phoneLabel: '전화문의',
+  phoneNumber: '010-8189-6900',
+  kakaoLabel: '카카오 문의',
+  kakaoChannelUrl: '',
+  kakaoEnabled: false
+};
+
 export const siteImages = {
   hero: null,
   searchThumbnail: '/images/seo/bareumgonggan-search-thumbnail-v1.png',
