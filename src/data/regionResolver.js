@@ -40,49 +40,53 @@ const previewRegionIndex = new Map();
 
 function buildIndexes() {
   keywordMetadata.forEach(item => {
-    const displaySlug = normalizeKeywordParam(item.displayRegion);
-    const slug = normalizeKeywordParam(item.routeKey);
+    if (!item.isIndexable) return;
+
+    const displaySlug = normalizeKeywordParam(item.displayRegionName);
+    const slug = normalizeKeywordParam(item.urlRegionKey);
 
     let masterEntity = null;
     let metro = '';
     let city = '';
     let groupName = '';
-    let officialName = item.displayRegion;
-    let type = item.type;
+    let officialName = item.officialRegionName;
+    let type = item.keywordVariant === 'lowerRegion' ? 'dong' : (item.regionType === '구' ? 'district' : 'city');
 
-    if (item.regionId.startsWith('seoul')) {
+    const lookupId = item.regionId;
+
+    if (lookupId.startsWith('seoul')) {
       metro = '서울';
       city = '서울시';
-      masterEntity = regionMaster.cities.find(c => c.id === item.regionId) || 
-                     regionMaster.dongs.find(d => d.id === item.regionId);
+      masterEntity = regionMaster.cities.find(c => c.id === lookupId) || 
+                     regionMaster.dongs.find(d => d.id === lookupId);
       if (masterEntity) {
         if (masterEntity.level === 'dong') {
           const parentCity = regionMaster.cities.find(c => c.id === masterEntity.parentId);
           groupName = parentCity ? parentCity.name : '';
         } else {
-          const cityEntity = regionMaster.cities.find(c => c.id === item.regionId) || masterEntity;
+          const cityEntity = regionMaster.cities.find(c => c.id === lookupId) || masterEntity;
           groupName = cityEntity ? cityEntity.name : '';
         }
       }
-    } else if (item.regionId.startsWith('incheon')) {
+    } else if (lookupId.startsWith('incheon')) {
       metro = '인천';
       city = '인천시';
-      masterEntity = regionMaster.cities.find(c => c.id === item.regionId) || 
-                     regionMaster.dongs.find(d => d.id === item.regionId);
+      masterEntity = regionMaster.cities.find(c => c.id === lookupId) || 
+                     regionMaster.dongs.find(d => d.id === lookupId);
       if (masterEntity) {
         if (masterEntity.level === 'dong') {
           const parentCity = regionMaster.cities.find(c => c.id === masterEntity.parentId);
           groupName = parentCity ? parentCity.name : '';
         } else {
-          const cityEntity = regionMaster.cities.find(c => c.id === item.regionId) || masterEntity;
+          const cityEntity = regionMaster.cities.find(c => c.id === lookupId) || masterEntity;
           groupName = cityEntity ? cityEntity.name : '';
         }
       }
-    } else if (item.regionId.startsWith('gyeonggi')) {
+    } else if (lookupId.startsWith('gyeonggi')) {
       metro = '경기';
-      masterEntity = regionMaster.cities.find(c => c.id === item.regionId) || 
-                     regionMaster.districts.find(d => d.id === item.regionId) || 
-                     regionMaster.dongs.find(d => d.id === item.regionId);
+      masterEntity = regionMaster.cities.find(c => c.id === lookupId) || 
+                     regionMaster.districts.find(d => d.id === lookupId) || 
+                     regionMaster.dongs.find(d => d.id === lookupId);
       if (masterEntity) {
         if (masterEntity.level === 'city') {
           city = masterEntity.name;
@@ -100,13 +104,9 @@ function buildIndexes() {
       }
     }
 
-    if (type === 'alias') {
-      type = masterEntity?.level || 'city';
-    }
-
     const entry = {
-      id: item.type === 'alias' ? `${item.regionId}-alias` : item.regionId,
-      name: item.keywordName || item.displayRegion,
+      id: item.id,
+      name: item.officialRegionName,
       type: type,
       parentId: masterEntity?.parentId || metro,
       generateKeyword: true,
@@ -114,15 +114,13 @@ function buildIndexes() {
       city: city,
       groupName: groupName,
       officialName: officialName,
-      displayName: item.keywordName || item.displayRegion,
-      urlRegion: item.routeKey,
+      displayName: item.displayRegionName,
+      urlRegion: item.urlRegionKey,
       aliases: [],
       collisionResolved: true,
       requiresCollisionReview: false,
-      active: true
+      active: item.isIndexable
     };
-
-    const legacySlug = normalizeKeywordParam(item.legacySlug);
 
     if (displaySlug) {
       activeRegionIndex.set(displaySlug, entry);
@@ -131,10 +129,6 @@ function buildIndexes() {
     if (slug && slug !== displaySlug) {
       activeRegionIndex.set(slug, entry);
       previewRegionIndex.set(slug, entry);
-    }
-    if (legacySlug && legacySlug !== slug && legacySlug !== displaySlug) {
-      activeRegionIndex.set(legacySlug, entry);
-      previewRegionIndex.set(legacySlug, entry);
     }
   });
 }

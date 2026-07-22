@@ -126,28 +126,23 @@ function App() {
         }
       }
       if (matchedService && prefix) {
-        const legacyMatch = keywordMetadata.find(km => km.legacySlug === prefix || km.originalSlug === prefix);
         let targetRouteKey = null;
-        if (legacyMatch && legacyMatch.routeKey !== prefix) {
-          targetRouteKey = legacyMatch.routeKey;
-        } else {
-          const directMatch = keywordMetadata.find(km => km.routeKey === prefix);
-          if (!directMatch) {
-            const parts = prefix.split('-');
-            const dongName = parts[parts.length - 1];
-            const parentPrefix = parts.slice(0, -1).join('-');
-            const candidates = keywordMetadata.filter(km => km.displayRegion === dongName && km.type === 'dong');
-            if (candidates.length === 1) {
-              targetRouteKey = candidates[0].routeKey;
-            } else if (candidates.length > 1 && parentPrefix) {
-              const cleanParentPrefix = parentPrefix.replace(/구$/, '').replace(/시$/, '');
-              const matchedTarget = candidates.find(cand => {
-                const parentClean = cand.parentRegion.replace(/구/g, '').replace(/시/g, '').replace(/권/g, '');
-                return parentClean.includes(cleanParentPrefix);
-              });
-              if (matchedTarget) {
-                targetRouteKey = matchedTarget.routeKey;
-              }
+        const directMatch = keywordMetadata.find(km => km.urlRegionKey === prefix && km.isIndexable);
+        if (!directMatch) {
+          const parts = prefix.split('-');
+          const dongName = parts[parts.length - 1];
+          const parentPrefix = parts.slice(0, -1).join('-');
+          const candidates = keywordMetadata.filter(km => km.displayRegionName === dongName && km.keywordVariant === 'lowerRegion' && km.isIndexable);
+          if (candidates.length === 1) {
+            targetRouteKey = candidates[0].urlRegionKey;
+          } else if (candidates.length > 1 && parentPrefix) {
+            const cleanParentPrefix = parentPrefix.replace(/구$/, '').replace(/시$/, '');
+            const matchedTarget = candidates.find(cand => {
+              const parentClean = cand.parentRegionName.replace(/구/g, '').replace(/시/g, '').replace(/권/g, '');
+              return parentClean.includes(cleanParentPrefix);
+            });
+            if (matchedTarget) {
+              targetRouteKey = matchedTarget.urlRegionKey;
             }
           }
         }
@@ -321,17 +316,39 @@ function App() {
     } else if (parsedKeyword) {
       const regionName = parsedKeyword.region.name;
       const taskName = parsedKeyword.service.keyword;
-      
-      if (parsedKeyword.service.serviceGroup === 'elastic') {
-        titleStr = `${regionName} ${taskName} 시공 | 베란다·세탁실 벽면 마감`;
+      const isShort = parsedKeyword.region.id.endsWith('-short');
+      const isOfficial = parsedKeyword.region.id.endsWith('-official');
+      const isDong = !isShort && !isOfficial;
+
+      if (isOfficial) {
+        if (parsedKeyword.service.serviceGroup === 'elastic') {
+          titleStr = `${regionName} ${taskName} 시공 안내 | 바름공간`;
+        } else {
+          titleStr = `${regionName} ${taskName} 안내 | 타일 틈 정리`;
+        }
+        if (parsedKeyword.service.searchIntent === 'agency') {
+          titleStr = `${regionName} ${taskName} | 공식 시공 기준 안내`;
+        }
+        descStr = `${regionName} ${taskName}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 안내합니다.`;
+      } else if (isShort) {
+        if (parsedKeyword.service.serviceGroup === 'elastic') {
+          titleStr = `${regionName} ${taskName} 전문 시공 | 바름공간`;
+        } else {
+          titleStr = `${regionName} ${taskName} 추천 마감 | 타일 틈 케어`;
+        }
+        if (parsedKeyword.service.searchIntent === 'agency') {
+          titleStr = `${regionName} ${taskName} | 시공 전 상세 점검사항`;
+        }
+        descStr = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
       } else {
-        titleStr = `${regionName} ${taskName} | 기존 줄눈 제거와 마감 안내`;
+        // Dong units
+        const parentFullName = parsedKeyword.region.officialName; // Use officialName which maps target parent full path
+        const parentArea = parsedKeyword.region.parentId && parsedKeyword.region.parentId.includes('-') 
+          ? parsedKeyword.region.parentId.split('-')[0] + ' ' + parsedKeyword.region.parentId.split('-')[1]
+          : '';
+        titleStr = `${parentArea ? parentArea + ' ' : ''}${regionName} ${taskName} | 바름공간`;
+        descStr = `${parentArea ? parentArea + ' ' : ''}${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
       }
-      if (parsedKeyword.service.searchIntent === 'agency') {
-        titleStr = `${regionName} ${taskName} | 시공 전 확인 기준`;
-      }
-      
-      descStr = `${regionName} ${taskName} 안내입니다. ${parsedKeyword.service.primarySpace} 구역의 기존 상태를 확인하고 환경에 최적화된 마감 시공 범위를 안내해 드립니다.`;
 
       // 1. Service schema
       schemas.push({
@@ -951,7 +968,13 @@ function App() {
         {parsedKeyword && (
           <div className="dynamic-notice-bar" style={{ backgroundColor: 'var(--light-sand)', padding: '12px 20px', textAlign: 'center', fontSize: '0.9rem' }}>
             <span className="notice-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>
-              <strong>{parsedKeyword.region.displayName}</strong> 지역을 위한 맞춤형 <strong>{parsedKeyword.service.keyword}</strong> 제안입니다.
+              {parsedKeyword.region.id.endsWith('-official') ? (
+                <strong>{parsedKeyword.region.displayName} 지역을 위한 맞춤형 {parsedKeyword.service.keyword} 시공 안내입니다.</strong>
+              ) : parsedKeyword.region.id.endsWith('-short') ? (
+                <strong>{parsedKeyword.region.displayName} 지역의 주거 공간에 맞춘 {parsedKeyword.service.keyword} 시공을 안내합니다.</strong>
+              ) : (
+                <strong>{parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : ''}{parsedKeyword.region.displayName} 지역을 위한 맞춤형 {parsedKeyword.service.keyword} 안내</strong>
+              )}
             </span>
             <span className="notice-mobile-only" style={{ display: isDesktop ? 'none' : 'inline', fontWeight: 'bold' }}>
               {parsedKeyword.region.displayName} {parsedKeyword.service.keyword} 시공 안내
@@ -1009,7 +1032,12 @@ function App() {
               </h1>
               <p style={{ opacity: 0.85, fontSize: '1.05rem', lineHeight: 1.6 }}>
                 {parsedKeyword 
-                  ? parsedKeyword.service.heroDescriptionTemplate
+                  ? (parsedKeyword.region.id.endsWith('-official')
+                      ? `${parsedKeyword.region.displayName} ${parsedKeyword.service.keyword}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 정밀하게 안내합니다.`
+                      : parsedKeyword.region.id.endsWith('-short')
+                        ? `${parsedKeyword.region.displayName} 지역 베란다와 세탁실 ${parsedKeyword.service.keyword} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`
+                        : `${parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : ''}${parsedKeyword.region.displayName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${parsedKeyword.service.keyword} 전문 안내입니다.`
+                    )
                   : '베란다와 세탁실 벽면부터 욕실과 현관의 타일 틈까지, 기존 상태를 확인하고 공간에 필요한 마감 시공을 안내합니다.'
                 }
               </p>

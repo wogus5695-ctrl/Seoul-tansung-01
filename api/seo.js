@@ -13,8 +13,23 @@ export default async function handler(req, res) {
   const kParam = url.searchParams.get('k')?.trim() || '';
   const pathname = url.pathname;
 
-  // 301 Permanent Redirect logic for old joined error URLs and long keywords
-  // e.g. 부평구-산곡동-탄성코트 -> 부평-산곡동-탄성코트, 안양-비산동-탄성코트 -> bisan-dong-탄성코트
+  // Legacy Redirect Map
+  const legacyRedirectMap = {
+    '부평-동': '부평동',
+    '연수-동': '연수동',
+    '덕양-동': '고양동',
+    '중원-동': null, // 확인 불가능 -> 404
+    '분당-동': '분당동',
+    '의정부-동': '의정부동',
+    '과천-동': '과천동',
+    '권선-동': '권선동',
+    '영통-동': '영통동',
+    '만안-동': '안양동',
+    '광명-동': '광명동',
+    '원미-동': '원미동',
+    '오정-동': '오정동'
+  };
+
   if (kParam) {
     const sortedKeywords = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
     let matchedService = null;
@@ -28,43 +43,24 @@ export default async function handler(req, res) {
       }
     }
 
-
     if (matchedService && prefix) {
-      // 1. Check legacySlug/originalSlug mapping first
-      const legacyMatch = keywordMetadata.find(km => km.legacySlug === prefix || km.originalSlug === prefix);
-      let targetRouteKey = null;
-
-      if (legacyMatch && legacyMatch.routeKey !== prefix) {
-        targetRouteKey = legacyMatch.routeKey;
-      } else {
-        // 2. Direct match
-        const directMatch = keywordMetadata.find(km => km.routeKey === prefix);
-        if (!directMatch) {
-          // 3. Normalize parts (parent prefix resolution)
-          const parts = prefix.split('-');
-          const dongName = parts[parts.length - 1];
-          const parentPrefix = parts.slice(0, -1).join('-');
-
-          const candidates = keywordMetadata.filter(km => km.displayRegion === dongName && km.type === 'dong');
-          if (candidates.length === 1) {
-            targetRouteKey = candidates[0].routeKey;
-          } else if (candidates.length > 1 && parentPrefix) {
-            const cleanParentPrefix = parentPrefix.replace(/구$/, '').replace(/시$/, '');
-            const matchedTarget = candidates.find(cand => {
-              const parentClean = cand.parentRegion.replace(/구/g, '').replace(/시/g, '').replace(/권/g, '');
-              return parentClean.includes(cleanParentPrefix);
-            });
-            if (matchedTarget) {
-              targetRouteKey = matchedTarget.routeKey;
-            }
-          }
+      if (prefix in legacyRedirectMap) {
+        const dest = legacyRedirectMap[prefix];
+        if (dest === null) {
+          // Explicitly 404 for untrusted regions
+          let htmlPath = path.join(process.cwd(), 'dist', 'index.html');
+          if (!fs.existsSync(htmlPath)) htmlPath = path.join(process.cwd(), 'index.html');
+          let html = fs.readFileSync(htmlPath, 'utf-8');
+          html = html.replace(/<title>.*?<\/title>/, "<title>페이지를 찾을 수 없습니다 | 바름공간</title>");
+          html = html.replace('</head>', '<meta name="robots" content="noindex, follow" />\n</head>');
+          html = html.replace('<div id="root"></div>', '<div id="root" style="padding:50px; text-align:center;"><h1>페이지를 찾을 수 없습니다. (404 Not Found)</h1></div>');
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.status(404).send(html);
+        } else {
+          const redirectUrl = `https://www.barumspace.co.kr/?k=${encodeURIComponent(dest + '-' + matchedService.keyword)}`;
+          res.setHeader('Location', redirectUrl);
+          return res.status(301).end();
         }
-      }
-
-      if (targetRouteKey) {
-        const redirectUrl = `https://www.barumspace.co.kr/?k=${encodeURIComponent(targetRouteKey + '-' + matchedService.keyword)}`;
-        res.setHeader('Location', redirectUrl);
-        return res.status(301).end();
       }
     }
   }
@@ -208,42 +204,44 @@ export default async function handler(req, res) {
       const regionName = matchedRegion.name;
       const taskName = matchedService.keyword;
 
-      // 1. Dynamic Title Mapping
-      let title = "";
-      if (taskName === '탄성코트') {
-        title = `${regionName} 탄성코트 시공 | 베란다·세탁실 벽면 마감`;
-      } else if (taskName === '탄성코트시공') {
-        title = `${regionName} 탄성코트시공 | 바탕면 정리와 시공 과정`;
-      } else if (taskName === '베란다탄성코트') {
-        title = `${regionName} 베란다탄성코트 | 벽면 상태 확인과 마감 시공`;
-      } else if (taskName === '세탁실탄성코트') {
-        title = `${regionName} 세탁실탄성코트 | 배관 주변 and 벽면 마감`;
-      } else if (taskName === '아파트탄성코트') {
-        title = `${regionName} 아파트탄성코트 | 베란다·세탁실 시공 안내`;
-      } else if (taskName === '탄성코트업체') {
-        title = `${regionName} 탄성코트업체 | 시공 전 확인 기준`;
-      } else if (taskName === '줄눈시공') {
-        title = `${regionName} 줄눈시공 | 욕실·현관 타일 틈새 마감`;
-      } else if (taskName === '욕실줄눈시공') {
-        title = `${regionName} 욕실줄눈시공 | 기존 줄눈 제거와 마감 안내`;
-      } else if (taskName === '현관줄눈시공') {
-        title = `${regionName} 현관줄눈시공 | 타일 색상과 오염 관리`;
-      } else if (taskName === '베란다줄눈시공') {
-        title = `${regionName} 베란다줄눈시공 | 기존 줄눈 상태와 마감`;
-      } else if (taskName === '줄눈시공업체') {
-        title = `${regionName} 줄눈시공업체 | 견적과 시공 범위 확인`;
-      } else if (taskName === '화장실줄눈시공') {
-        title = `${regionName} 화장실줄눈시공 | 타일 틈새 정리와 시공`;
-      } else {
-        title = `${regionName} ${taskName} 시공 | 바름공간`;
-      }
+      const isShort = matchedRegion.id.endsWith('-short');
+      const isOfficial = matchedRegion.id.endsWith('-official');
+      const isDong = !isShort && !isOfficial;
 
-      // 2. Dynamic Meta Description Mapping
+      let title = "";
       let desc = "";
-      if (matchedService.serviceGroup === 'elastic') {
-        desc = `${regionName} ${taskName} 시공 전 기존 벽면의 들뜸 및 오염 상태를 확인하고, 베란다·세탁실 바탕면 정리부터 필요한 마감 범위를 안내합니다.`;
+      let upperNotice = "";
+
+      if (isOfficial) {
+        if (matchedService.serviceGroup === 'elastic') {
+          title = `${regionName} ${taskName} 시공 안내 | 바름공간`;
+        } else {
+          title = `${regionName} ${taskName} 안내 | 타일 틈 정리`;
+        }
+        if (matchedService.searchIntent === 'agency') {
+          title = `${regionName} ${taskName} | 공식 시공 기준 안내`;
+        }
+        desc = `${regionName} ${taskName}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 정밀하게 안내합니다.`;
+        upperNotice = `${regionName} 지역을 위한 맞춤형 ${taskName} 시공 안내입니다.`;
+      } else if (isShort) {
+        if (matchedService.serviceGroup === 'elastic') {
+          title = `${regionName} ${taskName} 전문 시공 | 바름공간`;
+        } else {
+          title = `${regionName} ${taskName} 추천 마감 | 타일 틈 케어`;
+        }
+        if (matchedService.searchIntent === 'agency') {
+          title = `${regionName} ${taskName} | 시공 전 상세 점검사항`;
+        }
+        desc = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
+        upperNotice = `${regionName} 지역의 주거 공간에 맞춘 ${taskName} 시공을 안내합니다.`;
       } else {
-        desc = `${regionName} ${taskName} 전 기존 줄눈의 오염과 갈라짐을 확인하고, 필요한 제거 범위와 욕실 환경에 맞는 자재·색상을 안내합니다.`;
+        const parentFullName = matchedRegion.officialName;
+        const parentArea = matchedRegion.parentId && matchedRegion.parentId.includes('-') 
+          ? matchedRegion.parentId.split('-')[0] + ' ' + matchedRegion.parentId.split('-')[1]
+          : '';
+        title = `${parentArea ? parentArea + ' ' : ''}${regionName} ${taskName} | 바름공간`;
+        desc = `${parentArea ? parentArea + ' ' : ''}${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
+        upperNotice = `${parentArea ? parentArea + ' ' : ''}${regionName} 지역을 위한 맞춤형 ${taskName} 안내`;
       }
 
       // Inject Meta Tags into HTML
@@ -254,13 +252,20 @@ export default async function handler(req, res) {
 
       const cleanUrl = generateAbsoluteDynamicUrl('https://www.barumspace.co.kr', matchedRegion.urlRegion, matchedService.keyword);
 
-      // Inject Canonical & OpenGraph URL
-      html = html.replace('</head>', `<link rel="canonical" href="${cleanUrl}" />\n<meta property="og:url" content="${cleanUrl}" />\n</head>`);
+      // Inject Canonical, og:url and og:image
+      html = html.replace('</head>', `<link rel="canonical" href="${cleanUrl}" />\n<meta property="og:url" content="${cleanUrl}" />\n<meta property="og:image" content="https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v1.png" />\n</head>`);
 
-      // Pre-render content for bots (H1 and localized texts)
+      // Pre-render content for bots (H1 and localized texts, FAQs)
       let botContent = `<div style="display:none;" id="seo-pre-rendered">`;
       botContent += `<h1>${regionName} ${taskName}</h1>`;
-      botContent += `<p>${desc}</p>`;
+      botContent += `<p class="upper-notice">${upperNotice}</p>`;
+      botContent += `<p class="main-desc">${desc}</p>`;
+      botContent += `<h2>시공 관련 자주 묻는 질문(FAQ)</h2>`;
+      botContent += `<ul>`;
+      matchedService.faqSet.forEach(q => {
+        botContent += `<li><strong>Q: ${q}</strong></li>`;
+      });
+      botContent += `</ul>`;
       botContent += `</div>`;
 
       html = html.replace('<div id="root"></div>', `<div id="root"></div>\n${botContent}`);
@@ -271,6 +276,9 @@ export default async function handler(req, res) {
   }
 
   // If page is not matched, return 404
+  html = html.replace(/<title>.*?<\/title>/, "<title>페이지를 찾을 수 없습니다 | 바름공간</title>");
+  html = html.replace('</head>', '<meta name="robots" content="noindex, follow" />\n</head>');
+  html = html.replace('<div id="root"></div>', '<div id="root" style="padding:50px; text-align:center;"><h1>페이지를 찾을 수 없습니다. (404 Not Found)</h1></div>');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  return res.status(404).send('<h1>페이지를 찾을 수 없습니다. (404 Not Found)</h1>');
+  return res.status(404).send(html);
 }
