@@ -6,6 +6,10 @@
   },
   "rewrites": [
     {
+      "source": "/privacy-policy",
+      "destination": "/api/seo"
+    },
+    {
       "source": "/sitemap-seoul",
       "destination": "/api/seo"
     },

@@ -89,6 +89,45 @@ export default async function handler(req, res) {
 
   let html = fs.readFileSync(htmlPath, 'utf-8');
 
+  // Check if we are requesting privacy-policy
+  if (pathname === '/privacy-policy') {
+    const privacyTitle = "개인정보처리방침 | 바름공간";
+    const privacyDesc = "올케어 서비스가 운영하는 바름공간의 개인정보처리방침입니다.";
+    const privacyCanonical = "https://www.barumspace.co.kr/privacy-policy";
+
+    html = html.replace(/<title>.*?<\/title>/, "<title>" + privacyTitle + "</title>");
+    html = html.replace(/<meta name="description" content=".*?" \/>/, '<meta name="description" content="' + privacyDesc + '" />');
+    html = html.replace(/<meta property="og:title" content=".*?" \/>/, '<meta property="og:title" content="' + privacyTitle + '" />');
+    html = html.replace(/<meta property="og:description" content=".*?" \/>/, '<meta property="og:description" content="' + privacyDesc + '" />');
+
+    html = html.replace('</head>', '<link rel="canonical" href="' + privacyCanonical + '" />\n<meta property="og:url" content="' + privacyCanonical + '" />\n</head>');
+
+    let privacyHtml = '<div style="padding: 40px 20px; max-width: 800px; margin: 0 auto; font-family: sans-serif; color: #333; line-height: 1.75;">';
+    privacyHtml += '<h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px; border-bottom: 2px solid #183f35; padding-bottom: 12px;">개인정보처리방침</h1>';
+    privacyHtml += '<div style="background: #f0e9dc; padding: 18px 20px; border-radius: 6px; margin-bottom: 32px; font-weight: bold; color: #183f35;">올케어 서비스는 ‘바름공간’ 브랜드를 통해 탄성코트 및 줄눈시공 상담 서비스를 제공하며, 이용자의 개인정보를 관련 법령에 따라 안전하게 처리합니다.</div>';
+    privacyHtml += '<h2>1. 개인정보처리방침의 목적</h2><p>올케어 서비스(이하 \'회사\'라 함)는 운영 브랜드 \'바름공간\'(https://www.barumspace.co.kr)을 이용하는 고객의 개인정보를 중요시하며, 「개인정보 보호법」 등 관련 법령을 준수하고 있습니다. 본 방침은 회사가 제공하는 탄성코트 및 줄눈시공 안내·상담 서비스에서 개인정보가 어떻게 처리되고 관리되는지 알리는 데 목적이 있습니다.</p>';
+    privacyHtml += '<h2>2. 개인정보처리자 및 운영 브랜드</h2><ul><li><strong>개인정보처리자(사업자명):</strong> 올케어 서비스</li><li><strong>운영 브랜드:</strong> 바름공간</li><li><strong>대표자:</strong> 김재현</li><li><strong>사업자등록번호:</strong> 405-15-02677</li><li><strong>대표 연락처:</strong> 010-8189-6900</li><li><strong>웹사이트:</strong> https://www.barumspace.co.kr</li></ul>';
+    privacyHtml += '<h2>3. 처리하는 개인정보 항목</h2><p>본 홈페이지는 회원가입 기능이 없으며, 별도의 온라인 문의 작성 폼이나 서버 수집 DB를 운영하지 않습니다.</p><ul><li><strong>전화 상담 시:</strong> 전화문의(010-8189-6900)를 통해 이용자가 자발적으로 제공하는 정보 (성함, 연락처, 시공 요청 지역 등)</li><li><strong>카카오톡 상담 시:</strong> 카카오톡 채널 링크를 통한 채팅 상담 시 이용자가 직접 전송하는 대화 내용 및 현장 사진</li></ul>';
+    privacyHtml += '<h2>4. 개인정보의 처리 목적</h2><p>탄성코트 및 줄눈시공 상담·견적 안내, 현장 상태 확인 및 시공 서비스 이행, A/S 관리를 위해 처리합니다.</p>';
+    privacyHtml += '<h2>5. 개인정보의 보유 및 이용 기간</h2><p>상담 및 시공 서비스 완료 시까지 보유·이용 후 지체 없이 파기합니다. 단, 관계 법령에 따른 보존 의무가 있는 경우 법정 기간(시공 보증 및 소비자 불만 처리 기록 3년, 계약 기록 5년) 동안 안전하게 보관합니다.</p>';
+    privacyHtml += '<h2>6. 개인정보의 제3자 제공 여부</h2><p>원칙적으로 제3자에게 제공하지 않습니다.</p>';
+    privacyHtml += '<h2>7. 개인정보 처리업무 위탁 여부</h2><p>개인정보 처리업무를 외부에 위탁하지 않으며 직접 관리합니다.</p>';
+    privacyHtml += '<h2>8. 개인정보의 파기 절차 및 방법</h2><p>보유기간 경과 또는 처리 목적 달성 시 복구 불가능한 방법으로 지체 없이 삭제 및 파기합니다.</p>';
+    privacyHtml += '<h2>9. 정보주체의 권리와 행사 방법</h2><p>대표 전화(010-8189-6900)를 통해 개인정보 열람, 정정, 삭제, 처리정지를 요구할 수 있습니다.</p>';
+    privacyHtml += '<h2>10. 개인정보의 안전성 확보조치</h2><p>관리적·기술적 보안 조치를 이행하고 있습니다.</p>';
+    privacyHtml += '<h2>11. 개인정보 보호책임자 및 담당자</h2><p>김재현 대표 (연락처: 010-8189-6900, 평일 09:00~18:00)</p>';
+    privacyHtml += '<h2>12. 개인정보 침해 관련 문의 및 구제 방법</h2><p>개인정보분쟁조정위원회(1833-6972), 개인정보침해신고센터(118)</p>';
+    privacyHtml += '<h2>13. 쿠키 등 자동 수집 장치의 설치·운영 및 거부에 관한 사항</h2><p>쿠키 및 방문자 분석/추적 도구(Google Analytics, Meta Pixel, 네이버 애널리틱스 등)를 일절 사용하지 않습니다.</p>';
+    privacyHtml += '<h2>14. 개인정보처리방침의 변경 및 시행일</h2><p>공고일자: 2026년 7월 27일 / 시행일자: 2026년 7월 27일</p>';
+    privacyHtml += '<div style="margin-top: 40px;"><a href="/">메인 페이지로 돌아가기</a></div>';
+    privacyHtml += '</div>';
+
+    html = html.replace('<div id="root"></div>', '<div id="root">' + privacyHtml + '</div>');
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
+  }
+
   // Check if we are requesting sitemap-seoul
   if (pathname === '/sitemap-seoul') {
     const hubTitle = "서울·인천·경기 탄성코트·줄눈시공 지역별 페이지 | 바름공간";

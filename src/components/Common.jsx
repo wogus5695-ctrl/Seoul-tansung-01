@@ -167,13 +167,16 @@ export function Footer({ onNavigate }) {
         <div style={styles.footerGrid}>
           <div>
             <h3 style={styles.footerBrand}>{siteConfig.brandName}</h3>
+            <p style={styles.footerNotice}>{siteConfig.brandNotice}</p>
             <p style={styles.footerText}>대표번호: {contactConfig.phoneNumber}</p>
             <p style={styles.footerText}>운영시간: {siteConfig.operatingHours}</p>
           </div>
           <div>
-            <p style={styles.footerText}>사업자 정보: {siteConfig.businessInformation}</p>
+            <p style={styles.footerText}>사업자명: {siteConfig.companyName}</p>
+            <p style={styles.footerText}>대표자: {siteConfig.ceoName}</p>
+            <p style={styles.footerText}>사업자등록번호: {siteConfig.businessNumber}</p>
             <div style={styles.footerLinks}>
-              <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('개인정보처리방침 안내 플레이스홀더'); }} style={styles.footerLink}>
+              <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); onNavigate('/privacy-policy'); }} style={styles.footerLink}>
                 개인정보처리방침
               </a>
             </div>
@@ -512,6 +515,13 @@ const styles = {
     color: 'var(--white)',
     fontSize: '1.3rem',
     marginBottom: '8px',
+  },
+  footerNotice: {
+    fontSize: '0.9rem',
+    opacity: 0.9,
+    lineHeight: 1.6,
+    marginBottom: '12px',
+    wordBreak: 'keep-all',
   },
   footerText: {
     fontSize: '0.9rem',

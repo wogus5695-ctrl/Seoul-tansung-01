@@ -22,8 +22,9 @@ async function generateSitemap() {
   // 1. Index route /
   urls.push(`${SITE_URL}/`);
 
-  // 2. Directory hub /sitemap-seoul
+  // 2. Directory hub /sitemap-seoul & Privacy policy /privacy-policy
   urls.push(`${SITE_URL}/sitemap-seoul`);
+  urls.push(`${SITE_URL}/privacy-policy`);
 
   // 3. Dynamic keywords combinations using correct urlRegion token
   let count = 0;

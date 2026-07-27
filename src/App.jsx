@@ -12,6 +12,7 @@ import {
   ServiceSection,
   SEOContentSection
 } from './components/Common';
+import { PrivacyPolicyPage } from './components/PrivacyPolicy';
 
 // Ingest datasets
 import { seoulRegions } from './data/seoulRegions';
@@ -388,6 +389,17 @@ function App() {
         }))
       });
 
+    } else if (path === '/privacy-policy') {
+      titleStr = `개인정보처리방침 | 바름공간`;
+      descStr = `올케어 서비스가 운영하는 바름공간의 개인정보처리방침입니다.`;
+
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        'name': titleStr,
+        'description': descStr,
+        'url': `${defaultSiteUrl}/privacy-policy`
+      });
     } else if (path === '/sitemap-seoul') {
       titleStr = `서울 탄성코트·줄눈시공 지역별 안내`;
       descStr = `서울 자치구와 동 단위 지역별 탄성코트·줄눈시공 페이지를 확인할 수 있습니다. 지역명과 시공 서비스를 선택해 필요한 정보를 확인해 보세요.`;
@@ -585,6 +597,10 @@ function App() {
   }, []);
 
   const renderContent = () => {
+    if (path === '/privacy-policy') {
+      return <PrivacyPolicyPage onNavigate={navigate} />;
+    }
+
     if (isKeywordInvalid) {
       return (
         <SectionContainer padding="80px 20px">

@@ -3,10 +3,14 @@
 
 export const siteConfig = {
   brandName: '바름공간',
+  companyName: '올케어 서비스',
+  ceoName: '김재현',
+  businessNumber: '405-15-02677',
+  brandNotice: '바름공간은 올케어 서비스가 운영하는 탄성코트·줄눈시공 전문 브랜드입니다.',
   phoneNumber: '010-8189-6900',
   consultationUrl: 'https://open.kakao.com/o/sP3eGghg',
   businessInformation: '올케어 서비스 | 대표: 김재현 | 사업자등록번호: 405-15-02677',
-  operatingHours: '평일 09:00 - 18:00 (토/일 휴무)',
+  operatingHours: '평일 09:00~18:00 (토·일 휴무)',
   pricingPlaceholder: '상담 시 안내',
   warrantyPlaceholder: '시공 후 개별 안내',
   siteUrl: 'https://www.barumspace.co.kr',
