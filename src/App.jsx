@@ -286,7 +286,7 @@ function App() {
     let titleStr = `탄성코트·줄눈시공 전문`;
     let descStr = `베란다·세탁실 탄성코트와 욕실·현관 줄눈시공을 안내합니다. 기존 벽면과 타일 상태를 확인하고 공간에 필요한 시공 범위를 상담해 드립니다.`;
     const defaultSiteUrl = siteConfig.siteUrl;
-    const seoThumbnailUrl = `${siteConfig.siteUrl}/images/seo/bareumgonggan-search-thumbnail-v1.png`;
+    const seoThumbnailUrl = `${siteConfig.siteUrl}/images/seo/bareumgonggan-search-thumbnail-v1.jpg`;
     
     // Schema generation arrays
     const schemas = [];
@@ -322,29 +322,15 @@ function App() {
       const isDong = !isShort && !isOfficial;
 
       if (isOfficial) {
-        if (parsedKeyword.service.serviceGroup === 'elastic') {
-          titleStr = `${regionName} ${taskName} 시공 안내 | 바름공간`;
-        } else {
-          titleStr = `${regionName} ${taskName} 안내 | 타일 틈 정리`;
-        }
-        if (parsedKeyword.service.searchIntent === 'agency') {
-          titleStr = `${regionName} ${taskName} | 공식 시공 기준 안내`;
-        }
-        descStr = `${regionName} ${taskName}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 안내합니다.`;
+        titleStr = `${regionName} ${taskName} 시공 안내 | 바름공간`;
+        descStr = `${regionName} ${taskName}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 정밀하게 안내합니다.`;
       } else if (isShort) {
-        if (parsedKeyword.service.serviceGroup === 'elastic') {
-          titleStr = `${regionName} ${taskName} 전문 시공 | 바름공간`;
-        } else {
-          titleStr = `${regionName} ${taskName} 추천 마감 | 타일 틈 케어`;
-        }
-        if (parsedKeyword.service.searchIntent === 'agency') {
-          titleStr = `${regionName} ${taskName} | 시공 전 상세 점검사항`;
-        }
+        titleStr = `${regionName} ${taskName} 전문 시공 | 바름공간`;
         descStr = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
       } else {
-        // Dong units - 동 단위 최종 키워드 규칙에 맞추어 상위 시·구 정보 제외 처리
+        const fullRegionName = (parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : '') + regionName;
         titleStr = `${regionName} ${taskName} | 바름공간`;
-        descStr = `${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
+        descStr = `${fullRegionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
       }
 
       // 1. Service schema
@@ -450,7 +436,7 @@ function App() {
       updateMetaTag('meta[property="og:image"]', 'content', seoThumbnailUrl);
       updateMetaTag('meta[property="og:image:width"]', 'content', '1200');
       updateMetaTag('meta[property="og:image:height"]', 'content', '1200');
-      updateMetaTag('meta[property="og:image:type"]', 'content', 'image/png');
+      updateMetaTag('meta[property="og:image:type"]', 'content', 'image/jpeg');
       updateMetaTag('meta[property="og:image:alt"]', 'content', '바름공간 탄성코트·줄눈시공 전문 업체');
 
       updateMetaTag('meta[name="twitter:card"]', 'content', 'summary_large_image');

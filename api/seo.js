@@ -5,12 +5,49 @@ import { seoulRegions } from '../src/data/seoulRegions.js';
 import fs from 'fs';
 import path from 'path';
 
+const FAQ_CATALOG = {
+  '기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?': '재시공 가능 여부는 기존 마감의 접착 상태를 확인한 후에 판단할 수 있습니다. 들뜬 부분을 정리하지 않고 바로 덧시공을 하게 되면 다시 떨어질 우려가 있으므로, 사전에 상태를 확인하고 필요한 부분 보수 또는 전체 재시공 범위를 결정해야 합니다.',
+  '곰팡이나 결로가 있으면 바로 시공해도 되나요?': '표면만 덮어서 시공을 진행하면 원인이 해결되지 않아 마감 후에 다시 문제가 생길 수 있습니다. 결로나 누수 의심 원인을 먼저 확인해 조치를 취하고, 바탕면의 건조 상태가 완전히 확인된 후에 시공하는 것이 바람직합니다.',
+  '탄성코트 시공 전에 짐을 모두 빼야 하나요?': '작업할 벽면 및 보양을 진행할 공간의 확보와 작업 동선이 마련되어야 합니다. 세탁기, 선반, 실외기 등 부피가 큰 짐들의 이동 가능 여부는 사전 사진 상담 시 상태를 확인한 후에 안내해 드립니다.',
+  '일부 벽면만 부분 보수할 수 있나요?': '부분적인 보수가 가능한지의 여부는 손상된 범위와 기존 시공면의 색상 차이를 분석하여 판단합니다. 부분 시공을 할 경우 기존 면과의 미세한 색상이나 질감 차이가 관찰될 수 있어, 사진과 현장 상태를 기준으로 판단합니다.',
+  '탄성코트 색상은 어떻게 선택하나요?': '기존 인테리어와의 배합을 분석하여 현장에서 샘플 조색 카드를 대조하며 선택합니다. 밝은 톤의 웜화이트 및 실버/내추럴 그레이 등 오염 관리에 적합한 색상 매칭을 안내합니다.',
+  '시공 후 환기와 건조는 어떻게 해야 하나요?': '도포된 수지가 고르게 양생될 때까지 온도와 자연 기류 통풍 흐름을 안정적으로 유지해야 합니다. 자재 등급 및 양생 당일의 날씨 환경에 수렴하여 개별로 건조 완료 시점을 상세히 보고드립니다.',
+  '기존 줄눈을 제거하고 시공하나요?': '기존 타일 사이 줄눈의 오염도, 갈라짐 정도, 접착 상태를 면밀히 분석한 후 작업을 시작합니다. 필요한 작업 범위 내에 있는 기존 백시멘트를 제거하고 틈새를 꼼꼼히 정리하는 과정을 거친 후에 다시 시공하게 됩니다.',
+  '욕실과 현관에 같은 자재를 사용하나요?': '공간마다 물을 접하는 빈도와 오염물이 유입되는 경로가 다릅니다. 타일의 종류와 기존 마감재 상태도 다르기 때문에, 해당 공간의 환경에 가장 잘 부합하는 적합한 등급의 자재와 마감 색상을 선정하여 안내해 드립니다.',
+  '줄눈 일부만 보수할 수 있나요?': '줄눈의 훼손 부위 접착 특성을 판단해 마감 탈락 위험성이 높지 않은 경우 국소 보수가 가능합니다. 단, 전체 균일도 유지를 위해 가능한 타일 면 단위 정리를 권장합니다.',
+  '시공 후 언제부터 물을 사용할 수 있나요?': '정확한 사용 가능 시점은 현장에서 적용한 자재의 특성, 그리고 당일 현장의 온도와 습도 조건에 따라 다르게 나타납니다. 시공이 완료된 후 현장에서 양생 건조 관련 세부 주의사항과 함께 안내해 드립니다.',
+  '타일 색상에 맞춰 줄눈 색상을 선택할 수 있나요?': '타일의 메탈 느낌이나 은은한 미색에 맞춘 다채로운 메탈 조색, 펄 컬러 색조판을 구비하여 현장 대조 확인 후 선택할 수 있도록 조율합니다.',
+  '오염된 줄눈 위에 바로 덧시공하나요?': '오염물이 고착된 노후 백시멘트 바로 위에 줄눈제를 바르면 부착력이 저하되어 금방 부스러져 떨어집니다. 반드시 기존 오염된 줄눈 틈을 긁어 정리한 후에 시공을 집행합니다.',
+  '탄성코트 업체를 선택할 때 무엇을 확인해야 하나요?': '들뜬 마감을 철저히 긁어내는 전처리 밑작업 원칙을 고수하는지, 그리고 눈에 보이지 않는 균열 틈새 보강 절차를 성실히 진행하는지가 가장 핵심적인 선택 기준입니다.',
+  '줄눈시공 업체의 견적은 어떤 내용을 비교해야 하나요?': '단순 최저 단가보다는 기존 노후 마감재 홈파기 정리 깊이, 변기 및 욕조 테두리 코킹 마감 범위가 견적서상에 명확히 수록되어 있는지를 면밀히 비교 확인해야 합니다.',
+  '시공 전 기존 마감 상태를 확인하나요?': '벽체의 수분 함침 정도나 백시멘트의 딱딱하게 굳은 노후 수준에 맞춰 긁어내는 전용 장비와 마감 자재 배합이 달라지므로 시공 전 상태 진단은 반드시 필요합니다.',
+  '시공 사례는 어떤 기준으로 확인해야 하나요?': '마감이 완료된 표면의 균일한 분사 두께, 타일 테두리선과 줄눈선이 일정하게 평행을 이루며 깔끔하게 정리되었는지의 실제 근접 디테일 사진을 확인하는 것이 좋습니다.',
+  '부분 보수와 전체 시공은 어떻게 구분하나요?': '타일 틈의 갈라진 틈이 전체 욕실 면적의 극히 일부분인지 혹은 벽체 모서리 일부 페인트 박리가 전부인지 분석하여, 합리적인 조치 범위를 구분해 제안합니다.'
+};
+
 // This serverless function intercepts requests to the site (like / and /sitemap-seoul)
 // and dynamically injects meta tags, H1, and pre-rendered content for SEO robots.
 export default async function handler(req, res) {
-  // Parse incoming URL and k parameters
+  // Parse incoming URL and k parameters robustly under Vercel Rewrites
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  const kParam = url.searchParams.get('k')?.trim() || '';
+  
+  // Under vercel rewrite, req.url may change to /api/seo. We check req.query or the x-vercel-original-url if present
+  let kParam = '';
+  const originalUrlHeader = req.headers['x-vercel-original-url'] || req.headers['x-matched-path'] || '';
+  if (originalUrlHeader) {
+    try {
+      const origUrl = new URL(originalUrlHeader, `http://${req.headers.host || 'localhost'}`);
+      kParam = origUrl.searchParams.get('k')?.trim() || '';
+    } catch (e) {
+      // fallback
+    }
+  }
+  
+  if (!kParam) {
+    // Fallback to query object or request url
+    kParam = (req.query?.k || url.searchParams.get('k') || '').trim();
+  }
+
   const pathname = url.pathname;
 
   // Legacy Redirect Map
@@ -266,31 +303,19 @@ export default async function handler(req, res) {
       let desc = "";
       let upperNotice = "";
 
+      const fullRegionName = (matchedRegion.parentRegionName ? matchedRegion.parentRegionName + ' ' : '') + regionName;
+
       if (isOfficial) {
-        if (matchedService.serviceGroup === 'elastic') {
-          title = `${regionName} ${taskName} 시공 안내 | 바름공간`;
-        } else {
-          title = `${regionName} ${taskName} 안내 | 타일 틈 정리`;
-        }
-        if (matchedService.searchIntent === 'agency') {
-          title = `${regionName} ${taskName} | 공식 시공 기준 안내`;
-        }
+        title = `${regionName} ${taskName} 시공 안내 | 바름공간`;
         desc = `${regionName} ${taskName}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 정밀하게 안내합니다.`;
         upperNotice = `${regionName} 지역을 위한 맞춤형 ${taskName} 시공 안내입니다.`;
       } else if (isShort) {
-        if (matchedService.serviceGroup === 'elastic') {
-          title = `${regionName} ${taskName} 전문 시공 | 바름공간`;
-        } else {
-          title = `${regionName} ${taskName} 추천 마감 | 타일 틈 케어`;
-        }
-        if (matchedService.searchIntent === 'agency') {
-          title = `${regionName} ${taskName} | 시공 전 상세 점검사항`;
-        }
+        title = `${regionName} ${taskName} 전문 시공 | 바름공간`;
         desc = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
         upperNotice = `${regionName} 지역의 주거 공간에 맞춘 ${taskName} 시공을 안내합니다.`;
       } else {
         title = `${regionName} ${taskName} | 바름공간`;
-        desc = `${regionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
+        desc = `${fullRegionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
         upperNotice = `${regionName} 지역을 위한 맞춤형 ${taskName} 안내`;
       }
 
@@ -301,25 +326,76 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${desc}" />`);
 
       const cleanUrl = generateAbsoluteDynamicUrl('https://www.barumspace.co.kr', matchedRegion.urlRegion, matchedService.keyword);
+      const seoThumbnailUrl = 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v1.jpg'; // Prefer the highly compressed JPG (389KB) over PNG (2.8MB) for crawler speed
 
-      // Inject Canonical, og:url and og:image
-      html = html.replace('</head>', `<link rel="canonical" href="${cleanUrl}" />\n<meta property="og:url" content="${cleanUrl}" />\n<meta property="og:image" content="https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v1.png" />\n</head>`);
+      // Construct FAQPage JSON-LD
+      const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": matchedService.faqSet.map(q => ({
+          "@type": "Question",
+          "name": q,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.'
+          }
+        }))
+      };
 
-      // Pre-render content for bots (H1 and localized texts, FAQs)
-      let botContent = `<div style="display:none;" id="seo-pre-rendered">`;
-      botContent += `<h1>${regionName} ${taskName}</h1>`;
-      botContent += `<p class="upper-notice">${upperNotice}</p>`;
-      botContent += `<p class="main-desc">${desc}</p>`;
-      botContent += `<h2>시공 관련 자주 묻는 질문(FAQ)</h2>`;
-      botContent += `<ul>`;
+      // Construct and Inject all 17 target SEO tags + JSON-LD
+      const seoTags = `
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="${cleanUrl}" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="${cleanUrl}" />
+<meta property="og:image" content="${seoThumbnailUrl}" />
+<meta property="og:image:secure_url" content="${seoThumbnailUrl}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="1200" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:alt" content="${regionName} ${taskName} 전문 시공 바름공간" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${desc}" />
+<meta name="twitter:image" content="${seoThumbnailUrl}" />
+<script type="application/ld+json" id="jsonld-faq">
+${JSON.stringify(faqSchema)}
+</script>
+</head>`;
+      html = html.replace('</head>', seoTags);
+
+      // Pre-render content inside #root for SEO bots (H1, notice, desc, FAQs, and links)
+      let botContent = `
+<div id="root">
+  <div style="max-width:800px; margin:0 auto; padding:40px 20px; font-family:sans-serif; color:#333;">
+    <h1 style="font-size:2.5rem; color:#183f35; margin-bottom:10px;">${regionName} ${taskName}</h1>
+    <p style="font-size:1.1rem; font-weight:600; color:#556b2f; margin-bottom:20px;">${upperNotice}</p>
+    <p style="font-size:1.05rem; line-height:1.6; margin-bottom:30px;">${desc}</p>
+    
+    <h2 style="font-size:1.5rem; color:#183f35; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:16px;">시공 관련 자주 묻는 질문(FAQ)</h2>
+    <ul style="list-style:none; padding:0; margin:0 0 40px 0;">`;
+      
       matchedService.faqSet.forEach(q => {
-        botContent += `<li><strong>Q: ${q}</strong></li>`;
+        botContent += `
+      <li style="margin-bottom:16px; border-bottom:1px dashed #eee; padding-bottom:12px;">
+        <strong style="color:#183f35; display:block; margin-bottom:4px;">Q: ${q}</strong>
+        <span style="color:#666; font-size:0.95rem;">A: ${FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.'}</span>
+      </li>`;
       });
-      botContent += `</ul>`;
-      botContent += `</div>`;
+      
+      botContent += `
+    </ul>
+    
+    <div style="border-top:1px solid #ddd; padding-top:20px;">
+      <a href="/" style="color:#0076ff; text-decoration:none;">바름공간 메인 홈페이지 바로가기</a>
+    </div>
+  </div>
+</div>`;
 
-      html = html.replace('<div id="root"></div>', `<div id="root"></div>\n${botContent}`);
+      html = html.replace('<div id="root"></div>', botContent);
 
+      // Prevent shared CDN cache pollution and ensure search engines check for updates
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(html);
     }
@@ -329,6 +405,7 @@ export default async function handler(req, res) {
   html = html.replace(/<title>.*?<\/title>/, "<title>페이지를 찾을 수 없습니다 | 바름공간</title>");
   html = html.replace('</head>', '<meta name="robots" content="noindex, follow" />\n</head>');
   html = html.replace('<div id="root"></div>', '<div id="root" style="padding:50px; text-align:center;"><h1>페이지를 찾을 수 없습니다. (404 Not Found)</h1></div>');
+  res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   return res.status(404).send(html);
 }
