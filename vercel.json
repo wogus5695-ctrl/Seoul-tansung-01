@@ -14,7 +14,17 @@
       "destination": "/api/seo"
     },
     {
-      "source": "/(index.html)?",
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "k"
+        }
+      ],
+      "destination": "/api/seo"
+    },
+    {
+      "source": "/index.html",
       "has": [
         {
           "type": "query",
