@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/seo.js": {
-      "includeFiles": "dist/index.html"
+      "includeFiles": "dist/app.html"
     }
   },
   "rewrites": [
@@ -32,6 +32,10 @@
         }
       ],
       "destination": "/api/seo"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/app.html"
     }
   ]
 }

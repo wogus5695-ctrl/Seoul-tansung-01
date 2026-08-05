@@ -117,9 +117,9 @@ export default async function handler(req, res) {
     }
   }
 
-  // Read index.html compiled template from the deployment output
+  // Read app.html compiled template from the deployment output
   // Vercel routes index.html as a static asset, we can read it from the relative build output path
-  let htmlPath = path.join(process.cwd(), 'dist', 'index.html');
+  let htmlPath = path.join(process.cwd(), 'dist', 'app.html');
   if (!fs.existsSync(htmlPath)) {
     htmlPath = path.join(process.cwd(), 'index.html'); // Fallback for safety
   }
