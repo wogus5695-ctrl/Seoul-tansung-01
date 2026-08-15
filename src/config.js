@@ -26,7 +26,7 @@ export const contactConfig = {
 
 export const siteImages = {
   hero: null,
-  searchThumbnail: '/images/seo/bareumgonggan-search-thumbnail-v1.jpg',
+  searchThumbnail: '/images/seo/bareumgonggan-search-thumbnail-v2.jpg',
   elasticServiceBefore: '/elastic_before.png',
   elasticServiceAfter: '/elastic_after.png',
   elasticClosetBefore: '/closet_before.png',

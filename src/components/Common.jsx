@@ -277,10 +277,17 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
     const isElastic = imageSrc.includes('elastic');
     return (
       <div style={{ ...styles.placeholderContainer, border: 'none', backgroundColor: 'transparent' }}>
-        <img 
-          src={imageSrc} 
-          alt={isElastic ? "바름공간 탄성코트 시공" : "바름공간 줄눈시공"} 
-          style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px' }} 
+        <div 
+          style={{ 
+            width: '100%', 
+            paddingBottom: ratio === '16:9' ? '56.25%' : ratio === '4:3' ? '75%' : ratio === '4:5' ? '125%' : ratio === '5:6' ? '120%' : ratio === '1:1' ? '100%' : '56.25%',
+            backgroundImage: `url(${imageSrc})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: '4px'
+          }}
+          aria-label={isElastic ? "바름공간 탄성코트 시공" : "바름공간 줄눈시공"}
+          role="img"
         />
       </div>
     );

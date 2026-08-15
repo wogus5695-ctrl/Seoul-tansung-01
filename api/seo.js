@@ -326,7 +326,7 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${desc}" />`);
 
       const cleanUrl = generateAbsoluteDynamicUrl('https://www.barumspace.co.kr', matchedRegion.urlRegion, matchedService.keyword);
-      const seoThumbnailUrl = 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v1.jpg'; // Prefer the highly compressed JPG (389KB) over PNG (2.8MB) for crawler speed
+      const seoThumbnailUrl = 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v2.jpg'; // Prefer the highly compressed JPG (389KB) over PNG (2.8MB) for crawler speed
 
       // Construct FAQPage JSON-LD
       const faqSchema = {
@@ -346,6 +346,7 @@ export default async function handler(req, res) {
       const seoTags = `
 <meta name="robots" content="index, follow" />
 <link rel="canonical" href="${cleanUrl}" />
+<link rel="image_src" href="${seoThumbnailUrl}" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="${cleanUrl}" />
 <meta property="og:image" content="${seoThumbnailUrl}" />
