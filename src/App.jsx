@@ -320,17 +320,18 @@ function App() {
       const isShort = parsedKeyword.region.id.endsWith('-short');
       const isOfficial = parsedKeyword.region.id.endsWith('-official');
       const isDong = !isShort && !isOfficial;
+      const isTaskEndsWithSiGong = taskName.endsWith('시공');
 
       if (isOfficial) {
-        titleStr = `${regionName} ${taskName} 시공 안내 | 바름공간`;
-        descStr = `${regionName} ${taskName}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 정밀하게 안내합니다.`;
+        titleStr = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 안내' : ' 시공 안내'} | 바름공간`;
+        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionName);
       } else if (isShort) {
-        titleStr = `${regionName} ${taskName} 전문 시공 | 바름공간`;
-        descStr = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
+        titleStr = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 전문' : ' 전문 시공'} | 바름공간`;
+        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionName);
       } else {
         const fullRegionName = (parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : '') + regionName;
         titleStr = `${regionName} ${taskName} | 바름공간`;
-        descStr = `${fullRegionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
+        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, fullRegionName);
       }
 
       // 1. Service schema
@@ -428,12 +429,16 @@ function App() {
     updateMetaTag('meta[name="description"]', 'content', descStr);
     updateMetaTag('meta[property="og:title"]', 'content', titleStr);
     updateMetaTag('meta[property="og:description"]', 'content', descStr);
+    updateMetaTag('meta[name="twitter:title"]', 'content', titleStr);
+    updateMetaTag('meta[name="twitter:description"]', 'content', descStr);
 
     // Sync SEO Search Thumbnail dynamically for normal dynamic landing pages
     let imageSrcEl = document.querySelector('link[rel="image_src"]');
 
     if (parsedKeyword) {
+      updateMetaTag('meta[property="og:type"]', 'content', 'website');
       updateMetaTag('meta[property="og:image"]', 'content', seoThumbnailUrl);
+      updateMetaTag('meta[property="og:image:secure_url"]', 'content', seoThumbnailUrl);
       updateMetaTag('meta[property="og:image:width"]', 'content', '1200');
       updateMetaTag('meta[property="og:image:height"]', 'content', '1200');
       updateMetaTag('meta[property="og:image:type"]', 'content', 'image/jpeg');
@@ -457,9 +462,13 @@ function App() {
         'meta[property="og:image:height"]',
         'meta[property="og:image:type"]',
         'meta[property="og:image:alt"]',
+        'meta[property="og:image:secure_url"]',
+        'meta[property="og:type"]',
         'meta[name="twitter:card"]',
         'meta[name="twitter:image"]',
-        'meta[name="twitter:image:alt"]'
+        'meta[name="twitter:image:alt"]',
+        'meta[name="twitter:title"]',
+        'meta[name="twitter:description"]'
       ];
       tagsToCleanup.forEach(sel => {
         const el = document.querySelector(sel);
@@ -967,15 +976,15 @@ function App() {
           <div className="dynamic-notice-bar" style={{ backgroundColor: 'var(--light-sand)', padding: '12px 20px', textAlign: 'center', fontSize: '0.9rem' }}>
             <span className="notice-pc-only" style={{ display: isDesktop ? 'inline' : 'none' }}>
               {parsedKeyword.region.id.endsWith('-official') ? (
-                <strong>{parsedKeyword.region.displayName} 지역을 위한 맞춤형 {parsedKeyword.service.keyword} 시공 안내입니다.</strong>
+                <strong>{parsedKeyword.region.displayName} 지역을 위한 맞춤형 {parsedKeyword.service.keyword}{parsedKeyword.service.keyword.endsWith('시공') ? ' 안내입니다.' : ' 시공 안내입니다.'}</strong>
               ) : parsedKeyword.region.id.endsWith('-short') ? (
-                <strong>{parsedKeyword.region.displayName} 지역의 주거 공간에 맞춘 {parsedKeyword.service.keyword} 시공을 안내합니다.</strong>
+                <strong>{parsedKeyword.region.displayName} 지역의 주거 공간에 맞춘 {parsedKeyword.service.keyword}{parsedKeyword.service.keyword.endsWith('시공') ? '을 안내합니다.' : ' 시공을 안내합니다.'}</strong>
               ) : (
                 <strong>{parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : ''}{parsedKeyword.region.displayName} 지역을 위한 맞춤형 {parsedKeyword.service.keyword} 안내</strong>
               )}
             </span>
             <span className="notice-mobile-only" style={{ display: isDesktop ? 'none' : 'inline', fontWeight: 'bold' }}>
-              {parsedKeyword.region.displayName} {parsedKeyword.service.keyword} 시공 안내
+              {parsedKeyword.region.displayName} {parsedKeyword.service.keyword}{parsedKeyword.service.keyword.endsWith('시공') ? ' 안내' : ' 시공 안내'}
             </span>
           </div>
         )}
@@ -1030,12 +1039,7 @@ function App() {
               </h1>
               <p style={{ opacity: 0.85, fontSize: '1.05rem', lineHeight: 1.6 }}>
                 {parsedKeyword 
-                  ? (parsedKeyword.region.id.endsWith('-official')
-                      ? `${parsedKeyword.region.displayName} ${parsedKeyword.service.keyword}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 정밀하게 안내합니다.`
-                      : parsedKeyword.region.id.endsWith('-short')
-                        ? `${parsedKeyword.region.displayName} 지역 베란다와 세탁실 ${parsedKeyword.service.keyword} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`
-                        : `${parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : ''}${parsedKeyword.region.displayName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${parsedKeyword.service.keyword} 전문 안내입니다.`
-                    )
+                  ? parsedKeyword.service.heroDescriptionTemplate
                   : '베란다와 세탁실 벽면부터 욕실과 현관의 타일 틈까지, 기존 상태를 확인하고 공간에 필요한 마감 시공을 안내합니다.'
                 }
               </p>
@@ -1871,7 +1875,7 @@ function App() {
 
         {/* Dynamic SEO section container */}
         {parsedKeyword && (
-          <SEOContentSection keywordInfo={{ region: parsedKeyword.region.displayName, service: parsedKeyword.service.keyword }} />
+          <SEOContentSection keywordInfo={{ region: parsedKeyword.region.displayName, service: parsedKeyword.service.keyword, sectionDescription: parsedKeyword.service.sectionDescriptionTemplate }} />
         )}
       </>
     );

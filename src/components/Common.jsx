@@ -391,8 +391,10 @@ export function SEOContentSection({ keywordInfo }) {
       <div style={styles.seoBox}>
         <h3>{keywordInfo.region} {keywordInfo.service} 맞춤형 마감 제안</h3>
         <p style={styles.seoDesc}>
-          {keywordInfo.region}의 세대 환경에 최적화된 마감 자재와 전문 시공 기술력을 결합합니다.
-          현장의 습도와 노후도를 고려하여 결로 방지 성능을 극대화하는 탄성코트와 세균 번식을 근본적으로 방지하는 친환경 줄눈 공법으로 안심할 수 있는 정돈된 공간을 구현합니다.
+          {keywordInfo.sectionDescription 
+            ? keywordInfo.sectionDescription.replace(/{region}/g, keywordInfo.region)
+            : `${keywordInfo.region}의 세대 환경에 최적화된 마감 자재와 전문 시공 기술력을 결합합니다.`
+          }
         </p>
       </div>
     </SectionContainer>

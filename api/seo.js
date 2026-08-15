@@ -304,18 +304,19 @@ export default async function handler(req, res) {
       let upperNotice = "";
 
       const fullRegionName = (matchedRegion.parentRegionName ? matchedRegion.parentRegionName + ' ' : '') + regionName;
+      const isTaskEndsWithSiGong = taskName.endsWith('시공');
 
       if (isOfficial) {
-        title = `${regionName} ${taskName} 시공 안내 | 바름공간`;
-        desc = `${regionName} ${taskName}의 벽면 점검, 보양, 균열 보수 및 도포 과정을 정밀하게 안내합니다.`;
-        upperNotice = `${regionName} 지역을 위한 맞춤형 ${taskName} 시공 안내입니다.`;
+        title = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 안내' : ' 시공 안내'} | 바름공간`;
+        desc = matchedService.metaDescriptionTemplate.replace(/{region}/g, regionName);
+        upperNotice = `${regionName} 지역을 위한 맞춤형 ${taskName}${isTaskEndsWithSiGong ? ' 안내입니다.' : ' 시공 안내입니다.'}`;
       } else if (isShort) {
-        title = `${regionName} ${taskName} 전문 시공 | 바름공간`;
-        desc = `${regionName} 지역 베란다와 세탁실 ${taskName} 상담 시 확인할 벽면 상태와 시공 기준을 안내합니다.`;
-        upperNotice = `${regionName} 지역의 주거 공간에 맞춘 ${taskName} 시공을 안내합니다.`;
+        title = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 전문' : ' 전문 시공'} | 바름공간`;
+        desc = matchedService.metaDescriptionTemplate.replace(/{region}/g, regionName);
+        upperNotice = `${regionName} 지역의 주거 공간에 맞춘 ${taskName}${isTaskEndsWithSiGong ? '을 안내합니다.' : ' 시공을 안내합니다.'}`;
       } else {
         title = `${regionName} ${taskName} | 바름공간`;
-        desc = `${fullRegionName} 지역의 안정적인 타일 및 벽면 관리를 위한 ${taskName} 전문 안내입니다.`;
+        desc = matchedService.metaDescriptionTemplate.replace(/{region}/g, fullRegionName);
         upperNotice = `${regionName} 지역을 위한 맞춤형 ${taskName} 안내`;
       }
 
@@ -328,19 +329,51 @@ export default async function handler(req, res) {
       const cleanUrl = generateAbsoluteDynamicUrl('https://www.barumspace.co.kr', matchedRegion.urlRegion, matchedService.keyword);
       const seoThumbnailUrl = 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v2.jpg'; // Prefer the highly compressed JPG (389KB) over PNG (2.8MB) for crawler speed
 
-      // Construct FAQPage JSON-LD
-      const faqSchema = {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": matchedService.faqSet.map(q => ({
-          "@type": "Question",
-          "name": q,
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.'
+      // Construct Shared Schema JSON-LD (Service, BreadcrumbList, FAQPage)
+      const defaultSiteUrl = 'https://www.barumspace.co.kr';
+      const schemas = [];
+
+      // 1. Service schema
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        'name': `${regionName} ${taskName}`,
+        'provider': {
+          '@type': 'Organization',
+          'name': '바름공간'
+        },
+        'areaServed': {
+          '@type': 'AdministrativeArea',
+          'name': matchedRegion.districtName || regionName
+        },
+        'description': desc,
+        'image': seoThumbnailUrl
+      });
+
+      // 2. Breadcrumb schema
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
+          { '@type': 'ListItem', 'position': 2, 'name': '수도권 지역별 안내', 'item': `${defaultSiteUrl}/sitemap-seoul` },
+          { '@type': 'ListItem', 'position': 3, 'name': `${regionName} ${taskName}`, 'item': cleanUrl }
+        ]
+      });
+
+      // 3. FAQPage schema
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': matchedService.faqSet.map(q => ({
+          '@type': 'Question',
+          'name': q,
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.'
           }
         }))
-      };
+      });
 
       // Construct and Inject all 17 target SEO tags + JSON-LD
       const seoTags = `
@@ -359,8 +392,8 @@ export default async function handler(req, res) {
 <meta name="twitter:title" content="${title}" />
 <meta name="twitter:description" content="${desc}" />
 <meta name="twitter:image" content="${seoThumbnailUrl}" />
-<script type="application/ld+json" id="jsonld-faq">
-${JSON.stringify(faqSchema)}
+<script type="application/ld+json" id="jsonld-schema">
+${JSON.stringify(schemas)}
 </script>
 </head>`;
       html = html.replace('</head>', seoTags);
