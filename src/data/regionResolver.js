@@ -116,6 +116,8 @@ function buildIndexes() {
       officialName: officialName,
       displayName: item.displayRegionName,
       urlRegion: item.urlRegionKey,
+      parentRegionName: item.parentRegionName || metro,
+      districtName: item.parentRegionName ? item.parentRegionName.split(' ')[1] || groupName : groupName,
       aliases: [],
       collisionResolved: true,
       requiresCollisionReview: false,

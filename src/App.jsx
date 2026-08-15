@@ -16,7 +16,7 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicy';
 
 // Ingest datasets
 import { seoulRegions } from './data/seoulRegions';
-import { serviceKeywords } from './data/serviceKeywords';
+import { serviceKeywords, FAQ_CATALOG } from './data/serviceKeywords';
 import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl } from './data/regionResolver';
 import { incheonRegions } from './data/incheonRegions';
 import { gyeonggiRegions } from './data/gyeonggiRegions';
@@ -30,27 +30,6 @@ const SPACE_GUIDE_DATA = {
   toilet: { name: '화장실', img: 'TOILET_IMAGE', desc: '바닥과 벽면의 사용 환경에 맞춰 줄눈 상태를 점검합니다. 부분 보수와 전체 시공 중 적절한 범위를 안내합니다.' },
   entrance: { name: '현관', img: 'ENTRANCE_IMAGE', desc: '먼지와 외부 오염이 반복적으로 유입되는 공간입니다. 타일 색상과 관리 방식을 고려해 줄눈 색상을 선택합니다.' },
   utility: { name: '다용도실', img: 'UTILITY_ROOM_IMAGE', desc: '세탁기, 배관, 수납장 주변의 작업 공간을 먼저 확인합니다. 좁은 공간에서도 필요한 보양과 작업 동선을 검토합니다.' },
-};
-
-// Base FAQ catalog reference
-const FAQ_CATALOG = {
-  '기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?': '재시공 가능 여부는 기존 마감의 접착 상태를 확인한 후에 판단할 수 있습니다. 들뜬 부분을 정리하지 않고 바로 덧시공을 하게 되면 다시 떨어질 우려가 있으므로, 사전에 상태를 확인하고 필요한 부분 보수 또는 전체 재시공 범위를 결정해야 합니다.',
-  '곰팡이나 결로가 있으면 바로 시공해도 되나요?': '표면만 덮어서 시공을 진행하면 원인이 해결되지 않아 마감 후에 다시 문제가 생길 수 있습니다. 결로나 누수 의심 원인을 먼저 확인해 조치를 취하고, 바탕면의 건조 상태가 완전히 확인된 후에 시공하는 것이 바람직합니다.',
-  '탄성코트 시공 전에 짐을 모두 빼야 하나요?': '작업할 벽면 및 보양을 진행할 공간의 확보와 작업 동선이 마련되어야 합니다. 세탁기, 선반, 실외기 등 부피가 큰 짐들의 이동 가능 여부는 사전 사진 상담 시 상태를 확인한 후에 안내해 드립니다.',
-  '일부 벽면만 부분 보수할 수 있나요?': '부분적인 보수가 가능한지의 여부는 손상된 범위와 기존 시공면의 색상 차이를 분석하여 판단합니다. 부분 시공을 할 경우 기존 면과의 미세한 색상이나 질감 차이가 관찰될 수 있어, 사진과 현장 상태를 기준으로 판단합니다.',
-  '탄성코트 색상은 어떻게 선택하나요?': '기존 인테리어와의 배합을 분석하여 현장에서 샘플 조색 카드를 대조하며 선택합니다. 밝은 톤의 웜화이트 및 실버/내추럴 그레이 등 오염 관리에 적합한 색상 매칭을 안내합니다.',
-  '시공 후 환기와 건조는 어떻게 해야 하나요?': '도포된 수지가 고르게 양생될 때까지 온도와 자연 기류 통풍 흐름을 안정적으로 유지해야 합니다. 자재 등급 및 양생 당일의 날씨 환경에 수렴하여 개별로 건조 완료 시점을 상세히 보고드립니다.',
-  '기존 줄눈을 제거하고 시공하나요?': '기존 타일 사이 줄눈의 오염도, 갈라짐 정도, 접착 상태를 면밀히 분석한 후 작업을 시작합니다. 필요한 작업 범위 내에 있는 기존 백시멘트를 제거하고 틈새를 꼼꼼히 정리하는 과정을 거친 후에 다시 시공하게 됩니다.',
-  '욕실과 현관에 같은 자재를 사용하나요?': '공간마다 물을 접하는 빈도와 오염물이 유입되는 경로가 다릅니다. 타일의 종류와 기존 마감재 상태도 다르기 때문에, 해당 공간의 환경에 가장 잘 부합하는 적합한 등급의 자재와 마감 색상을 선정하여 안내해 드립니다.',
-  '줄눈 일부만 보수할 수 있나요?': '줄눈의 훼손 부위 접착 특성을 판단해 마감 탈락 위험성이 높지 않은 경우 국소 보수가 가능합니다. 단, 전체 균일도 유지를 위해 가능한 타일 면 단위 정리를 권장합니다.',
-  '시공 후 언제부터 물을 사용할 수 있나요?': '정확한 사용 가능 시점은 현장에서 적용한 자재의 특성, 그리고 당일 현장의 온도와 습도 조건에 따라 다르게 나타납니다. 시공이 완료된 후 현장에서 양생 건조 관련 세부 주의사항과 함께 안내해 드립니다.',
-  '타일 색상에 맞춰 줄눈 색상을 선택할 수 있나요?': '타일의 메탈 느낌이나 은은한 미색에 맞춘 다채로운 메탈 조색, 펄 컬러 색조판을 구비하여 현장 대조 확인 후 선택할 수 있도록 조율합니다.',
-  '오염된 줄눈 위에 바로 덧시공하나요?': '오염물이 고착된 노후 백시멘트 바로 위에 줄눈제를 바르면 부착력이 저하되어 금방 부스러져 떨어집니다. 반드시 기존 오염된 줄눈 틈을 긁어 정리한 후에 시공을 집행합니다.',
-  '탄성코트 업체를 선택할 때 무엇을 확인해야 하나요?': '들뜬 마감을 철저히 긁어내는 전처리 밑작업 원칙을 고수하는지, 그리고 눈에 보이지 않는 균열 틈새 보강 절차를 성실히 진행하는지가 가장 핵심적인 선택 기준입니다.',
-  '줄눈시공 업체의 견적은 어떤 내용을 비교해야 하나요?': '단순 최저 단가보다는 기존 노후 마감재 홈파기 정리 깊이, 변기 및 욕조 테두리 코킹 마감 범위가 견적서상에 명확히 수록되어 있는지를 면밀히 비교 확인해야 합니다.',
-  '시공 전 기존 마감 상태를 확인하나요?': '벽체의 수분 함침 정도나 백시멘트의 딱딱하게 굳은 노후 수준에 맞춰 긁어내는 전용 장비와 마감 자재 배합이 달라지므로 시공 전 상태 진단은 반드시 필요합니다.',
-  '시공 사례는 어떤 기준으로 확인해야 하나요?': '마감이 완료된 표면의 균일한 분사 두께, 타일 테두리선과 줄눈선이 일정하게 평행을 이루며 깔끔하게 정리되었는지의 실제 근접 디테일 사진을 확인하는 것이 좋습니다.',
-  '부분 보수와 전체 시공은 어떻게 구분하나요?': '타일 틈의 갈라진 틈이 전체 욕실 면적의 극히 일부분인지 혹은 벽체 모서리 일부 페인트 박리가 전부인지 분석하여, 합리적인 조치 범위를 구분해 제안합니다.'
 };
 
 // Portfolio Structures
@@ -273,12 +252,9 @@ function App() {
     : [
         { question: '기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?', answer: FAQ_CATALOG['기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?'] },
         { question: '곰팡이나 결로가 있으면 바로 시공해도 되나요?', answer: FAQ_CATALOG['곰팡이나 결로가 있으면 바로 시공해도 되나요?'] },
-        { question: '탄성코트 시공 전에 짐을 모두 빼야 하나요?', answer: FAQ_CATALOG['탄성코트 시공 전에 짐을 모두 빼야 하나요?'] },
         { question: '기존 줄눈을 제거하고 시공하나요?', answer: FAQ_CATALOG['기존 줄눈을 제거하고 시공하나요?'] },
         { question: '욕실과 현관에 같은 자재를 사용하나요?', answer: FAQ_CATALOG['욕실과 현관에 같은 자재를 사용하나요?'] },
-        { question: '시공 후 언제부터 물을 사용할 수 있나요?', answer: FAQ_CATALOG['시공 후 언제부터 물을 사용할 수 있나요?'] },
-        { question: '줄눈 일부만 보수할 수 있나요?', answer: FAQ_CATALOG['줄눈 일부만 보수할 수 있나요?'] },
-        { question: '시공 전 기존 마감 상태를 확인하나요?', answer: FAQ_CATALOG['시공 전 기존 마감 상태를 확인하나요?'] }
+        { question: '시공 후 언제부터 물을 사용할 수 있나요?', answer: FAQ_CATALOG['시공 후 언제부터 물을 사용할 수 있나요?'] }
       ];
 
   // Sync title, meta tags, and canonical dynamically on mount/update
@@ -322,16 +298,24 @@ function App() {
       const isDong = !isShort && !isOfficial;
       const isTaskEndsWithSiGong = taskName.endsWith('시공');
 
+      // Determine region context name for duplicate correction URLs
+      const isCorrectionUrl = parsedKeyword.region.displayName !== parsedKeyword.region.urlRegion;
+      const cleanParent = (parsedKeyword.region.parentRegionName || "").replace(/특별시|광역시/g, "");
+      const regionContextName = isCorrectionUrl 
+        ? `${cleanParent} ${regionName}`.trim().replace(/\s+/g, ' ')
+        : regionName;
+
       if (isOfficial) {
         titleStr = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 안내' : ' 시공 안내'} | 바름공간`;
-        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionName);
+        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionContextName);
       } else if (isShort) {
         titleStr = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 전문' : ' 전문 시공'} | 바름공간`;
-        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionName);
+        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionContextName);
       } else {
         const fullRegionName = (parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : '') + regionName;
         titleStr = `${regionName} ${taskName} | 바름공간`;
-        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, fullRegionName);
+        const replacementName = isCorrectionUrl ? regionContextName : fullRegionName;
+        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, replacementName);
       }
 
       // 1. Service schema
@@ -345,7 +329,7 @@ function App() {
         },
         'areaServed': {
           '@type': 'AdministrativeArea',
-          'name': parsedKeyword.region.districtName
+          'name': isCorrectionUrl ? `${parsedKeyword.region.districtName || ""} ${regionName}`.trim() : (parsedKeyword.region.districtName || regionName)
         },
         'description': descStr,
         'image': seoThumbnailUrl
@@ -1039,7 +1023,7 @@ function App() {
               </h1>
               <p style={{ opacity: 0.85, fontSize: '1.05rem', lineHeight: 1.6 }}>
                 {parsedKeyword 
-                  ? parsedKeyword.service.heroDescriptionTemplate
+                  ? parsedKeyword.service.heroDescriptionTemplate.replace(/{region}/g, parsedKeyword.region.displayName)
                   : '베란다와 세탁실 벽면부터 욕실과 현관의 타일 틈까지, 기존 상태를 확인하고 공간에 필요한 마감 시공을 안내합니다.'
                 }
               </p>
@@ -1875,7 +1859,13 @@ function App() {
 
         {/* Dynamic SEO section container */}
         {parsedKeyword && (
-          <SEOContentSection keywordInfo={{ region: parsedKeyword.region.displayName, service: parsedKeyword.service.keyword, sectionDescription: parsedKeyword.service.sectionDescriptionTemplate }} />
+          <SEOContentSection keywordInfo={{
+            region: (parsedKeyword.region.displayName !== parsedKeyword.region.urlRegion)
+              ? `${(parsedKeyword.region.parentRegionName || "").replace(/특별시|광역시/g, "")} ${parsedKeyword.region.districtName || ""} ${parsedKeyword.region.displayName}`.trim().replace(/\s+/g, ' ')
+              : parsedKeyword.region.displayName,
+            service: parsedKeyword.service.keyword,
+            sectionDescription: parsedKeyword.service.sectionDescriptionTemplate
+          }} />
         )}
       </>
     );
