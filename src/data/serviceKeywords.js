@@ -15,7 +15,7 @@ export const serviceKeywords = [
     heroTitleTemplate: '벽면 상태부터 확인하는 시공',
     heroDescriptionTemplate: '{region} 베란다와 세탁실의 기존 도장 상태를 확인하고, 바탕면 정리부터 필요한 탄성코트 시공 범위를 안내합니다.',
     metaTitleTemplate: '탄성코트 시공 안내 | 베란다·세탁실 벽면 마감',
-    metaDescriptionTemplate: '{region} 탄성코트 전문 시공을 위한 벽면 진단과 마감 정보입니다. 베란다 및 세탁실의 도막 박리와 크랙 보수를 진행하는 바름공간의 시공 기준을 안내합니다.',
+    metaDescriptionTemplate: '{region} 베란다 벽면의 들뜸과 얼룩 때문에 고민이신가요? 기존 페인트와 갈라진 부분을 확인하고 필요한 보수 후 탄성코트를 진행합니다. 시공 후에도 문제가 생기면 A/S 기준에 따라 확인해드립니다.',
     sectionDescriptionTemplate: '{region} 지역의 탄성코트 시공은 베란다와 다용도실 등 온도차가 큰 벽면의 수축 팽창에 견디는 마감이 필수적입니다. 기온 차로 발생하는 미세 결로를 예방하고 곰팡이 유발 오염원을 억제하기 위해, 벽면의 기존 페인트 박리 공정과 밀착 균열 보강을 철저히 선행한 뒤 기능성 인증 세라믹 코팅제를 균일하게 도포합니다.',
     faqSet: [
       '기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?',
@@ -39,7 +39,7 @@ export const serviceKeywords = [
     heroTitleTemplate: '공정 단계별 정밀 도포 마감',
     heroDescriptionTemplate: '{region} 현장의 보양부터 기존 페인트 긁어내기, 균열 메우기 및 탄성코트 분사까지 단계별 품질 기준을 준수합니다.',
     metaTitleTemplate: '탄성코트시공 과정 및 기준 안내',
-    metaDescriptionTemplate: '{region} 현장의 세밀한 보양 작업과 바탕면 페인트 박리, 보수 공정 등 단계별로 실행되는 탄성코트시공의 정밀한 품질 관리 과정을 소개합니다.',
+    metaDescriptionTemplate: '{region} 벽면이 들뜨고 갈라졌는데 바로 탄성코트를 해도 될지 고민이신가요? 벽 상태를 확인하고 필요한 보수와 정리 후 순서에 맞춰 시공합니다. 시공 후에도 A/S 기준에 따라 확인해드립니다.',
     sectionDescriptionTemplate: '{region} 현장의 탄성코트시공은 분사 장비의 압력 조절과 균일한 도막 두께 형성이 품질을 좌우합니다. 틈새 코너 실리콘 보강, 창틀 주위의 노후 크랙 부위 아크릴 코킹 메우기 등의 정밀한 밑작업 과정을 확인하고 공간에 필요한 도포 마감 가이드를 확인해 보세요.',
     faqSet: [
       '곰팡이나 결로가 있으면 바로 시공해도 되나요?',
@@ -63,7 +63,7 @@ export const serviceKeywords = [
     heroTitleTemplate: '온도차와 습기를 고려한 마감',
     heroDescriptionTemplate: '{region} 베란다 내외벽의 습기 노출도와 기존 도장 균열을 진단하여 밀착력 높은 세라믹 탄성 마감을 안내합니다.',
     metaTitleTemplate: '베란다탄성코트 시공 안내 | 오염 및 들뜸 예방',
-    metaDescriptionTemplate: '{region} 베란다 외벽 결로 및 기존 도장 들뜸 문제를 보완하는 탄성코트 작업입니다. 창틀 코킹 누수 균열 보수 기준과 바름공간의 벽면 정리 절차를 제시합니다.',
+    metaDescriptionTemplate: '{region} 베란다 벽면의 곰팡이 자국과 들뜬 페인트 때문에 고민이신가요? 기존 벽면 상태를 확인하고 필요한 보수와 정리 후 탄성코트를 진행합니다. 시공 후에도 A/S 기준에 따라 확인해드립니다.',
     sectionDescriptionTemplate: '{region} 베란다탄성코트 관리는 외부 습기와 직접 접하는 외벽면의 도장 상태 회복에 집중합니다. 창호 샷시 코킹 틈새의 노화 여부와 콘크리트 미세 균열을 진단하여 밀착력이 저하된 페인트 막을 긁어내고 방습 안심 마감 기준을 안착시킵니다.',
     faqSet: [
       '기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?',
@@ -87,7 +87,7 @@ export const serviceKeywords = [
     heroTitleTemplate: '높은 습기를 방어하는 마감',
     heroDescriptionTemplate: '{region} 세탁실의 지속적인 배수와 환기 부족으로 오염되기 쉬운 벽체의 기존 마감 상태를 정밀 진단합니다.',
     metaTitleTemplate: '세탁실탄성코트 맞춤형 벽면 관리 가이드',
-    metaDescriptionTemplate: '{region} 환기가 지연되고 물 사용이 잦은 세탁실의 도막 부식과 벽체 곰팡이 오염을 방지하는 탄성코트 시공 요령과 배관 뒤 밀착 마감 기준을 확인하세요.',
+    metaDescriptionTemplate: '{region} 세탁실 벽면의 얼룩과 들뜬 페인트가 신경 쓰이시나요? 벽면과 배관 주변 상태를 확인하고 필요한 범위부터 꼼꼼하게 시공합니다. 시공 후에도 A/S 기준에 따라 확인해드립니다.',
     sectionDescriptionTemplate: '{region} 세탁실탄성코트는 수도관 주위와 건조기 배관 뒷면 등 통풍이 제한적인 음지 벽면 관리에 중점을 둔다. 상시적인 결로와 높은 상대 습도 조건에서도 도장막이 쉽게 부식되지 않도록 방균 성능이 보완된 바이오 세라믹 자재를 밀착 적용합니다.',
     faqSet: [
       '곰팡이나 결로가 있으면 바로 시공해도 되나요?',
@@ -111,7 +111,7 @@ export const serviceKeywords = [
     heroTitleTemplate: '신축 및 구축 아파트 맞춤형 시공',
     heroDescriptionTemplate: '{region} 아파트 발코니 벽면의 노후 상태와 기존 도막 상태를 진단하여 가장 적합한 벽면 보수 마감을 지원합니다.',
     metaTitleTemplate: '아파트탄성코트 확인 사항과 시공 기준',
-    metaDescriptionTemplate: '{region} 아파트 다용도실 및 실외기실의 외기 노출 상태를 고려한 세라믹 페인트 시공입니다. 신축 하자 점검 및 구축 벽면 전처리 기준을 바름공간에서 안내합니다.',
+    metaDescriptionTemplate: '{region} 아파트 베란다·세탁실 벽면 마감이 아쉬우신가요? 기존 벽면과 들뜬 부분을 확인하고 필요한 보수 후 깔끔하게 마감합니다. 시공 후에도 A/S 기준에 따라 확인해드립니다.',
     sectionDescriptionTemplate: '{region} 아파트탄성코트 마감은 대피공간, 실외기실 등 발코니 내부 전역의 외기 접촉면을 정돈하는 공정입니다. 신축 아파트의 콘크리트 습기 배출 유도부터 구축 세대의 들뜬 시멘트 박리 보강까지 아파트 연식에 맞춘 세분화된 도장 품질을 유지합니다.',
     faqSet: [
       '탄성코트 시공 전에 짐을 모두 빼야 하나요?',
@@ -135,7 +135,7 @@ export const serviceKeywords = [
     heroTitleTemplate: '시공 전 확인 기준부터 비교하세요',
     heroDescriptionTemplate: '{region} 지역의 과장된 장기 보증 선전 대신, 들뜬 마감을 꼼꼼히 긁어내고 바탕면을 철저히 정돈하는 신뢰성 있는 기준을 제안합니다.',
     metaTitleTemplate: '탄성코트업체 비교 및 선택 기준 안내',
-    metaDescriptionTemplate: '{region} 탄성코트 전문 업체를 비교할 때 필수적인 도포 전 밑작업 및 크랙 보강 검토 방법입니다. 보수 단가보다 밑작업의 투명한 공정 고수 기준을 알아봅니다.',
+    metaDescriptionTemplate: '{region} 탄성코트 업체가 많아 어디에 맡겨야 할지 고민이신가요? 견적뿐 아니라 벽면 상태와 보수·시공 범위를 확인하고 상담합니다. 시공 후에도 문제가 생기면 A/S 기준에 따라 확인해드립니다.',
     sectionDescriptionTemplate: '{region} 탄성코트업체를 비교할 때는 도포 기계 분사 두께의 균일성뿐만 아니라, 들뜬 도막 정돈과 균열 보수 등의 전처리 공정에 얼마큼의 시간을 투자하는지 점검해야 합니다. 투명한 시공 프로세스와 안심 보증 기준을 확인하세요.',
     faqSet: [
       '탄성코트 업체를 선택할 때 무엇을 확인해야 하나요?',
