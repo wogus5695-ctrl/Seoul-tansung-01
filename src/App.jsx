@@ -305,17 +305,17 @@ function App() {
         ? `${cleanParent} ${regionName}`.trim().replace(/\s+/g, ' ')
         : regionName;
 
+      const metaDescText = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, parsedKeyword.region.displayName || regionName);
       if (isOfficial) {
         titleStr = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 안내' : ' 시공 안내'} | 바름공간`;
-        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionContextName);
+        descStr = metaDescText;
       } else if (isShort) {
         titleStr = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 전문' : ' 전문 시공'} | 바름공간`;
-        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, regionContextName);
+        descStr = metaDescText;
       } else {
         const fullRegionName = (parsedKeyword.region.parentRegionName ? parsedKeyword.region.parentRegionName + ' ' : '') + regionName;
         titleStr = `${regionName} ${taskName} | 바름공간`;
-        const replacementName = isCorrectionUrl ? regionContextName : fullRegionName;
-        descStr = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, replacementName);
+        descStr = metaDescText;
       }
 
       // 1. Service schema

@@ -294,16 +294,16 @@ export default async function handler(req, res) {
       const fullRegionName = (matchedRegion.parentRegionName ? matchedRegion.parentRegionName + ' ' : '') + regionName;
       const isTaskEndsWithSiGong = taskName.endsWith('시공');
 
+      const metaDescText = matchedService.metaDescriptionTemplate.replace(/{region}/g, matchedRegion.displayName || regionName);
       if (isOfficial) {
         title = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 안내' : ' 시공 안내'} | 바름공간`;
-        desc = matchedService.metaDescriptionTemplate.replace(/{region}/g, regionContextName);
+        desc = metaDescText;
       } else if (isShort) {
         title = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 전문' : ' 전문 시공'} | 바름공간`;
-        desc = matchedService.metaDescriptionTemplate.replace(/{region}/g, regionContextName);
+        desc = metaDescText;
       } else {
         title = `${regionName} ${taskName} | 바름공간`;
-        const replacementName = isCorrectionUrl ? regionContextName : fullRegionName;
-        desc = matchedService.metaDescriptionTemplate.replace(/{region}/g, replacementName);
+        desc = metaDescText;
       }
 
       // Inject Meta Tags into HTML
