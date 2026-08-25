@@ -18,6 +18,7 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicy';
 import { seoulRegions } from './data/seoulRegions';
 import { serviceKeywords, FAQ_CATALOG } from './data/serviceKeywords';
 import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl } from './data/regionResolver';
+import { thumbnailTestMap } from './data/thumbnailTestMap';
 import { incheonRegions } from './data/incheonRegions';
 import { gyeonggiRegions } from './data/gyeonggiRegions';
 import { keywordMetadata } from './data/keywordMetadata';
@@ -262,7 +263,10 @@ function App() {
     let titleStr = `탄성코트·줄눈시공 전문`;
     let descStr = `베란다·세탁실 탄성코트와 욕실·현관 줄눈시공을 안내합니다. 기존 벽면과 타일 상태를 확인하고 공간에 필요한 시공 범위를 상담해 드립니다.`;
     const defaultSiteUrl = siteConfig.siteUrl;
-    const seoThumbnailUrl = `${siteConfig.siteUrl}/images/seo/bareumgonggan-search-thumbnail-v2.jpg`;
+    const customThumb = thumbnailTestMap[kParam];
+    const seoThumbnailUrl = customThumb 
+      ? `${siteConfig.siteUrl}${customThumb}`
+      : `${siteConfig.siteUrl}/images/seo/bareumgonggan-search-thumbnail-v2.jpg`;
     
     // Schema generation arrays
     const schemas = [];

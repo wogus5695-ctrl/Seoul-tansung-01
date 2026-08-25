@@ -2,6 +2,7 @@ import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl } from '../src/data/regionResolver.js';
 import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
+import { thumbnailTestMap } from '../src/data/thumbnailTestMap.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -313,7 +314,10 @@ export default async function handler(req, res) {
       html = html.replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${desc}" />`);
 
       const cleanUrl = generateAbsoluteDynamicUrl('https://www.barumspace.co.kr', matchedRegion.urlRegion, matchedService.keyword);
-      const seoThumbnailUrl = 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v2.jpg'; // Prefer the highly compressed JPG (389KB) over PNG (2.8MB) for crawler speed
+      const customThumb = thumbnailTestMap[kParam];
+      const seoThumbnailUrl = customThumb 
+        ? `https://www.barumspace.co.kr${customThumb}`
+        : 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v2.jpg';
 
       // Construct Shared Schema JSON-LD (Service, BreadcrumbList, FAQPage)
       const defaultSiteUrl = 'https://www.barumspace.co.kr';
