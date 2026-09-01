@@ -2,6 +2,7 @@ import { regionMaster } from './regionMaster.js';
 import { keywordMetadata } from './keywordMetadata.js';
 import { serviceKeywords } from './serviceKeywords.js';
 import { getAllowedServicesForRegion } from './servicePolicy.js';
+import { gyeonggiSouthRegions } from './gyeonggiSouthRegions.js';
 
 export { getAllowedServicesForRegion };
 
@@ -42,7 +43,9 @@ const activeRegionIndex = new Map();
 const previewRegionIndex = new Map();
 
 function buildIndexes() {
-  keywordMetadata.forEach(item => {
+  const allMetadata = [...keywordMetadata, ...gyeonggiSouthRegions];
+
+  allMetadata.forEach(item => {
     if (!item.isIndexable) return;
 
     const displaySlug = normalizeKeywordParam(item.displayRegionName);
@@ -104,6 +107,12 @@ function buildIndexes() {
           const pDist = masterEntity.districtId ? regionMaster.districts.find(di => di.id === masterEntity.districtId) : null;
           groupName = pDist ? pDist.name : city;
         }
+      } else {
+        // Fallback for expansion regions in gyeonggiSouthRegions
+        const parts = item.parentRegionName ? item.parentRegionName.split(' ') : [];
+        metro = parts[0] ? parts[0].replace('도', '') : '경기';
+        city = parts[1] || item.officialRegionName;
+        groupName = parts[2] || city;
       }
     }
 

@@ -2,6 +2,7 @@
 // Ensures data integrity, zero duplicate URLs, zero composite keywords, and valid service families.
 
 import { keywordMetadata } from '../src/data/keywordMetadata.js';
+import { gyeonggiSouthRegions } from '../src/data/gyeonggiSouthRegions.js';
 import { serviceKeywords } from '../src/data/serviceKeywords.js';
 import { getActiveRegions, getAllowedServicesForRegion } from '../src/data/regionResolver.js';
 
@@ -14,7 +15,9 @@ function validateRegions() {
   const seenIds = new Set();
   const seenUrlRegionKeys = new Map();
 
-  keywordMetadata.forEach((item, index) => {
+  const allMetadata = [...keywordMetadata, ...gyeonggiSouthRegions];
+
+  allMetadata.forEach((item, index) => {
     const locStr = `[Index ${index} | ID: ${item.id || 'N/A'} | Region: ${item.displayRegionName || 'N/A'}]`;
 
     // Rule 1: Duplicate region ID (warn on baseline, error on new expansion)
