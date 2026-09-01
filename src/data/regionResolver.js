@@ -1,6 +1,9 @@
 import { regionMaster } from './regionMaster.js';
 import { keywordMetadata } from './keywordMetadata.js';
 import { serviceKeywords } from './serviceKeywords.js';
+import { getAllowedServicesForRegion } from './servicePolicy.js';
+
+export { getAllowedServicesForRegion };
 
 export const ENABLE_CAPITAL_REGION_EXPANSION = true;
 
@@ -121,7 +124,11 @@ function buildIndexes() {
       aliases: [],
       collisionResolved: true,
       requiresCollisionReview: false,
-      active: item.isIndexable
+      active: item.isIndexable,
+      allowedServiceFamilies: item.allowedServiceFamilies,
+      parentIds: item.parentIds || (item.additionalParentIds ? [masterEntity?.parentId || metro, ...item.additionalParentIds] : null),
+      expansionBatch: item.expansionBatch,
+      sitemapGroup: item.sitemapGroup
     };
 
     const addIndex = (key, val) => {
@@ -177,6 +184,11 @@ export function parseAndValidateK(kParam, usePreview = false) {
 
   const region = findRegionByUrlToken(urlRegionToken, usePreview);
   if (!region) return { region: null, service: null, isValid: false };
+
+  // Validate if the service is allowed for this region
+  const allowedServices = getAllowedServicesForRegion(region);
+  const isAllowed = allowedServices.some(s => s.keyword === service.keyword);
+  if (!isAllowed) return { region: null, service: null, isValid: false };
 
   return {
     region,

@@ -17,7 +17,7 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicy';
 // Ingest datasets
 import { seoulRegions } from './data/seoulRegions';
 import { serviceKeywords, FAQ_CATALOG } from './data/serviceKeywords';
-import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl } from './data/regionResolver';
+import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from './data/regionResolver';
 import { thumbnailTestMap } from './data/thumbnailTestMap';
 import { incheonRegions } from './data/incheonRegions';
 import { gyeonggiRegions } from './data/gyeonggiRegions';
@@ -534,13 +534,17 @@ function App() {
     ? activePortfolios
     : activePortfolios.filter(p => p.serviceType === portfolioFilter);
 
-  const relatedServicesLinks = parsedKeyword ? parsedKeyword.service.relatedServices.map(task => ({
-    label: `${parsedKeyword.region.name} ${task}`,
-    href: generateDynamicUrl(parsedKeyword.region.urlRegion, task)
-  })) : null;
+  const allowedServicesForCurrentRegion = parsedKeyword ? getAllowedServicesForRegion(parsedKeyword.region) : [];
+
+  const relatedServicesLinks = parsedKeyword ? parsedKeyword.service.relatedServices
+    .filter(task => allowedServicesForCurrentRegion.some(s => s.keyword === task))
+    .map(task => ({
+      label: `${parsedKeyword.region.name} ${task}`,
+      href: generateDynamicUrl(parsedKeyword.region.urlRegion, task)
+    })) : null;
 
   const relatedRegionsLinks = parsedKeyword ? getActiveRegions().filter(
-    r => r.parentId === parsedKeyword.region.parentId && r.id !== parsedKeyword.region.id
+    r => r.parentId === parsedKeyword.region.parentId && r.id !== parsedKeyword.region.id && getAllowedServicesForRegion(r).some(s => s.keyword === parsedKeyword.service.keyword)
   ).slice(0, 6).map(reg => ({
     label: `${reg.name} ${parsedKeyword.service.keyword}`,
     href: generateDynamicUrl(reg.urlRegion, parsedKeyword.service.keyword)
@@ -795,7 +799,9 @@ function App() {
                       let keywordLinkCount = 0;
                       Object.keys(city.districts).forEach(dk => {
                         childCount += city.districts[dk].regions.length;
-                        keywordLinkCount += city.districts[dk].regions.length * 12;
+                        city.districts[dk].regions.forEach(r => {
+                          keywordLinkCount += getAllowedServicesForRegion(r).length;
+                        });
                       });
 
                       const isOpen = !!openDistricts[cityKey];
@@ -869,6 +875,7 @@ function App() {
                                           const isRegionMatched = reg.displayName.includes(regionSearch) || reg.officialName.includes(regionSearch);
                                           if (!isRegionMatched) return null;
 
+                                          const allowedServices = getAllowedServicesForRegion(reg);
                                           const isDongOpen = !!openDistricts[`dong-${reg.id}`];
 
                                           return (
@@ -894,7 +901,7 @@ function App() {
                                                 }}
                                               >
                                                 <span>{reg.name}</span>
-                                                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{isDongOpen ? '접기' : '키워드 링크 보기 (12)'}</span>
+                                                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{isDongOpen ? '접기' : `키워드 링크 보기 (${allowedServices.length})`}</span>
                                               </div>
 
                                               {isDongOpen && (
@@ -906,7 +913,7 @@ function App() {
                                                   flexDirection: 'column',
                                                   gap: '6px'
                                                 }}>
-                                                  {serviceKeywords.map(tk => {
+                                                  {allowedServices.map(tk => {
                                                     const isFilterMatched = sitemapFilter === '전체' || tk.serviceGroup === (sitemapFilter === '탄성코트' ? 'elastic' : 'grout');
                                                     const isTaskSearchMatched = tk.keyword.includes(taskSearch);
                                                     if (!isFilterMatched || !isTaskSearchMatched) return null;

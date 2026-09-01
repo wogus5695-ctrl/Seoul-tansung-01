@@ -1,5 +1,5 @@
 import { keywordMetadata } from '../src/data/keywordMetadata.js';
-import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl } from '../src/data/regionResolver.js';
+import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from '../src/data/regionResolver.js';
 import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
 import { thumbnailTestMap } from '../src/data/thumbnailTestMap.js';
@@ -244,7 +244,8 @@ export default async function handler(req, res) {
             seoContent += '<div style="border: 1px solid #eee; padding: 12px; border-radius: 4px; background: #fafafa;">';
             seoContent += '<h5 style="font-size: 0.9rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h5>';
             seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
-            serviceKeywords.forEach(k => {
+            const allowedServices = getAllowedServicesForRegion(reg);
+            allowedServices.forEach(k => {
               const dynUrl = generateDynamicUrl(reg.urlRegion, k.keyword);
               seoContent += '<li><a href="' + dynUrl + '" style="color: #0076ff; text-decoration: none;">' + reg.displayName + ' ' + k.keyword + '</a></li>';
             });

@@ -4,7 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getActiveRegions, generateAbsoluteDynamicUrl } from '../src/data/regionResolver.js';
+import { getActiveRegions, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from '../src/data/regionResolver.js';
 import { serviceKeywords } from '../src/data/serviceKeywords.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +29,8 @@ async function generateSitemap() {
   // 3. Dynamic keywords combinations using correct urlRegion token
   let count = 0;
   activeRegions.forEach(reg => {
-    serviceKeywords.forEach(tk => {
+    const allowedServices = getAllowedServicesForRegion(reg);
+    allowedServices.forEach(tk => {
       urls.push(generateAbsoluteDynamicUrl(SITE_URL, reg.urlRegion, tk.keyword));
       count++;
     });
