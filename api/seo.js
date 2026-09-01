@@ -1,5 +1,5 @@
 import { keywordMetadata } from '../src/data/keywordMetadata.js';
-import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from '../src/data/regionResolver.js';
+import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion, findRegionByUrlToken } from '../src/data/regionResolver.js';
 import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
 import { thumbnailTestMap } from '../src/data/thumbnailTestMap.js';
@@ -82,7 +82,7 @@ export default async function handler(req, res) {
       }
 
       // 2. If it contains a hyphen and is not a valid active key (meaning it's an old combined parent-dong structure, e.g. 일산동-풍산동 or 하남-풍산동)
-      const exactMatch = keywordMetadata.find(km => km.urlRegionKey === prefix && km.isIndexable);
+      const exactMatch = findRegionByUrlToken(prefix);
       if (!exactMatch && prefix.includes('-')) {
         const tokens = prefix.split('-');
         const lastToken = tokens[tokens.length - 1]; // e.g. "풍산동"
