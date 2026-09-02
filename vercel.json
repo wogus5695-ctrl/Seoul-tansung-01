@@ -6,6 +6,17 @@
   },
   "rewrites": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "k",
+          "value": "^(%EB%B0%B0%EC%96%91%EB%8F%99-%ED%83%84%EC%84%B1%EC%BD%94%ED%8A%B8|%EC%95%88%EB%83%95%EB%8F%99-%ED%83%84%EC%84%B1%EC%BD%94%ED%8A%B8|%ED%99%A9%EA%B3%84%EB%8F%99-%ED%83%84%EC%84%B1%EC%BD%94%ED%8A%B8|배양동-탄성코트|안녕동-탄성코트|황계동-탄성코트)$"
+        }
+      ],
+      "destination": "/app.html"
+    },
+    {
       "source": "/privacy-policy",
       "destination": "/api/seo"
     },
