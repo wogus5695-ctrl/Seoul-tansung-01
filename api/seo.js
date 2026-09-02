@@ -2,7 +2,7 @@ import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion, findRegionByUrlToken } from '../src/data/regionResolver.js';
 import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
-import { thumbnailTestMap, testBKeywords } from '../src/data/thumbnailTestMap.js';
+import { thumbnailTestMap, thumbnailDimensions, testBKeywords } from '../src/data/thumbnailTestMap.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -316,6 +316,7 @@ export default async function handler(req, res) {
 
       const cleanUrl = generateAbsoluteDynamicUrl('https://www.barumspace.co.kr', matchedRegion.urlRegion, matchedService.keyword);
       const customThumb = thumbnailTestMap[kParam];
+      const customDim = thumbnailDimensions[kParam] || { width: 1200, height: 1200 };
       const seoThumbnailUrl = customThumb 
         ? `https://www.barumspace.co.kr${customThumb}`
         : 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v2.jpg';
@@ -375,8 +376,8 @@ export default async function handler(req, res) {
 <meta property="og:url" content="${cleanUrl}" />
 <meta property="og:image" content="${seoThumbnailUrl}" />
 <meta property="og:image:secure_url" content="${seoThumbnailUrl}" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="1200" />
+<meta property="og:image:width" content="${customDim.width}" />
+<meta property="og:image:height" content="${customDim.height}" />
 <meta property="og:image:type" content="image/jpeg" />
 <meta property="og:image:alt" content="${regionName} ${taskName} 전문 시공 바름공간" />
 <meta name="twitter:card" content="summary_large_image" />
