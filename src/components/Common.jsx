@@ -224,9 +224,9 @@ export function SecondaryButton({ children, onClick, style = {} }) {
 }
 
 // 6. ImagePlaceholder Component (Renders real images if configured, otherwise shows placeholder)
-export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 800x450' }) {
+export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 800x450', customImageSrc = null, useSemanticImg = false, altText = null }) {
   // Map labels to siteImages keys
-  let imageSrc = null;
+  let imageSrc = customImageSrc;
   const isGroutKeyword = label === 'BATHROOM_GROUT_IMAGE' || 
                          label === 'GROUT_HERO' || 
                          label === 'ENTRANCE_GROUT_IMAGE' || 
@@ -234,59 +234,77 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
                          label === 'TOILET_GROUT_IMAGE';
 
   const isElasticKeyword = label === 'ELASTIC_COATING_HERO' || 
-                           label === 'BALCONY_ELASTIC_IMAGE' || 
-                           label === 'LAUNDRY_ELASTIC_IMAGE';
+                           label === 'ELASTIC_COATING_SERVICE_IMAGE';
 
-  if (isGroutKeyword) {
-    imageSrc = '/bathroom_grout_hero.png';
-  } else if (label === 'GROUT_SERVICE_IMAGE' || label === 'GROUT_PANEL') {
-    imageSrc = '/bathroom_grout_panel.png';
-  } else if (label === 'GROUT_SERVICE_BEFORE') {
-    imageSrc = '/grout_service_before.png';
-  } else if (label === 'GROUT_SERVICE_AFTER') {
-    imageSrc = '/grout_service_after.png';
-  } else if (label === 'GROUT_BEFORE') {
-    imageSrc = '/grout_before.png';
-  } else if (label === 'GROUT_AFTER') {
-    imageSrc = '/grout_after.png';
-  } else if (isElasticKeyword) {
-    imageSrc = '/elastic_coating_hero.png';
-  } else if (label === 'ELASTIC_COATING_SERVICE_IMAGE') {
-    imageSrc = '/elastic_coating_panel.png';
-  } else if (label === 'ELASTIC_COATING_BEFORE') {
-    imageSrc = '/closet_before.png';
-  } else if (label === 'ELASTIC_COATING_AFTER') {
-    imageSrc = '/closet_after.png';
-  } else if (label === 'ELASTIC_COATING_SERVICE_BEFORE') {
-    imageSrc = '/elastic_before.png';
-  } else if (label === 'ELASTIC_COATING_SERVICE_AFTER') {
-    imageSrc = '/elastic_after.png';
-  } else if (label && (label.endsWith('BALCONY_IMAGE') || label === 'BALCONY_IMAGE')) {
-    imageSrc = '/balcony_guide.png';
-  } else if (label && (label.endsWith('LAUNDRY_ROOM_IMAGE') || label === 'LAUNDRY_ROOM_IMAGE')) {
-    imageSrc = '/laundry_guide.png';
-  } else if (label && (label.endsWith('UTILITY_ROOM_IMAGE') || label === 'UTILITY_ROOM_IMAGE')) {
-    imageSrc = '/utility_guide.png';
-  } else if (label === 'ELASTIC_CONSULTATION_IMAGE_PATTERN') {
-    imageSrc = '/consultation_peeling.png';
-  } else if (label === 'GROUT_CONSULTATION_IMAGE_PATTERN') {
-    imageSrc = '/consultation_grout.png';
+  if (!imageSrc) {
+    if (isGroutKeyword) {
+      imageSrc = '/bathroom_grout_hero.png';
+    } else if (label === 'GROUT_SERVICE_IMAGE') {
+      imageSrc = '/bathroom_grout_panel.png';
+    } else if (label === 'GROUT_SERVICE_BEFORE') {
+      imageSrc = '/grout_before.png';
+    } else if (label === 'GROUT_SERVICE_AFTER') {
+      imageSrc = '/grout_after.png';
+    } else if (isElasticKeyword) {
+      imageSrc = '/elastic_coating_hero.png';
+    } else if (label === 'ELASTIC_COATING_PANEL') {
+      imageSrc = '/elastic_coating_panel.png';
+    } else if (label === 'ELASTIC_COATING_SERVICE_BEFORE') {
+      imageSrc = '/elastic_before.png';
+    } else if (label === 'ELASTIC_COATING_SERVICE_AFTER') {
+      imageSrc = '/elastic_after.png';
+    } else if (label && (label.endsWith('BALCONY_IMAGE') || label === 'BALCONY_IMAGE')) {
+      imageSrc = '/balcony_guide.png';
+    } else if (label && (label.endsWith('LAUNDRY_ROOM_IMAGE') || label === 'LAUNDRY_ROOM_IMAGE')) {
+      imageSrc = '/laundry_guide.png';
+    } else if (label && (label.endsWith('UTILITY_ROOM_IMAGE') || label === 'UTILITY_ROOM_IMAGE')) {
+      imageSrc = '/utility_guide.png';
+    } else if (label === 'ELASTIC_CONSULTATION_IMAGE_PATTERN') {
+      imageSrc = '/consultation_peeling.png';
+    } else if (label === 'GROUT_CONSULTATION_IMAGE_PATTERN') {
+      imageSrc = '/consultation_grout.png';
+    }
   }
 
   if (imageSrc) {
-    const isElastic = imageSrc.includes('elastic');
+    const isElastic = imageSrc.includes('elastic') || imageSrc.includes('field');
+    const paddingBottomVal = ratio === '16:9' ? '56.25%' : ratio === '4:3' ? '75%' : ratio === '4:5' ? '125%' : ratio === '5:6' ? '120%' : ratio === '1:1' ? '100%' : '56.25%';
+    const computedAlt = altText || (isElastic ? "바름공간 탄성코트 시공 현장" : "바름공간 줄눈시공 현장");
+
+    if (useSemanticImg) {
+      return (
+        <div style={{ ...styles.placeholderContainer, border: 'none', backgroundColor: 'transparent' }}>
+          <div 
+            style={{ 
+              width: '100%', 
+              position: 'relative',
+              paddingBottom: paddingBottomVal,
+              borderRadius: '4px',
+              overflow: 'hidden'
+            }}
+          >
+            <img 
+              src={imageSrc} 
+              alt={computedAlt} 
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div style={{ ...styles.placeholderContainer, border: 'none', backgroundColor: 'transparent' }}>
         <div 
           style={{ 
             width: '100%', 
-            paddingBottom: ratio === '16:9' ? '56.25%' : ratio === '4:3' ? '75%' : ratio === '4:5' ? '125%' : ratio === '5:6' ? '120%' : ratio === '1:1' ? '100%' : '56.25%',
+            paddingBottom: paddingBottomVal,
             backgroundImage: `url(${imageSrc})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             borderRadius: '4px'
           }}
-          aria-label={isElastic ? "바름공간 탄성코트 시공" : "바름공간 줄눈시공"}
+          aria-label={computedAlt}
           role="img"
         />
       </div>

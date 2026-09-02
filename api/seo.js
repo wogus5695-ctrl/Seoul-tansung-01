@@ -2,7 +2,7 @@ import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion, findRegionByUrlToken } from '../src/data/regionResolver.js';
 import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
-import { thumbnailTestMap } from '../src/data/thumbnailTestMap.js';
+import { thumbnailTestMap, testBKeywords } from '../src/data/thumbnailTestMap.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -389,12 +389,13 @@ ${JSON.stringify(schemas)}
 </head>`;
       html = html.replace('</head>', seoTags);
 
-      // Pre-render content inside #root for SEO bots (H1, notice, desc, FAQs, and links)
+      const isTestB = testBKeywords.has(kParam);
       let botContent = `
 <div id="root">
   <div style="max-width:800px; margin:0 auto; padding:40px 20px; font-family:sans-serif; color:#333;">
     <h1 style="font-size:2.5rem; color:#183f35; margin-bottom:10px;">${regionName} ${taskName}</h1>
     <p style="font-size:1.1rem; font-weight:600; color:#556b2f; margin-bottom:20px;">${upperNotice}</p>
+    ${isTestB ? `<div style="margin-bottom:25px;"><img src="${seoThumbnailUrl}" alt="${matchedRegion.displayName} ${matchedService.keyword} 시공 현장" style="max-width:100%; height:auto; border-radius:4px;" /></div>` : ''}
     <p style="font-size:1.05rem; line-height:1.6; margin-bottom:30px;">${desc}</p>
     
     <h2 style="font-size:1.5rem; color:#183f35; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:16px;">시공 관련 자주 묻는 질문(FAQ)</h2>

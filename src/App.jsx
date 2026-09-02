@@ -18,7 +18,7 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicy';
 import { seoulRegions } from './data/seoulRegions';
 import { serviceKeywords, FAQ_CATALOG } from './data/serviceKeywords';
 import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from './data/regionResolver';
-import { thumbnailTestMap } from './data/thumbnailTestMap';
+import { thumbnailTestMap, testBKeywords } from './data/thumbnailTestMap';
 import { incheonRegions } from './data/incheonRegions';
 import { gyeonggiRegions } from './data/gyeonggiRegions';
 import { keywordMetadata } from './data/keywordMetadata';
@@ -1070,6 +1070,9 @@ function App() {
                 } 
                 ratio="4:5" 
                 size="Main image (4:5 / Recommended: 800x1000)" 
+                customImageSrc={thumbnailTestMap[kParam] || null}
+                useSemanticImg={testBKeywords.has(kParam)}
+                altText={parsedKeyword ? `${parsedKeyword.region.displayName} ${parsedKeyword.service.keyword} 시공 현장` : '바름공간 시공 현장'}
               />
             </div>
           </div>
