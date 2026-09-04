@@ -16,7 +16,9 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicy';
 
 // Ingest datasets
 import { seoulRegions } from './data/seoulRegions';
-import { serviceKeywords, FAQ_CATALOG, getSeoEngineVersion, getFaqV2ListForTask } from './data/serviceKeywords';
+import { serviceKeywords, FAQ_CATALOG } from './data/serviceKeywords';
+import { getSeoEngineVersion } from './data/seoV2/featureFlag';
+import { getFaqV2ListForTask } from './data/seoV2/faqRegistry';
 import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from './data/regionResolver';
 import { thumbnailTestMap, testBKeywords } from './data/thumbnailTestMap';
 import { incheonRegions } from './data/incheonRegions';
@@ -96,7 +98,8 @@ function App() {
   useEffect(() => {
     const kParam = searchParams.get('k')?.trim() || '';
     if (kParam) {
-      const sortedKeywords = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
+      const safeServiceKeywords = Array.isArray(serviceKeywords) ? serviceKeywords : [];
+      const sortedKeywords = [...safeServiceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
       let matchedService = null;
       let prefix = '';
       for (const s of sortedKeywords) {

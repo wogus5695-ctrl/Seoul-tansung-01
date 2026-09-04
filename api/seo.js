@@ -1,6 +1,9 @@
 import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion, findRegionByUrlToken } from '../src/data/regionResolver.js';
-import { serviceKeywords, FAQ_CATALOG, getSeoEngineVersion, buildV2Content, buildV2InternalLinks } from '../src/data/serviceKeywords.js';
+import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
+import { getSeoEngineVersion } from '../src/data/seoV2/featureFlag.js';
+import { buildV2Content } from '../src/data/seoV2/contentBuilder.js';
+import { buildV2InternalLinks } from '../src/data/seoV2/linkEngine.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
 import { thumbnailTestMap, thumbnailDimensions, testBKeywords } from '../src/data/thumbnailTestMap.js';
 import fs from 'fs';

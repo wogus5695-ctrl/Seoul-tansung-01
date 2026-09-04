@@ -27,10 +27,18 @@ export function normalizeKeywordParam(k) {
   }
 }
 
-const sortedServices = [...serviceKeywords].sort((a, b) => b.keyword.length - a.keyword.length);
+let sortedServicesMemo = null;
+function getSortedServices() {
+  if (!sortedServicesMemo) {
+    const services = Array.isArray(serviceKeywords) ? serviceKeywords : [];
+    sortedServicesMemo = [...services].sort((a, b) => b.keyword.length - a.keyword.length);
+  }
+  return sortedServicesMemo;
+}
 
 export function matchServiceSuffix(normalizedK) {
   if (!normalizedK) return null;
+  const sortedServices = getSortedServices();
   for (const service of sortedServices) {
     if (normalizedK.endsWith(`-${service.keyword}`)) {
       return service;

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { siteConfig, contactConfig } from '../config';
-import { getSeoEngineVersion, buildV2Content, buildV2InternalLinks } from '../data/serviceKeywords.js';
+import { getSeoEngineVersion } from '../data/seoV2/featureFlag.js';
+import { buildV2Content } from '../data/seoV2/contentBuilder.js';
+import { buildV2InternalLinks } from '../data/seoV2/linkEngine.js';
 
 // 1. Header Component with Mobile Hamburger Menu and Keyboard accessibility
 export function Header({ onNavigate, currentPath, onPhoneClick, onChatClick }) {
