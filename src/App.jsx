@@ -19,6 +19,7 @@ import { seoulRegions } from './data/seoulRegions';
 import { serviceKeywords, FAQ_CATALOG } from './data/serviceKeywords';
 import { getSeoEngineVersion } from './data/seoV2/featureFlag';
 import { getFaqV2ListForTask } from './data/seoV2/faqRegistry';
+import { buildV3Content } from './data/seoV2/contentBuilder';
 import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from './data/regionResolver';
 import { thumbnailTestMap, testBKeywords } from './data/thumbnailTestMap';
 import { incheonRegions } from './data/incheonRegions';
@@ -265,7 +266,7 @@ function App() {
         { question: '시공 후 언제부터 물을 사용할 수 있나요?', answer: FAQ_CATALOG['시공 후 언제부터 물을 사용할 수 있나요?'] }
       ];
     }
-    if (engineVersion === 'V2') {
+    if (engineVersion === 'V2' || engineVersion === 'V3') {
       const v2Faqs = getFaqV2ListForTask(parsedKeyword.service.keyword);
       return v2Faqs.map(f => ({ question: f.q, answer: f.a }));
     }
@@ -323,7 +324,12 @@ function App() {
         ? `${cleanParent} ${regionName}`.trim().replace(/\s+/g, ' ')
         : regionName;
 
-      const metaDescText = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, parsedKeyword.region.displayName || regionName);
+      let metaDescText = parsedKeyword.service.metaDescriptionTemplate.replace(/{region}/g, parsedKeyword.region.displayName || regionName);
+      if (engineVersion === 'V3') {
+        const v3Content = buildV3Content(parsedKeyword.region, parsedKeyword.service);
+        metaDescText = v3Content.metaDescription;
+      }
+
       if (isOfficial) {
         titleStr = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 안내' : ' 시공 안내'} | 바름공간`;
         descStr = metaDescText;

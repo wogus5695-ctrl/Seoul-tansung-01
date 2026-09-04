@@ -112,3 +112,34 @@ export function buildV2InternalLinks(regionObj, serviceObj, siteUrl = 'https://w
     totalLinkCount
   };
 }
+
+/**
+ * BARUMSPACE SEO ENGINE V3 - INTERNAL LINK ENGINE (4~6 Controlled SSR Links)
+ */
+export function buildV3InternalLinks(regionObj, serviceObj, siteUrl = 'https://www.barumspace.co.kr') {
+  const v2Links = buildV2InternalLinks(regionObj, serviceObj, siteUrl);
+  
+  // Constrain total links strictly to 4~6 links
+  const parentRegionLink = v2Links.parentRegionLink;
+  const hubLink = v2Links.hubLink;
+
+  const sameRegionTasks = (v2Links.sameRegionTasks || []).slice(0, 2);
+  const sameDistrictRegions = (v2Links.sameDistrictRegions || []).slice(0, parentRegionLink ? 1 : 2);
+
+  const totalLinkCount = sameRegionTasks.length + sameDistrictRegions.length + (parentRegionLink ? 1 : 0) + (hubLink ? 1 : 0);
+
+  return {
+    isV3LinkEngine: true,
+    engineVersion: 'V3',
+    regionName: v2Links.regionName,
+    currentTask: v2Links.currentTask,
+    sameRegionTasks,
+    sameDistrictTitle: '같은 구의 관련 서비스 지역',
+    sameDistrictRegions,
+    parentRegionTitle: '상위 행정구역 시공 안내',
+    parentRegionLink,
+    hubLink,
+    totalLinkCount
+  };
+}
+

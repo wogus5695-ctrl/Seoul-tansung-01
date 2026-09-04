@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { siteConfig, contactConfig } from '../config';
 import { getSeoEngineVersion } from '../data/seoV2/featureFlag.js';
-import { buildV2Content } from '../data/seoV2/contentBuilder.js';
-import { buildV2InternalLinks } from '../data/seoV2/linkEngine.js';
+import { buildV2Content, buildV3Content } from '../data/seoV2/contentBuilder.js';
+import { buildV2InternalLinks, buildV3InternalLinks } from '../data/seoV2/linkEngine.js';
 
 // 1. Header Component with Mobile Hamburger Menu and Keyboard accessibility
 export function Header({ onNavigate, currentPath, onPhoneClick, onChatClick }) {
@@ -415,6 +415,103 @@ export function SEOContentSection({ keywordInfo }) {
   const regionName = keywordInfo.region || '';
   const taskName = keywordInfo.service || '';
   const engineVersion = getSeoEngineVersion(regionName, taskName);
+
+  if (engineVersion === 'V3') {
+    const v3Data = buildV3Content(keywordInfo.rawRegion || regionName, keywordInfo.rawService || taskName);
+    const v3Links = buildV3InternalLinks(keywordInfo.rawRegion || regionName, keywordInfo.rawService || taskName);
+
+    return (
+      <SectionContainer background="beige">
+        <div style={styles.seoBox}>
+          <h2 style={{ fontSize: '1.4rem', color: 'var(--forest-green-main)', marginBottom: '16px', borderBottom: '2px solid var(--soft-gold)', paddingBottom: '8px' }}>
+            {v3Data.h1Text} 시공 및 현장 진단 안내
+          </h2>
+          <p style={{ ...styles.seoDesc, fontWeight: '600', color: 'var(--forest-green-dark)', marginBottom: '20px' }}>
+            {v3Data.heroIntro}
+          </p>
+
+          {v3Data.h2Sections.map((sec, idx) => (
+            <div key={sec.h2Id || idx} style={{ marginBottom: '24px', textAlign: 'left' }}>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--charcoal-text)', fontWeight: 'bold', marginBottom: '8px' }}>
+                {sec.title}
+              </h3>
+              {sec.paragraphs.map((p, pIdx) => (
+                <p key={pIdx} style={{ fontSize: '0.98rem', lineHeight: '1.65', color: '#444', marginBottom: '8px' }}>
+                  {p}
+                </p>
+              ))}
+            </div>
+          ))}
+
+          {/* V3 CONSUMER CHECKLIST */}
+          <div style={{ backgroundColor: '#f4f6f0', borderLeft: '4px solid var(--forest-green-main)', borderRadius: '4px', padding: '18px', marginTop: '24px', marginBottom: '24px', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '1.1rem', color: 'var(--forest-green-main)', margin: '0 0 12px 0', fontWeight: 'bold' }}>
+              시공 전 소비자 필수 점검 리스트
+            </h3>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {v3Data.checklist.map((item, idx) => (
+                <li key={idx} style={{ marginBottom: '8px', fontSize: '0.92rem', color: '#333', lineHeight: '1.5' }}>
+                  <strong style={{ color: 'var(--forest-green-dark)' }}>✓ {item.title}:</strong> {item.desc}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* V3 INTERNAL LINKS SECTION (CSR UI) */}
+          <div style={{ backgroundColor: '#fff', border: '1px solid var(--light-sand)', borderRadius: '8px', padding: '20px', marginTop: '32px', textAlign: 'left' }}>
+            {v3Links.sameRegionTasks.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '1.05rem', color: 'var(--forest-green-main)', margin: '0 0 10px 0', fontWeight: 'bold' }}>
+                  관련 탄성코트 서비스 안내
+                </h4>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {v3Links.sameRegionTasks.map((link, idx) => (
+                    <a key={idx} href={link.href} style={{ padding: '6px 12px', background: 'var(--warm-white)', border: '1px solid var(--light-sand)', borderRadius: '4px', color: 'var(--charcoal-text)', textDecoration: 'none', fontSize: '0.9rem' }}>
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {v3Links.sameDistrictRegions.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '1.05rem', color: 'var(--forest-green-main)', margin: '0 0 10px 0', fontWeight: 'bold' }}>
+                  {v3Links.sameDistrictTitle}
+                </h4>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {v3Links.sameDistrictRegions.map((link, idx) => (
+                    <a key={idx} href={link.href} style={{ padding: '6px 12px', background: 'var(--warm-white)', border: '1px solid var(--light-sand)', borderRadius: '4px', color: 'var(--forest-green-dark)', textDecoration: 'none', fontSize: '0.9rem' }}>
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {v3Links.parentRegionLink && (
+              <div style={{ marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '1.05rem', color: 'var(--forest-green-main)', margin: '0 0 10px 0', fontWeight: 'bold' }}>
+                  {v3Links.parentRegionTitle}
+                </h4>
+                <div>
+                  <a href={v3Links.parentRegionLink.href} style={{ padding: '6px 12px', background: 'var(--warm-white)', border: '1px solid var(--forest-green-main)', borderRadius: '4px', color: 'var(--forest-green-main)', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                    {v3Links.parentRegionLink.label} &rarr;
+                  </a>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <a href={v3Links.hubLink.href} style={{ color: 'var(--terracotta-accent)', fontWeight: 'bold', textDecoration: 'none', fontSize: '0.95rem' }}>
+                {v3Links.hubLink.label} &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </SectionContainer>
+    );
+  }
 
   if (engineVersion === 'V2') {
     const v2Data = buildV2Content(regionName, taskName);

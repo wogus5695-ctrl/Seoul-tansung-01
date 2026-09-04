@@ -2,8 +2,8 @@ import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion, findRegionByUrlToken } from '../src/data/regionResolver.js';
 import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
 import { getSeoEngineVersion } from '../src/data/seoV2/featureFlag.js';
-import { buildV2Content } from '../src/data/seoV2/contentBuilder.js';
-import { buildV2InternalLinks } from '../src/data/seoV2/linkEngine.js';
+import { buildV2Content, buildV3Content } from '../src/data/seoV2/contentBuilder.js';
+import { buildV2InternalLinks, buildV3InternalLinks } from '../src/data/seoV2/linkEngine.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
 import { thumbnailTestMap, thumbnailDimensions, testBKeywords } from '../src/data/thumbnailTestMap.js';
 import fs from 'fs';
@@ -302,7 +302,16 @@ export default async function handler(req, res) {
       const fullRegionName = (matchedRegion.parentRegionName ? matchedRegion.parentRegionName + ' ' : '') + regionName;
       const isTaskEndsWithSiGong = taskName.endsWith('시공');
 
-      const metaDescText = matchedService.metaDescriptionTemplate.replace(/{region}/g, matchedRegion.displayName || regionName);
+      // Feature Flag Check (Wave 1 Pilot for Elastic Coating keywords in Pilot regions)
+      const forceV2 = usePreview || url.searchParams.get('v2') === 'true';
+      const engineVersion = getSeoEngineVersion(regionName, taskName, forceV2);
+
+      let metaDescText = matchedService.metaDescriptionTemplate.replace(/{region}/g, matchedRegion.displayName || regionName);
+      if (engineVersion === 'V3') {
+        const v3Content = buildV3Content(matchedRegion, matchedService);
+        metaDescText = v3Content.metaDescription;
+      }
+
       if (isOfficial) {
         title = `${regionName} ${taskName}${isTaskEndsWithSiGong ? ' 안내' : ' 시공 안내'} | 바름공간`;
         desc = metaDescText;
@@ -359,12 +368,11 @@ export default async function handler(req, res) {
         ]
       });
 
-      // Feature Flag Check (Wave 1 Pilot for Elastic Coating keywords in Pilot regions)
-      const forceV2 = usePreview || url.searchParams.get('v2') === 'true';
-      const engineVersion = getSeoEngineVersion(regionName, taskName, forceV2);
-
       let faqEntries = [];
-      if (engineVersion === 'V2') {
+      if (engineVersion === 'V3') {
+        const v3Content = buildV3Content(matchedRegion, matchedService);
+        faqEntries = v3Content.faqs.map(f => ({ name: f.q, text: f.a }));
+      } else if (engineVersion === 'V2') {
         const v2Content = buildV2Content(matchedRegion, matchedService);
         faqEntries = v2Content.faqs.map(f => ({ name: f.q, text: f.a }));
       } else {
@@ -414,7 +422,81 @@ ${JSON.stringify(schemas)}
       const isTestB = testBKeywords.has(kParam);
       let botContent = '';
 
-      if (engineVersion === 'V2') {
+      if (engineVersion === 'V3') {
+        const v3Data = buildV3Content(matchedRegion, matchedService);
+        const v3Links = buildV3InternalLinks(matchedRegion, matchedService);
+        botContent = `
+<div id="root">
+  <div style="max-width:800px; margin:0 auto; padding:40px 20px; font-family:sans-serif; color:#333;">
+    <h1 style="font-size:2.5rem; color:#183f35; margin-bottom:10px;">${v3Data.h1Text}</h1>
+    <p style="font-size:1.1rem; font-weight:600; color:#556b2f; margin-bottom:20px;">${v3Data.heroIntro}</p>
+    ${isTestB ? `<div style="margin-bottom:25px;"><img src="${seoThumbnailUrl}" alt="${matchedRegion.displayName} ${matchedService.keyword} 시공 현장" style="max-width:100%; height:auto; border-radius:4px;" /></div>` : ''}
+    <p style="font-size:1.05rem; line-height:1.6; margin-bottom:30px;">${v3Data.metaContextText}</p>
+    
+    ${v3Data.h2Sections.map(sec => `
+    <section style="margin-bottom:32px;">
+      <h2 style="font-size:1.5rem; color:#183f35; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:14px;">${sec.title}</h2>
+      ${sec.paragraphs.map(p => `<p style="font-size:1rem; line-height:1.7; color:#444; margin-bottom:12px;">${p}</p>`).join('')}
+    </section>`).join('')}
+
+    <section style="background-color:#f4f6f0; border-left:4px solid #183f35; border-radius:4px; padding:20px; margin-bottom:32px;">
+      <h2 style="font-size:1.3rem; color:#183f35; margin:0 0 14px 0;">시공 전 소비자 필수 점검 리스트</h2>
+      <ul style="list-style:none; padding:0; margin:0;">
+        ${v3Data.checklist.map(item => `
+        <li style="margin-bottom:10px; font-size:0.95rem; line-height:1.5; color:#333;">
+          <strong style="color:#183f35;">✓ ${item.title}:</strong> ${item.desc}
+        </li>`).join('')}
+      </ul>
+    </section>
+
+    <h2 style="font-size:1.5rem; color:#183f35; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:16px;">시공 관련 자주 묻는 질문(FAQ)</h2>
+    <ul style="list-style:none; padding:0; margin:0 0 40px 0;">
+      ${v3Data.faqs.map(f => `
+      <li style="margin-bottom:16px; border-bottom:1px dashed #eee; padding-bottom:12px;">
+        <strong style="color:#183f35; display:block; margin-bottom:4px;">Q: ${f.q}</strong>
+        <span style="color:#666; font-size:0.95rem;">A: ${f.a}</span>
+      </li>`).join('')}
+    </ul>
+
+    <!-- SEO ENGINE V3 INTERNAL LINK ENGINE (SSR HTML DISCOVERY) -->
+    <div style="background-color:#f9f8f3; border:1px solid #e2dec9; border-radius:8px; padding:24px; margin-bottom:32px;">
+      ${v3Links.sameRegionTasks.length > 0 ? `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:1.15rem; color:#183f35; margin:0 0 10px 0;">관련 탄성코트 서비스 안내</h3>
+        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:10px;">
+          ${v3Links.sameRegionTasks.map(link => `
+          <li><a href="${link.href}" style="display:inline-block; padding:6px 12px; background:#fff; border:1px solid #ccc; border-radius:4px; color:#183f35; text-decoration:none; font-size:0.95rem;">${link.label}</a></li>`).join('')}
+        </ul>
+      </div>` : ''}
+
+      ${v3Links.sameDistrictRegions.length > 0 ? `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:1.15rem; color:#183f35; margin:0 0 10px 0;">${v3Links.sameDistrictTitle}</h3>
+        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:10px;">
+          ${v3Links.sameDistrictRegions.map(link => `
+          <li><a href="${link.href}" style="display:inline-block; padding:6px 12px; background:#fff; border:1px solid #ccc; border-radius:4px; color:#556b2f; text-decoration:none; font-size:0.95rem;">${link.label}</a></li>`).join('')}
+        </ul>
+      </div>` : ''}
+
+      ${v3Links.parentRegionLink ? `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:1.15rem; color:#183f35; margin:0 0 10px 0;">${v3Links.parentRegionTitle}</h3>
+        <div>
+          <a href="${v3Links.parentRegionLink.href}" style="display:inline-block; padding:6px 12px; background:#fff; border:1px solid #183f35; border-radius:4px; color:#183f35; text-decoration:none; font-weight:bold; font-size:0.95rem;">${v3Links.parentRegionLink.label} &rarr;</a>
+        </div>
+      </div>` : ''}
+
+      <div>
+        <a href="${v3Links.hubLink.href}" style="color:#0076ff; font-weight:bold; text-decoration:none; font-size:0.95rem;">${v3Links.hubLink.label} &rarr;</a>
+      </div>
+    </div>
+    
+    <div style="border-top:1px solid #ddd; padding-top:20px;">
+      <a href="/" style="color:#0076ff; text-decoration:none;">바름공간 메인 홈페이지 바로가기</a>
+    </div>
+  </div>
+</div>`;
+      } else if (engineVersion === 'V2') {
         const v2Data = buildV2Content(matchedRegion, matchedService);
         const v2Links = buildV2InternalLinks(matchedRegion, matchedService);
         botContent = `
