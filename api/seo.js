@@ -102,6 +102,9 @@ export default async function handler(req, res) {
   // Vercel routes index.html as a static asset, we can read it from the relative build output path
   let htmlPath = path.join(process.cwd(), 'dist', 'app.html');
   if (!fs.existsSync(htmlPath)) {
+    htmlPath = path.join(process.cwd(), 'dist', 'index.html');
+  }
+  if (!fs.existsSync(htmlPath)) {
     htmlPath = path.join(process.cwd(), 'index.html'); // Fallback for safety
   }
 
@@ -509,6 +512,12 @@ ${JSON.stringify(schemas)}
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(html);
     }
+  }
+
+  if (pathname === '/' || pathname === '/index.html') {
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
   }
 
   // If page is not matched, return 404
