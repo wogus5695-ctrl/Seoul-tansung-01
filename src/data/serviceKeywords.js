@@ -315,3 +315,15 @@ export const FAQ_CATALOG = {
   '줄눈시공 사례는 어떤 기준으로 확인해야 하나요?': '타일 테두리 측면과 줄눈선이 일정하게 수평을 이루며, 넘치거나 모자람 없이 고르게 충진되었는지의 실제 근접 디테일 사진을 확인하는 것이 좋습니다.',
   '줄눈 부분 보수와 전체 시공은 어떻게 구분하나요?': '타일 틈새의 갈라짐이나 탈락이 전체 욕실 바닥 면적의 극히 일부분에 국한되는지 판단하여, 누수 우려가 없는 범위 내에서 조치 범위를 구분해 제안합니다.'
 };
+
+// --- SEO ENGINE V2 DATA REGISTRY RE-EXPORTS ---
+export { OFFICIAL_SEARCH_INTENT_REGISTRY } from './seoV2/intentRegistry.js';
+export { CONTENT_MODULE_REGISTRY } from './seoV2/contentModules.js';
+export { CORE_FAQ_LIST, TASK_SPECIFIC_FAQ_REGISTRY, getFaqV2ListForTask } from './seoV2/faqRegistry.js';
+export { validateSeoV2Registry, buildCoverageMatrix } from './seoV2/dataValidation.js';
+export { getSeoEngineVersion, PILOT_V2_REGIONS } from './seoV2/featureFlag.js';
+export { buildV2Content } from './seoV2/contentBuilder.js';
+export { getRegionEvidence, EVIDENCE_STATUS_ENUM } from './seoV2/regionEvidence.js';
+export { buildV2InternalLinks } from './seoV2/linkEngine.js';
+export { evaluateUrlQualityGate, QUALITY_TIERS, DEPLOYMENT_STATUS } from './seoV2/qualityGate.js';
+

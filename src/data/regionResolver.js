@@ -231,3 +231,72 @@ export function generateAbsoluteDynamicUrl(siteUrl, routeKey, keyword) {
   const base = siteUrl.endsWith('/') ? siteUrl.slice(0, -1) : siteUrl;
   return `${base}/?${params.toString()}`;
 }
+
+export function getParentDistrictRegion(currentRegion) {
+  if (!currentRegion) return null;
+  const districtName = currentRegion.districtName || currentRegion.parentRegionName || '';
+  if (!districtName) return null;
+
+  const activeRegions = getActiveRegions();
+  // Find Parent Region matching districtName (e.g. 강남구, 화성시)
+  const parentReg = activeRegions.find(r => 
+    (r.displayName === districtName || r.name === districtName || r.urlRegion === districtName) &&
+    r.urlRegion !== currentRegion.urlRegion
+  );
+
+  return parentReg || null;
+}
+
+export function getSameDistrictRegions(currentRegion, maxCount = 4) {
+  if (!currentRegion) return [];
+
+  const district = currentRegion.districtName || currentRegion.parentRegionName || '';
+  if (!district) return [];
+
+  const activeRegions = getActiveRegions();
+  const allPeersMap = new Map();
+
+  // 1. Collect all same-level peer regions under the same district/city (excluding Parent Landing itself)
+  for (const reg of activeRegions) {
+    const regDistrict = reg.districtName || reg.parentRegionName || '';
+    if (!regDistrict) continue;
+
+    // Must belong to same district/city
+    const isSameDistrict = (regDistrict === district || regDistrict.includes(district) || district.includes(regDistrict));
+    
+    // Filter to SAME ADMIN LEVEL (e.g. Dong level peers, excluding parent district entry itself if urlRegion matches district)
+    const isSameLevelPeer = reg.urlRegion !== reg.districtName && reg.urlRegion !== reg.parentRegionName;
+
+    if (isSameDistrict && isSameLevelPeer) {
+      allPeersMap.set(reg.urlRegion, reg);
+    }
+  }
+
+  // Ensure currentRegion is in the map for indexing
+  allPeersMap.set(currentRegion.urlRegion, currentRegion);
+
+  // 2. Sort all peers deterministically by displayName / name (Korean alphabetical order)
+  const sortedPeers = Array.from(allPeersMap.values()).sort((a, b) => 
+    (a.displayName || a.name).localeCompare(b.displayName || b.name, 'ko')
+  );
+
+  if (sortedPeers.length <= 1) return [];
+
+  // 3. Find index of currentRegion
+  const currIdx = sortedPeers.findIndex(r => r.urlRegion === currentRegion.urlRegion);
+  if (currIdx === -1) return sortedPeers.filter(r => r.urlRegion !== currentRegion.urlRegion).slice(0, maxCount);
+
+  // 4. Stable Cyclic Peer Selection (Take next maxCount peers circularly)
+  const result = [];
+  const total = sortedPeers.length;
+
+  for (let i = 1; i < total && result.length < maxCount; i++) {
+    const nextIdx = (currIdx + i) % total;
+    const peer = sortedPeers[nextIdx];
+    if (peer.urlRegion !== currentRegion.urlRegion) {
+      result.push(peer);
+    }
+  }
+
+  return result;
+}

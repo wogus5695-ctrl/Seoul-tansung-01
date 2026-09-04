@@ -1,6 +1,6 @@
 import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { parseAndValidateK, getActiveRegions, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion, findRegionByUrlToken } from '../src/data/regionResolver.js';
-import { serviceKeywords, FAQ_CATALOG } from '../src/data/serviceKeywords.js';
+import { serviceKeywords, FAQ_CATALOG, getSeoEngineVersion, buildV2Content, buildV2InternalLinks } from '../src/data/serviceKeywords.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
 import { thumbnailTestMap, thumbnailDimensions, testBKeywords } from '../src/data/thumbnailTestMap.js';
 import fs from 'fs';
@@ -353,16 +353,31 @@ export default async function handler(req, res) {
         ]
       });
 
+      // Feature Flag Check (Wave 1 Pilot for Elastic Coating keywords in Pilot regions)
+      const forceV2 = usePreview || url.searchParams.get('v2') === 'true';
+      const engineVersion = getSeoEngineVersion(regionName, taskName, forceV2);
+
+      let faqEntries = [];
+      if (engineVersion === 'V2') {
+        const v2Content = buildV2Content(matchedRegion, matchedService);
+        faqEntries = v2Content.faqs.map(f => ({ name: f.q, text: f.a }));
+      } else {
+        faqEntries = matchedService.faqSet.map(q => ({
+          name: q,
+          text: FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.'
+        }));
+      }
+
       // 3. FAQPage schema
       schemas.push({
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
-        'mainEntity': matchedService.faqSet.map(q => ({
+        'mainEntity': faqEntries.map(f => ({
           '@type': 'Question',
-          'name': q,
+          'name': f.name,
           'acceptedAnswer': {
             '@type': 'Answer',
-            'text': FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.'
+            'text': f.text
           }
         }))
       });
@@ -391,7 +406,74 @@ ${JSON.stringify(schemas)}
       html = html.replace('</head>', seoTags);
 
       const isTestB = testBKeywords.has(kParam);
-      let botContent = `
+      let botContent = '';
+
+      if (engineVersion === 'V2') {
+        const v2Data = buildV2Content(matchedRegion, matchedService);
+        const v2Links = buildV2InternalLinks(matchedRegion, matchedService);
+        botContent = `
+<div id="root">
+  <div style="max-width:800px; margin:0 auto; padding:40px 20px; font-family:sans-serif; color:#333;">
+    <h1 style="font-size:2.5rem; color:#183f35; margin-bottom:10px;">${v2Data.h1Text}</h1>
+    <p style="font-size:1.1rem; font-weight:600; color:#556b2f; margin-bottom:20px;">${v2Data.heroIntro}</p>
+    ${isTestB ? `<div style="margin-bottom:25px;"><img src="${seoThumbnailUrl}" alt="${matchedRegion.displayName} ${matchedService.keyword} 시공 현장" style="max-width:100%; height:auto; border-radius:4px;" /></div>` : ''}
+    <p style="font-size:1.05rem; line-height:1.6; margin-bottom:30px;">${v2Data.metaContextText}</p>
+    
+    ${v2Data.h2Sections.map(sec => `
+    <section style="margin-bottom:32px;">
+      <h2 style="font-size:1.5rem; color:#183f35; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:14px;">${sec.title}</h2>
+      ${sec.paragraphs.map(p => `<p style="font-size:1rem; line-height:1.7; color:#444; margin-bottom:12px;">${p}</p>`).join('')}
+    </section>`).join('')}
+
+    <h2 style="font-size:1.5rem; color:#183f35; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:16px;">시공 관련 자주 묻는 질문(FAQ)</h2>
+    <ul style="list-style:none; padding:0; margin:0 0 40px 0;">
+      ${v2Data.faqs.map(f => `
+      <li style="margin-bottom:16px; border-bottom:1px dashed #eee; padding-bottom:12px;">
+        <strong style="color:#183f35; display:block; margin-bottom:4px;">Q: ${f.q}</strong>
+        <span style="color:#666; font-size:0.95rem;">A: ${f.a}</span>
+      </li>`).join('')}
+    </ul>
+
+    <!-- SEO ENGINE V2 INTERNAL LINK ENGINE (SSR HTML DISCOVERY) -->
+    <div style="background-color:#f9f8f3; border:1px solid #e2dec9; border-radius:8px; padding:24px; margin-bottom:32px;">
+      ${v2Links.sameRegionTasks.length > 0 ? `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:1.15rem; color:#183f35; margin:0 0 10px 0;">관련 탄성코트 서비스 안내</h3>
+        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:10px;">
+          ${v2Links.sameRegionTasks.map(link => `
+          <li><a href="${link.href}" style="display:inline-block; padding:6px 12px; background:#fff; border:1px solid #ccc; border-radius:4px; color:#183f35; text-decoration:none; font-size:0.95rem;">${link.label}</a></li>`).join('')}
+        </ul>
+      </div>` : ''}
+
+      ${v2Links.sameDistrictRegions.length > 0 ? `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:1.15rem; color:#183f35; margin:0 0 10px 0;">${v2Links.sameDistrictTitle}</h3>
+        <ul style="list-style:none; padding:0; margin:0; display:flex; flex-wrap:wrap; gap:10px;">
+          ${v2Links.sameDistrictRegions.map(link => `
+          <li><a href="${link.href}" style="display:inline-block; padding:6px 12px; background:#fff; border:1px solid #ccc; border-radius:4px; color:#556b2f; text-decoration:none; font-size:0.95rem;">${link.label}</a></li>`).join('')}
+        </ul>
+      </div>` : ''}
+
+      ${v2Links.parentRegionLink ? `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:1.15rem; color:#183f35; margin:0 0 10px 0;">${v2Links.parentRegionTitle}</h3>
+        <div>
+          <a href="${v2Links.parentRegionLink.href}" style="display:inline-block; padding:6px 12px; background:#fff; border:1px solid #183f35; border-radius:4px; color:#183f35; text-decoration:none; font-weight:bold; font-size:0.95rem;">${v2Links.parentRegionLink.label} &rarr;</a>
+        </div>
+      </div>` : ''}
+
+      <div>
+        <a href="${v2Links.hubLink.href}" style="color:#0076ff; font-weight:bold; text-decoration:none; font-size:0.95rem;">${v2Links.hubLink.label} &rarr;</a>
+      </div>
+    </div>
+    
+    <div style="border-top:1px solid #ddd; padding-top:20px;">
+      <a href="/" style="color:#0076ff; text-decoration:none;">바름공간 메인 홈페이지 바로가기</a>
+    </div>
+  </div>
+</div>`;
+      } else {
+        botContent = `
 <div id="root">
   <div style="max-width:800px; margin:0 auto; padding:40px 20px; font-family:sans-serif; color:#333;">
     <h1 style="font-size:2.5rem; color:#183f35; margin-bottom:10px;">${regionName} ${taskName}</h1>
@@ -402,15 +484,15 @@ ${JSON.stringify(schemas)}
     <h2 style="font-size:1.5rem; color:#183f35; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:16px;">시공 관련 자주 묻는 질문(FAQ)</h2>
     <ul style="list-style:none; padding:0; margin:0 0 40px 0;">`;
       
-      matchedService.faqSet.forEach(q => {
-        botContent += `
+        matchedService.faqSet.forEach(q => {
+          botContent += `
       <li style="margin-bottom:16px; border-bottom:1px dashed #eee; padding-bottom:12px;">
         <strong style="color:#183f35; display:block; margin-bottom:4px;">Q: ${q}</strong>
         <span style="color:#666; font-size:0.95rem;">A: ${FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.'}</span>
       </li>`;
-      });
+        });
       
-      botContent += `
+        botContent += `
     </ul>
     
     <div style="border-top:1px solid #ddd; padding-top:20px;">
@@ -418,6 +500,7 @@ ${JSON.stringify(schemas)}
     </div>
   </div>
 </div>`;
+      }
 
       html = html.replace('<div id="root"></div>', botContent);
 

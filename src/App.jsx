@@ -16,7 +16,7 @@ import { PrivacyPolicyPage } from './components/PrivacyPolicy';
 
 // Ingest datasets
 import { seoulRegions } from './data/seoulRegions';
-import { serviceKeywords, FAQ_CATALOG } from './data/serviceKeywords';
+import { serviceKeywords, FAQ_CATALOG, getSeoEngineVersion, getFaqV2ListForTask } from './data/serviceKeywords';
 import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from './data/regionResolver';
 import { thumbnailTestMap, testBKeywords } from './data/thumbnailTestMap';
 import { incheonRegions } from './data/incheonRegions';
@@ -248,15 +248,26 @@ function App() {
   const activeGroup = parsedKeyword ? parsedKeyword.service.serviceGroup : 'both';
   const activeIntent = parsedKeyword ? parsedKeyword.service.searchIntent : 'general';
 
-  const currentFaqList = parsedKeyword 
-    ? parsedKeyword.service.faqSet.map(q => ({ question: q, answer: FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.' }))
-    : [
+  const engineVersion = parsedKeyword 
+    ? getSeoEngineVersion(parsedKeyword.region.name, parsedKeyword.service.keyword)
+    : 'V1';
+
+  const currentFaqList = useMemo(() => {
+    if (!parsedKeyword) {
+      return [
         { question: '기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?', answer: FAQ_CATALOG['기존 탄성코트가 들뜬 곳도 다시 시공할 수 있나요?'] },
         { question: '곰팡이나 결로가 있으면 바로 시공해도 되나요?', answer: FAQ_CATALOG['곰팡이나 결로가 있으면 바로 시공해도 되나요?'] },
         { question: '기존 줄눈을 제거하고 시공하나요?', answer: FAQ_CATALOG['기존 줄눈을 제거하고 시공하나요?'] },
         { question: '욕실과 현관에 같은 자재를 사용하나요?', answer: FAQ_CATALOG['욕실과 현관에 같은 자재를 사용하나요?'] },
         { question: '시공 후 언제부터 물을 사용할 수 있나요?', answer: FAQ_CATALOG['시공 후 언제부터 물을 사용할 수 있나요?'] }
       ];
+    }
+    if (engineVersion === 'V2') {
+      const v2Faqs = getFaqV2ListForTask(parsedKeyword.service.keyword);
+      return v2Faqs.map(f => ({ question: f.q, answer: f.a }));
+    }
+    return parsedKeyword.service.faqSet.map(q => ({ question: q, answer: FAQ_CATALOG[q] || '상세 시공 문의 시 전문 답변을 준비해 드립니다.' }));
+  }, [parsedKeyword, engineVersion]);
 
   // Sync title, meta tags, and canonical dynamically on mount/update
   useEffect(() => {
@@ -1878,7 +1889,9 @@ function App() {
               ? `${(parsedKeyword.region.parentRegionName || "").replace(/특별시|광역시/g, "")} ${parsedKeyword.region.districtName || ""} ${parsedKeyword.region.displayName}`.trim().replace(/\s+/g, ' ')
               : parsedKeyword.region.displayName,
             service: parsedKeyword.service.keyword,
-            sectionDescription: parsedKeyword.service.sectionDescriptionTemplate
+            sectionDescription: parsedKeyword.service.sectionDescriptionTemplate,
+            rawRegion: parsedKeyword.region,
+            rawService: parsedKeyword.service
           }} />
         )}
       </>
