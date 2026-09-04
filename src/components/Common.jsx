@@ -252,10 +252,14 @@ export function ImagePlaceholder({ label, ratio = '16:9', size = 'Recommended: 8
       imageSrc = '/elastic_coating_hero.png';
     } else if (label === 'ELASTIC_COATING_PANEL') {
       imageSrc = '/elastic_coating_panel.png';
-    } else if (label === 'ELASTIC_COATING_SERVICE_BEFORE' || label === 'ELASTIC_COATING_BEFORE') {
+    } else if (label === 'ELASTIC_COATING_SERVICE_BEFORE') {
       imageSrc = '/elastic_before.png';
-    } else if (label === 'ELASTIC_COATING_SERVICE_AFTER' || label === 'ELASTIC_COATING_AFTER') {
+    } else if (label === 'ELASTIC_COATING_BEFORE') {
+      imageSrc = '/elastic_ba_before.jpg';
+    } else if (label === 'ELASTIC_COATING_SERVICE_AFTER') {
       imageSrc = '/elastic_after.png';
+    } else if (label === 'ELASTIC_COATING_AFTER') {
+      imageSrc = '/elastic_ba_after.jpg';
     } else if (label && (label.endsWith('BALCONY_IMAGE') || label === 'BALCONY_IMAGE')) {
       imageSrc = '/balcony_guide.png';
     } else if (label && (label.endsWith('LAUNDRY_ROOM_IMAGE') || label === 'LAUNDRY_ROOM_IMAGE')) {
