@@ -179,6 +179,7 @@ export default async function handler(req, res) {
     };
 
     activeList.forEach(r => {
+      if (r.metro !== '서울' && r.metro !== '인천' && r.metro !== '경기') return;
       const metroKey = r.metro === '서울' ? '서울권' : (r.metro === '인천' ? '인천권' : '경기권');
       const group = metroGroups[metroKey];
       
@@ -261,6 +262,101 @@ export default async function handler(req, res) {
           seoContent += '</div>';
         }
         seoContent += '</div>';
+      }
+      seoContent += '</div>';
+    }
+    seoContent += '</div>';
+
+    html = html.replace('<div id="root"></div>', '<div id="root">' + seoContent + '</div>');
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
+  }
+
+  // Check if we are requesting sitemap-chungcheong
+  if (pathname === '/sitemap-chungcheong') {
+    const hubTitle = "대전·세종 탄성코트 시공 지역별 페이지 안내 | 바름공간";
+    const hubDesc = "대전광역시, 세종특별자치시 주요 구·동 단위의 탄성코트 전문 시공 서비스 페이지 안내 목록입니다.";
+    
+    const hubCanonical = "https://www.barumspace.co.kr/sitemap-chungcheong";
+
+    // Replace Meta Tags
+    html = html.replace(/<title>.*?<\/title>/, "<title>" + hubTitle + "</title>");
+    html = html.replace(/<meta name="description" content=".*?" \/>/, '<meta name="description" content="' + hubDesc + '" />');
+    html = html.replace(/<meta property="og:title" content=".*?" \/>/, '<meta property="og:title" content="' + hubTitle + '" />');
+    html = html.replace(/<meta property="og:description" content=".*?" \/>/, '<meta property="og:description" content="' + hubDesc + '" />');
+
+    // Inject canonical & og:url tags
+    html = html.replace('</head>', '<link rel="canonical" href="' + hubCanonical + '" />\n<meta property="og:url" content="' + hubCanonical + '" />\n</head>');
+
+    // Fetch all active production regions
+    const activeList = getActiveRegions();
+    
+    // Grouping for Chungcheong (Batch 1A: Daejeon + Sejong)
+    const chungcheongGroups = {
+      '대전권': { label: '대전광역시', districts: {} },
+      '세종권': { label: '세종특별자치시', districts: {} }
+    };
+
+    activeList.forEach(r => {
+      if (r.metro !== '대전' && r.metro !== '세종') return;
+      const metroKey = r.metro === '대전' ? '대전권' : '세종권';
+      const group = chungcheongGroups[metroKey];
+      
+      let distKey = '전체';
+      if (r.metro === '대전') {
+        distKey = (r.groupName && r.groupName !== '대전시') ? r.groupName : '시 단위';
+      }
+      
+      if (!group.districts[distKey]) {
+        group.districts[distKey] = {
+          name: distKey,
+          regions: []
+        };
+      }
+      group.districts[distKey].regions.push(r);
+    });
+
+    let seoContent = '<div style="padding: 40px; max-width: 1200px; margin: 0 auto; font-family: sans-serif;">';
+    seoContent += '<h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px;">대전·세종 탄성코트 시공 지역별 페이지 안내</h1>';
+    seoContent += '<p style="color: #666; margin-bottom: 40px;">대전광역시 및 세종특별자치시 주요 구·동 단위의 탄성코트 전문 시공 서비스 안내 목록입니다.</p>';
+
+    for (const metroKey of Object.keys(chungcheongGroups)) {
+      const metro = chungcheongGroups[metroKey];
+      const distKeys = Object.keys(metro.districts);
+      if (distKeys.length === 0) continue;
+
+      let childCount = 0;
+      distKeys.forEach(dk => { childCount += metro.districts[dk].regions.length; });
+
+      seoContent += '<div style="margin-bottom: 50px;">';
+      seoContent += '<h2 style="font-size: 1.6rem; color: #183f35; border-bottom: 3px solid #183f35; padding-bottom: 10px; margin-bottom: 24px;">' + metro.label + ' <span style="font-size: 1rem; color: #666; font-weight: normal;">(총 ' + childCount + '개 지역)</span></h2>';
+
+      for (const distKey of distKeys) {
+        const district = metro.districts[distKey];
+        
+        seoContent += '<div style="margin-bottom: 30px; border: 1px solid #e5e5e5; padding: 20px; border-radius: 6px; background: #fff;">';
+        if (distKey !== '전체') {
+          seoContent += '<h3 style="font-size: 1.3rem; color: #183f35; margin: 0 0 16px 0; border-bottom: 1px dashed #e5e5e5; padding-bottom: 8px;">[' + distKey + '] <span style="font-size: 0.9rem; color: #666; font-weight: normal;">(하위 지역: ' + district.regions.length + '개)</span></h3>';
+        } else {
+          seoContent += '<h3 style="font-size: 1.3rem; color: #183f35; margin: 0 0 16px 0; border-bottom: 1px dashed #e5e5e5; padding-bottom: 8px;">세종특별자치시 전역 <span style="font-size: 0.9rem; color: #666; font-weight: normal;">(하위 지역: ' + district.regions.length + '개)</span></h3>';
+        }
+
+        seoContent += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">';
+        
+        district.regions.forEach(reg => {
+          seoContent += '<div style="border: 1px solid #eee; padding: 12px; border-radius: 4px; background: #fafafa;">';
+          seoContent += '<h5 style="font-size: 0.9rem; color: #333; font-weight: bold; margin: 0 0 8px 0;">' + reg.name + '</h5>';
+          seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
+          const allowedServices = getAllowedServicesForRegion(reg);
+          allowedServices.forEach(k => {
+            const dynUrl = generateDynamicUrl(reg.urlRegion, k.keyword);
+            seoContent += '<li><a href="' + dynUrl + '" style="color: #0076ff; text-decoration: none;">' + reg.displayName + ' ' + k.keyword + '</a></li>';
+          });
+          seoContent += '</ul></div>';
+        });
+
+        seoContent += '</div></div>';
       }
       seoContent += '</div>';
     }
@@ -358,12 +454,13 @@ export default async function handler(req, res) {
       });
 
       // 2. Breadcrumb schema
+      const isChungcheong = matchedRegion.metro === '대전' || matchedRegion.metro === '세종' || matchedRegion.metro === '충청';
       schemas.push({
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         'itemListElement': [
           { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
-          { '@type': 'ListItem', 'position': 2, 'name': '수도권 지역별 안내', 'item': `${defaultSiteUrl}/sitemap-seoul` },
+          { '@type': 'ListItem', 'position': 2, 'name': isChungcheong ? '대전·세종 지역별 안내' : '수도권 지역별 안내', 'item': isChungcheong ? `${defaultSiteUrl}/sitemap-chungcheong` : `${defaultSiteUrl}/sitemap-seoul` },
           { '@type': 'ListItem', 'position': 3, 'name': `${regionName} ${taskName}`, 'item': cleanUrl }
         ]
       });

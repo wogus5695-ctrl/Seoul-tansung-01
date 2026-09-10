@@ -3,6 +3,7 @@
 
 import { keywordMetadata } from '../src/data/keywordMetadata.js';
 import { gyeonggiSouthRegions } from '../src/data/gyeonggiSouthRegions.js';
+import { chungcheongRegions } from '../src/data/chungcheongRegions.js';
 import { serviceKeywords } from '../src/data/serviceKeywords.js';
 import { getActiveRegions, getAllowedServicesForRegion } from '../src/data/regionResolver.js';
 
@@ -15,7 +16,7 @@ function validateRegions() {
   const seenIds = new Set();
   const seenUrlRegionKeys = new Map();
 
-  const allMetadata = [...keywordMetadata, ...gyeonggiSouthRegions];
+  const allMetadata = [...keywordMetadata, ...gyeonggiSouthRegions, ...chungcheongRegions];
 
   allMetadata.forEach((item, index) => {
     const locStr = `[Index ${index} | ID: ${item.id || 'N/A'} | Region: ${item.displayRegionName || 'N/A'}]`;

@@ -25,6 +25,10 @@
       "dest": "/api/seo"
     },
     {
+      "src": "/sitemap-chungcheong",
+      "dest": "/api/seo"
+    },
+    {
       "src": "/",
       "has": [
         {

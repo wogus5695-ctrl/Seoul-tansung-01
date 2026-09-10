@@ -194,6 +194,7 @@ function App() {
     };
 
     list.forEach(r => {
+      if (r.metro !== '서울' && r.metro !== '인천' && r.metro !== '경기') return;
       const metroKey = r.metro === '서울' ? '서울권' : (r.metro === '인천' ? '인천권' : '경기권');
       const group = metroGroups[metroKey];
       
@@ -231,6 +232,32 @@ function App() {
       }
     });
 
+    const chungcheongMetroGroups = {
+      '대전권': { label: '대전광역시', cities: {} },
+      '세종권': { label: '세종특별자치시', cities: {} }
+    };
+
+    list.forEach(r => {
+      if (r.metro !== '대전' && r.metro !== '세종') return;
+      const metroKey = r.metro === '대전' ? '대전권' : '세종권';
+      const group = chungcheongMetroGroups[metroKey];
+      const cityKey = r.metro === '대전' ? '대전시' : '세종시';
+      if (!group.cities[cityKey]) {
+        group.cities[cityKey] = {
+          name: cityKey,
+          districts: {}
+        };
+      }
+      const distKey = r.metro === '대전' ? (r.groupName && r.groupName !== '대전시' ? r.groupName : '시 단위') : '전체';
+      if (!group.cities[cityKey].districts[distKey]) {
+        group.cities[cityKey].districts[distKey] = {
+          name: distKey,
+          regions: []
+        };
+      }
+      group.cities[cityKey].districts[distKey].regions.push(r);
+    });
+
     const uniqueDistricts = [];
     Object.keys(metroGroups).forEach(mKey => {
       Object.keys(metroGroups[mKey].cities).forEach(cKey => {
@@ -244,6 +271,7 @@ function App() {
       totalTasksCount,
       totalUrlsCount,
       metroGroups,
+      chungcheongMetroGroups,
       uniqueDistricts
     };
   }, []);
@@ -360,12 +388,13 @@ function App() {
       });
 
       // 2. Breadcrumb schema
+      const isChung = parsedKeyword?.region?.metro === '대전' || parsedKeyword?.region?.metro === '세종' || parsedKeyword?.region?.metro === '충청';
       schemas.push({
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         'itemListElement': [
           { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
-          { '@type': 'ListItem', 'position': 2, 'name': '수도권 지역별 안내', 'item': `${defaultSiteUrl}/sitemap-seoul` },
+          { '@type': 'ListItem', 'position': 2, 'name': isChung ? '대전·세종 지역별 안내' : '수도권 지역별 안내', 'item': isChung ? `${defaultSiteUrl}/sitemap-chungcheong` : `${defaultSiteUrl}/sitemap-seoul` },
           { '@type': 'ListItem', 'position': 3, 'name': `${regionName} ${taskName}`, 'item': generateAbsoluteDynamicUrl(defaultSiteUrl, parsedKeyword.region.urlRegion, parsedKeyword.service.keyword) }
         ]
       });
@@ -394,6 +423,26 @@ function App() {
         'name': titleStr,
         'description': descStr,
         'url': `${defaultSiteUrl}/privacy-policy`
+      });
+    } else if (path === '/sitemap-chungcheong') {
+      titleStr = `대전·세종 탄성코트 시공 지역별 페이지 안내 | 바름공간`;
+      descStr = `대전광역시, 세종특별자치시 주요 구·동 단위의 탄성코트 전문 시공 서비스 페이지 안내 목록입니다.`;
+
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        'name': titleStr,
+        'description': descStr,
+        'url': `${defaultSiteUrl}/sitemap-chungcheong`
+      });
+
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
+          { '@type': 'ListItem', 'position': 2, 'name': '대전·세종 지역별 안내', 'item': `${defaultSiteUrl}/sitemap-chungcheong` }
+        ]
       });
     } else if (path === '/sitemap-seoul') {
       titleStr = `서울 탄성코트·줄눈시공 지역별 안내`;
@@ -621,8 +670,11 @@ function App() {
       );
     }
 
-    // B: Sitemap Hub Page (/sitemap-seoul)
-    if (path === '/sitemap-seoul') {
+    // B: Sitemap Hub Page (/sitemap-seoul or /sitemap-chungcheong)
+    if (path === '/sitemap-seoul' || path === '/sitemap-chungcheong') {
+      const isChungcheongHub = path === '/sitemap-chungcheong';
+      const currentMetroGroups = isChungcheongHub ? metrics.chungcheongMetroGroups : metrics.metroGroups;
+
       return (
         <SectionContainer padding="60px 20px">
           {/* Header titles */}
@@ -631,10 +683,16 @@ function App() {
               SEO DIRECTORY
             </span>
             <h1 style={{ marginTop: '8px', marginBottom: '16px', fontSize: '2.5rem' }}>
-              수도권 탄성코트·줄눈시공<br />지역별 페이지 안내
+              {isChungcheongHub ? (
+                <>대전·세종 탄성코트<br />지역별 페이지 안내</>
+              ) : (
+                <>수도권 탄성코트·줄눈시공<br />지역별 페이지 안내</>
+              )}
             </h1>
             <p style={{ opacity: 0.8, maxWidth: '720px', lineHeight: 1.6, fontSize: '1.05rem' }}>
-              서울·경기·인천 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지를 확인할 수 있습니다.
+              {isChungcheongHub
+                ? '대전광역시 및 세종특별자치시 주요 구·동 단위의 탄성코트 서비스 페이지를 확인할 수 있습니다.'
+                : '서울·경기·인천 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지를 확인할 수 있습니다.'}
             </p>
           </div>
 
@@ -795,11 +853,13 @@ function App() {
 
           {/* Hierarchical links listing */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-            {Object.keys(metrics.metroGroups).map(metroKey => {
-              const metroVal = metroFilter === '서울' ? '서울권' : (metroFilter === '경기' ? '경기권' : (metroFilter === '인천' ? '인천권' : '전체'));
-              if (metroFilter !== '전체' && metroKey !== metroVal) return null;
+            {Object.keys(currentMetroGroups).map(metroKey => {
+              if (!isChungcheongHub) {
+                const metroVal = metroFilter === '서울' ? '서울권' : (metroFilter === '경기' ? '경기권' : (metroFilter === '인천' ? '인천권' : '전체'));
+                if (metroFilter !== '전체' && metroKey !== metroVal) return null;
+              }
 
-              const metro = metrics.metroGroups[metroKey];
+              const metro = currentMetroGroups[metroKey];
               return (
                 <div key={metroKey} style={{ textAlign: 'left' }}>
                   <h2 style={{
@@ -1912,13 +1972,13 @@ function App() {
       <Header onNavigate={navigate} currentPath={path} onPhoneClick={handlePhoneCall} onChatClick={handleCTA} />
       <main style={{ 
         flex: 1,
-        paddingBottom: (path !== '/sitemap-seoul' && !isDesktop) ? 'calc(88px + env(safe-area-inset-bottom))' : '0px'
+        paddingBottom: (path !== '/sitemap-seoul' && path !== '/sitemap-chungcheong' && !isDesktop) ? 'calc(88px + env(safe-area-inset-bottom))' : '0px'
       }}>
         {renderContent()}
       </main>
       <Footer onNavigate={navigate} />
       {/* Hide Fixed CTA only on sitemap directory page */}
-      {path !== '/sitemap-seoul' && (
+      {path !== '/sitemap-seoul' && path !== '/sitemap-chungcheong' && (
         <MobileFixedCTA onPhoneClick={handlePhoneCall} onChatClick={handleCTA} />
       )}
     </div>
