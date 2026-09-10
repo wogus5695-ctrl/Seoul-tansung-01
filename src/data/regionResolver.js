@@ -151,6 +151,20 @@ function buildIndexes() {
       } else {
         groupName = '청주시';
       }
+    } else if (lookupId.startsWith('cheonan')) {
+      metro = '충남';
+      city = '천안시';
+      if (item.officialRegionName === '천안동남구' || (item.parentRegionName && item.parentRegionName.includes('동남구'))) {
+        groupName = '천안동남구';
+      } else if (item.officialRegionName === '천안서북구' || (item.parentRegionName && item.parentRegionName.includes('서북구'))) {
+        groupName = '천안서북구';
+      } else {
+        groupName = '천안시';
+      }
+    } else if (lookupId.startsWith('asan')) {
+      metro = '충남';
+      city = '아산시';
+      groupName = '아산시';
     }
 
     const entry = {
@@ -166,7 +180,7 @@ function buildIndexes() {
       displayName: item.displayRegionName,
       urlRegion: item.urlRegionKey,
       parentRegionName: item.parentRegionName || metro,
-      districtName: (metro === '대전') ? ((item.regionType === '구') ? '대전시' : groupName) : ((metro === '세종') ? '세종시' : ((metro === '충북') ? ((item.regionType === '구' || item.regionType === '시') ? '청주시' : (item.parentRegionName || groupName)) : (item.parentRegionName ? item.parentRegionName.split(' ')[1] || groupName : groupName))),
+      districtName: (metro === '대전') ? ((item.regionType === '구') ? '대전시' : groupName) : ((metro === '세종') ? '세종시' : ((metro === '충북') ? ((item.regionType === '구' || item.regionType === '시') ? '청주시' : (item.parentRegionName || groupName)) : ((metro === '충남') ? ((item.regionType === '시') ? '충청남도' : ((item.regionType === '구') ? '천안시' : groupName)) : (item.parentRegionName ? item.parentRegionName.split(' ')[1] || groupName : groupName)))),
       aliases: [],
       collisionResolved: true,
       requiresCollisionReview: false,

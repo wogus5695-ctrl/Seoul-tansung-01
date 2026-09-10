@@ -971,5 +971,329 @@ export const chungcheongRegions = [
     "expansionBatch": "chungcheong-batch-1b-2026",
     "expansionGroup": "chungcheong-2026",
     "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-official",
+    "parentRegionName": "충청남도",
+    "officialRegionName": "천안시",
+    "displayRegionName": "천안시",
+    "urlRegionKey": "천안시",
+    "keywordVariant": "official",
+    "regionType": "시",
+    "isIndexable": true,
+    "regionId": "cheonan",
+    "originalType": "city",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-동남구-official",
+    "parentRegionName": "충청남도 천안시",
+    "officialRegionName": "천안동남구",
+    "displayRegionName": "천안동남구",
+    "urlRegionKey": "천안동남구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "cheonan-동남구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-서북구-official",
+    "parentRegionName": "충청남도 천안시",
+    "officialRegionName": "천안서북구",
+    "displayRegionName": "천안서북구",
+    "urlRegionKey": "천안서북구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "cheonan-서북구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-서북구-불당-official",
+    "parentRegionName": "천안시 서북구",
+    "officialRegionName": "불당동",
+    "displayRegionName": "불당동",
+    "urlRegionKey": "불당동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheonan-서북구-불당",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-서북구-백석-official",
+    "parentRegionName": "천안시 서북구",
+    "officialRegionName": "백석동",
+    "displayRegionName": "백석동",
+    "urlRegionKey": "천안백석동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheonan-서북구-백석",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-서북구-성성-official",
+    "parentRegionName": "천안시 서북구",
+    "officialRegionName": "성성동",
+    "displayRegionName": "성성동",
+    "urlRegionKey": "성성동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheonan-서북구-성성",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-서북구-두정-official",
+    "parentRegionName": "천안시 서북구",
+    "officialRegionName": "두정동",
+    "displayRegionName": "두정동",
+    "urlRegionKey": "두정동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheonan-서북구-두정",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-서북구-쌍용-official",
+    "parentRegionName": "천안시 서북구",
+    "officialRegionName": "쌍용동",
+    "displayRegionName": "쌍용동",
+    "urlRegionKey": "쌍용동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheonan-서북구-쌍용",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-동남구-신방-official",
+    "parentRegionName": "천안시 동남구",
+    "officialRegionName": "신방동",
+    "displayRegionName": "신방동",
+    "urlRegionKey": "신방동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheonan-동남구-신방",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheonan-동남구-청당-official",
+    "parentRegionName": "천안시 동남구",
+    "officialRegionName": "청당동",
+    "displayRegionName": "청당동",
+    "urlRegionKey": "청당동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheonan-동남구-청당",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-official",
+    "parentRegionName": "충청남도",
+    "officialRegionName": "아산시",
+    "displayRegionName": "아산시",
+    "urlRegionKey": "아산시",
+    "keywordVariant": "official",
+    "regionType": "시",
+    "isIndexable": true,
+    "regionId": "asan",
+    "originalType": "city",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-배방-official",
+    "parentRegionName": "아산시",
+    "officialRegionName": "배방읍",
+    "displayRegionName": "배방읍",
+    "urlRegionKey": "배방읍",
+    "keywordVariant": "lowerRegion",
+    "regionType": "읍",
+    "isIndexable": true,
+    "regionId": "asan-배방",
+    "originalType": "eup",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-탕정-official",
+    "parentRegionName": "아산시",
+    "officialRegionName": "탕정면",
+    "displayRegionName": "탕정면",
+    "urlRegionKey": "탕정면",
+    "keywordVariant": "lowerRegion",
+    "regionType": "면",
+    "isIndexable": true,
+    "regionId": "asan-탕정",
+    "originalType": "myeon",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-모종-official",
+    "parentRegionName": "아산시",
+    "officialRegionName": "모종동",
+    "displayRegionName": "모종동",
+    "urlRegionKey": "모종동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "asan-모종",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-풍기-official",
+    "parentRegionName": "아산시",
+    "officialRegionName": "풍기동",
+    "displayRegionName": "풍기동",
+    "urlRegionKey": "풍기동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "asan-풍기",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-권곡-official",
+    "parentRegionName": "아산시",
+    "officialRegionName": "권곡동",
+    "displayRegionName": "권곡동",
+    "urlRegionKey": "권곡동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "asan-권곡",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-용화-official",
+    "parentRegionName": "아산시",
+    "officialRegionName": "용화동",
+    "displayRegionName": "용화동",
+    "urlRegionKey": "용화동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "asan-용화",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "asan-온천-official",
+    "parentRegionName": "아산시",
+    "officialRegionName": "온천동",
+    "displayRegionName": "온천동",
+    "urlRegionKey": "온천동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "asan-온천",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1c-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
   }
 ];

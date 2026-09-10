@@ -284,7 +284,7 @@ export default async function handler(req, res) {
   // Check if we are requesting sitemap-chungcheong
   if (pathname === '/sitemap-chungcheong') {
     const hubTitle = "충청권 탄성코트 시공 지역별 페이지 안내 | 바름공간";
-    const hubDesc = "대전광역시, 세종특별자치시 및 충청북도 청주시 주요 구·동 단위의 탄성코트 전문 시공 서비스 페이지 안내 목록입니다.";
+    const hubDesc = "대전광역시, 세종특별자치시, 충청북도 청주시 및 충청남도 천안·아산 주요 구·동 단위의 탄성코트 전문 시공 서비스 페이지 안내 목록입니다.";
     
     const hubCanonical = "https://www.barumspace.co.kr/sitemap-chungcheong";
 
@@ -300,16 +300,17 @@ export default async function handler(req, res) {
     // Fetch all active production regions
     const activeList = getActiveRegions();
     
-    // Grouping for Chungcheong (Batch 1A: Daejeon + Sejong, Batch 1B: Cheongju)
+    // Grouping for Chungcheong (Batch 1A: Daejeon + Sejong, Batch 1B: Cheongju, Batch 1C: Cheonan + Asan)
     const chungcheongGroups = {
       '대전권': { label: '대전광역시', districts: {} },
       '세종권': { label: '세종특별자치시', districts: {} },
-      '충북권': { label: '충청북도 (청주시)', districts: {} }
+      '충북권': { label: '충청북도 (청주시)', districts: {} },
+      '충남권': { label: '충청남도 (천안·아산)', districts: {} }
     };
 
     activeList.forEach(r => {
-      if (r.metro !== '대전' && r.metro !== '세종' && r.metro !== '충북') return;
-      const metroKey = r.metro === '대전' ? '대전권' : (r.metro === '세종' ? '세종권' : '충북권');
+      if (r.metro !== '대전' && r.metro !== '세종' && r.metro !== '충북' && r.metro !== '충남') return;
+      const metroKey = r.metro === '대전' ? '대전권' : (r.metro === '세종' ? '세종권' : (r.metro === '충북' ? '충북권' : '충남권'));
       const group = chungcheongGroups[metroKey];
       
       let distKey = '전체';
@@ -317,6 +318,8 @@ export default async function handler(req, res) {
         distKey = (r.groupName && r.groupName !== '대전시') ? r.groupName : '시 단위';
       } else if (r.metro === '충북') {
         distKey = (r.groupName && r.groupName !== '청주시') ? r.groupName : '시 단위';
+      } else if (r.metro === '충남') {
+        distKey = r.groupName || '시 단위';
       }
       
       if (!group.districts[distKey]) {
@@ -330,7 +333,7 @@ export default async function handler(req, res) {
 
     let seoContent = '<div style="padding: 40px; max-width: 1200px; margin: 0 auto; font-family: sans-serif;">';
     seoContent += '<h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px;">충청권 탄성코트 시공 지역별 페이지 안내</h1>';
-    seoContent += '<p style="color: #666; margin-bottom: 30px;">대전광역시, 세종특별자치시 및 충청북도 청주시 주요 구·동 단위의 탄성코트 전문 시공 서비스 안내 목록입니다.</p>';
+    seoContent += '<p style="color: #666; margin-bottom: 30px;">대전광역시, 세종특별자치시, 충청북도 청주시 및 충청남도 천안·아산 주요 구·동 단위의 탄성코트 전문 시공 서비스 안내 목록입니다.</p>';
 
     // Region Hub Cross-Navigation CTA
     seoContent += '<div style="background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 6px; padding: 20px; margin-bottom: 40px;">';

@@ -235,14 +235,15 @@ function App() {
     const chungcheongMetroGroups = {
       '대전권': { label: '대전광역시', cities: {} },
       '세종권': { label: '세종특별자치시', cities: {} },
-      '충북권': { label: '충청북도 (청주시)', cities: {} }
+      '충북권': { label: '충청북도 (청주시)', cities: {} },
+      '충남권': { label: '충청남도 (천안·아산)', cities: {} }
     };
 
     list.forEach(r => {
-      if (r.metro !== '대전' && r.metro !== '세종' && r.metro !== '충북') return;
-      const metroKey = r.metro === '대전' ? '대전권' : (r.metro === '세종' ? '세종권' : '충북권');
+      if (r.metro !== '대전' && r.metro !== '세종' && r.metro !== '충북' && r.metro !== '충남') return;
+      const metroKey = r.metro === '대전' ? '대전권' : (r.metro === '세종' ? '세종권' : (r.metro === '충북' ? '충북권' : '충남권'));
       const group = chungcheongMetroGroups[metroKey];
-      const cityKey = r.metro === '대전' ? '대전시' : (r.metro === '세종' ? '세종시' : '청주시');
+      const cityKey = r.metro === '대전' ? '대전시' : (r.metro === '세종' ? '세종시' : (r.metro === '충북' ? '청주시' : (r.city || '충남')));
       if (!group.cities[cityKey]) {
         group.cities[cityKey] = {
           name: cityKey,
@@ -254,6 +255,8 @@ function App() {
         distKey = (r.groupName && r.groupName !== '대전시') ? r.groupName : '시 단위';
       } else if (r.metro === '충북') {
         distKey = (r.groupName && r.groupName !== '청주시') ? r.groupName : '시 단위';
+      } else if (r.metro === '충남') {
+        distKey = (r.groupName && r.groupName !== cityKey) ? r.groupName : '시 단위';
       }
       if (!group.cities[cityKey].districts[distKey]) {
         group.cities[cityKey].districts[distKey] = {
@@ -697,7 +700,7 @@ function App() {
             </h1>
             <p style={{ opacity: 0.8, maxWidth: '720px', lineHeight: 1.6, fontSize: '1.05rem' }}>
               {isChungcheongHub
-                ? '대전광역시, 세종특별자치시 및 충청북도 청주시 주요 구·동 단위의 탄성코트 서비스 페이지를 확인할 수 있습니다.'
+                ? '대전광역시, 세종특별자치시, 충청북도 청주시 및 충청남도 천안·아산 주요 구·동 단위의 탄성코트 서비스 페이지를 확인할 수 있습니다.'
                 : '서울·경기·인천 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지를 확인할 수 있습니다.'}
             </p>
           </div>
