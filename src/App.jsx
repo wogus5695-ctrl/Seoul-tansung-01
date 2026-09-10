@@ -289,7 +289,9 @@ function App() {
   const activeGroup = parsedKeyword ? parsedKeyword.service.serviceGroup : 'both';
   const activeIntent = parsedKeyword ? parsedKeyword.service.searchIntent : 'general';
 
-  const engineVersion = parsedKeyword 
+  const isChungcheongRegion = parsedKeyword?.region?.metro === '대전' || parsedKeyword?.region?.metro === '세종' || parsedKeyword?.region?.metro === '충북' || parsedKeyword?.region?.metro === '충남' || parsedKeyword?.region?.metro === '충청';
+
+  const engineVersion = (parsedKeyword && !isChungcheongRegion)
     ? getSeoEngineVersion(parsedKeyword.region.name, parsedKeyword.service.keyword)
     : 'V1';
 

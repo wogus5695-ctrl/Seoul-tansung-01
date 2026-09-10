@@ -130,6 +130,12 @@ function buildIndexes() {
         groupName = '대전서구';
       } else if (item.officialRegionName === '대전유성구' || (item.parentRegionName && item.parentRegionName.includes('유성구'))) {
         groupName = '대전유성구';
+      } else if (item.officialRegionName === '대전동구' || (item.parentRegionName && item.parentRegionName.includes('동구'))) {
+        groupName = '대전동구';
+      } else if (item.officialRegionName === '대전중구' || (item.parentRegionName && item.parentRegionName.includes('중구'))) {
+        groupName = '대전중구';
+      } else if (item.officialRegionName === '대전대덕구' || (item.parentRegionName && item.parentRegionName.includes('대덕구'))) {
+        groupName = '대전대덕구';
       } else {
         groupName = '대전시';
       }

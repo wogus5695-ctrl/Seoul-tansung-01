@@ -1295,5 +1295,329 @@ export const chungcheongRegions = [
     "expansionBatch": "chungcheong-batch-1c-2026",
     "expansionGroup": "chungcheong-2026",
     "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-동구-official",
+    "parentRegionName": "대전광역시",
+    "officialRegionName": "대전동구",
+    "displayRegionName": "대전동구",
+    "urlRegionKey": "대전동구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "daejeon-동구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-동구-가오-official",
+    "parentRegionName": "대전광역시 동구",
+    "officialRegionName": "가오동",
+    "displayRegionName": "가오동",
+    "urlRegionKey": "가오동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-동구-가오",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-동구-천-official",
+    "parentRegionName": "대전광역시 동구",
+    "officialRegionName": "천동",
+    "displayRegionName": "천동",
+    "urlRegionKey": "천동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-동구-천",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-동구-판암-official",
+    "parentRegionName": "대전광역시 동구",
+    "officialRegionName": "판암동",
+    "displayRegionName": "판암동",
+    "urlRegionKey": "판암동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-동구-판암",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-동구-용운-official",
+    "parentRegionName": "대전광역시 동구",
+    "officialRegionName": "용운동",
+    "displayRegionName": "용운동",
+    "urlRegionKey": "용운동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-동구-용운",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-동구-대-official",
+    "parentRegionName": "대전광역시 동구",
+    "officialRegionName": "대동",
+    "displayRegionName": "대동",
+    "urlRegionKey": "대동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-동구-대",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-동구-성남-official",
+    "parentRegionName": "대전광역시 동구",
+    "officialRegionName": "성남동",
+    "displayRegionName": "성남동",
+    "urlRegionKey": "대전성남동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-동구-성남",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-중구-official",
+    "parentRegionName": "대전광역시",
+    "officialRegionName": "대전중구",
+    "displayRegionName": "대전중구",
+    "urlRegionKey": "대전중구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "daejeon-중구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-중구-문화-official",
+    "parentRegionName": "대전광역시 중구",
+    "officialRegionName": "문화동",
+    "displayRegionName": "문화동",
+    "urlRegionKey": "문화동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-중구-문화",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-중구-중촌-official",
+    "parentRegionName": "대전광역시 중구",
+    "officialRegionName": "중촌동",
+    "displayRegionName": "중촌동",
+    "urlRegionKey": "중촌동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-중구-중촌",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-중구-태평-official",
+    "parentRegionName": "대전광역시 중구",
+    "officialRegionName": "태평동",
+    "displayRegionName": "태평동",
+    "urlRegionKey": "대전태평동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-중구-태평",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-중구-오류-official",
+    "parentRegionName": "대전광역시 중구",
+    "officialRegionName": "오류동",
+    "displayRegionName": "오류동",
+    "urlRegionKey": "대전오류동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-중구-오류",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-중구-목-official",
+    "parentRegionName": "대전광역시 중구",
+    "officialRegionName": "목동",
+    "displayRegionName": "목동",
+    "urlRegionKey": "대전목동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-중구-목",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-대덕구-official",
+    "parentRegionName": "대전광역시",
+    "officialRegionName": "대전대덕구",
+    "displayRegionName": "대전대덕구",
+    "urlRegionKey": "대전대덕구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "daejeon-대덕구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-대덕구-송촌-official",
+    "parentRegionName": "대전광역시 대덕구",
+    "officialRegionName": "송촌동",
+    "displayRegionName": "송촌동",
+    "urlRegionKey": "송촌동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-대덕구-송촌",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-대덕구-법-official",
+    "parentRegionName": "대전광역시 대덕구",
+    "officialRegionName": "법동",
+    "displayRegionName": "법동",
+    "urlRegionKey": "법동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-대덕구-법",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "daejeon-대덕구-석봉-official",
+    "parentRegionName": "대전광역시 대덕구",
+    "officialRegionName": "석봉동",
+    "displayRegionName": "석봉동",
+    "urlRegionKey": "석봉동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "daejeon-대덕구-석봉",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "sejong-조치원-official",
+    "parentRegionName": "세종특별자치시",
+    "officialRegionName": "조치원읍",
+    "displayRegionName": "조치원읍",
+    "urlRegionKey": "조치원읍",
+    "keywordVariant": "lowerRegion",
+    "regionType": "읍",
+    "isIndexable": true,
+    "regionId": "sejong-조치원",
+    "originalType": "eup",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2a-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
   }
 ];

@@ -424,7 +424,8 @@ export default async function handler(req, res) {
 
       // Feature Flag Check (Wave 1 Pilot for Elastic Coating keywords in Pilot regions)
       const forceV2 = usePreview || url.searchParams.get('v2') === 'true';
-      const engineVersion = getSeoEngineVersion(regionName, taskName, forceV2);
+      const isChungcheongRegion = matchedRegion.metro === '대전' || matchedRegion.metro === '세종' || matchedRegion.metro === '충북' || matchedRegion.metro === '충남' || matchedRegion.metro === '충청';
+      const engineVersion = isChungcheongRegion ? 'V1' : getSeoEngineVersion(regionName, taskName, forceV2);
 
       let metaDescText = matchedService.metaDescriptionTemplate.replace(/{region}/g, matchedRegion.displayName || regionName);
       if (engineVersion === 'V3') {
