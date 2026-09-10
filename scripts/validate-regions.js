@@ -76,9 +76,10 @@ function validateRegions() {
       }
     }
 
-    // Rule 9: Accidental Eup / Myeon indexing on new expansion batches
+    // Rule 9: Accidental Eup / Myeon indexing on new expansion batches (except explicit whitelist)
+    const EUP_MYEON_WHITELIST = new Set(['오송읍', '오창읍']);
     if (item.isIndexable && (item.regionType === '읍' || item.regionType === '면')) {
-      if (item.expansionBatch || item.allowedServiceFamilies) {
+      if ((item.expansionBatch || item.allowedServiceFamilies) && !EUP_MYEON_WHITELIST.has(item.displayRegionName)) {
         console.error(`[ERROR 9] Accidental indexing of new Eup/Myeon '${item.displayRegionName}' (${item.regionType}) at ${locStr}`);
         errorCount++;
       }

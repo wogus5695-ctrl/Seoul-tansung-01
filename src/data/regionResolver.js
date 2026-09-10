@@ -137,6 +137,20 @@ function buildIndexes() {
       metro = '세종';
       city = '세종시';
       groupName = '세종시';
+    } else if (lookupId.startsWith('cheongju')) {
+      metro = '충북';
+      city = '청주시';
+      if (item.officialRegionName === '청주상당구' || (item.parentRegionName && item.parentRegionName.includes('상당구'))) {
+        groupName = '청주상당구';
+      } else if (item.officialRegionName === '청주서원구' || (item.parentRegionName && item.parentRegionName.includes('서원구'))) {
+        groupName = '청주서원구';
+      } else if (item.officialRegionName === '청주흥덕구' || (item.parentRegionName && item.parentRegionName.includes('흥덕구'))) {
+        groupName = '청주흥덕구';
+      } else if (item.officialRegionName === '청주청원구' || (item.parentRegionName && item.parentRegionName.includes('청원구'))) {
+        groupName = '청주청원구';
+      } else {
+        groupName = '청주시';
+      }
     }
 
     const entry = {
@@ -152,7 +166,7 @@ function buildIndexes() {
       displayName: item.displayRegionName,
       urlRegion: item.urlRegionKey,
       parentRegionName: item.parentRegionName || metro,
-      districtName: (metro === '대전') ? ((item.regionType === '구') ? '대전시' : groupName) : ((metro === '세종') ? '세종시' : (item.parentRegionName ? item.parentRegionName.split(' ')[1] || groupName : groupName)),
+      districtName: (metro === '대전') ? ((item.regionType === '구') ? '대전시' : groupName) : ((metro === '세종') ? '세종시' : ((metro === '충북') ? ((item.regionType === '구' || item.regionType === '시') ? '청주시' : (item.parentRegionName || groupName)) : (item.parentRegionName ? item.parentRegionName.split(' ')[1] || groupName : groupName))),
       aliases: [],
       collisionResolved: true,
       requiresCollisionReview: false,

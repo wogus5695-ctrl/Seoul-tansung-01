@@ -91,11 +91,11 @@ export function buildV2InternalLinks(regionObj, serviceObj, siteUrl = 'https://w
   }
 
   // TIER C: Existing Hub Link
-  const isChungcheong = regionObj?.metro === '대전' || regionObj?.metro === '세종' || regionObj?.metro === '충청';
+  const isChungcheong = regionObj?.metro === '대전' || regionObj?.metro === '세종' || regionObj?.metro === '충북' || regionObj?.metro === '충남' || regionObj?.metro === '충청';
   const hubLink = {
     href: isChungcheong ? '/sitemap-chungcheong' : '/sitemap-seoul',
     absoluteHref: isChungcheong ? `${siteUrl}/sitemap-chungcheong` : `${siteUrl}/sitemap-seoul`,
-    label: isChungcheong ? '대전·세종 지역별 탄성코트 시공 안내 허브' : '수도권 지역별 탄성코트 시공 안내 허브'
+    label: isChungcheong ? '충청권 지역별 탄성코트 시공 안내 허브' : '수도권 지역별 탄성코트 시공 안내 허브'
   };
 
   const totalLinkCount = sameRegionTasks.length + sameDistrictRegions.length + (parentRegionLink ? 1 : 0) + (hubLink ? 1 : 0);

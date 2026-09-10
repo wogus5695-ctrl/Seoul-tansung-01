@@ -647,4 +647,329 @@ export const chungcheongRegions = [
     "expansionGroup": "chungcheong-2026",
     "sitemapGroup": "chungcheong"
   }
+,
+{
+    "id": "cheongju-official",
+    "parentRegionName": "충청북도",
+    "officialRegionName": "청주시",
+    "displayRegionName": "청주시",
+    "urlRegionKey": "청주시",
+    "keywordVariant": "official",
+    "regionType": "시",
+    "isIndexable": true,
+    "regionId": "cheongju",
+    "originalType": "city",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-상당구-official",
+    "parentRegionName": "청주시",
+    "officialRegionName": "청주상당구",
+    "displayRegionName": "청주상당구",
+    "urlRegionKey": "청주상당구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "cheongju-상당구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-서원구-official",
+    "parentRegionName": "청주시",
+    "officialRegionName": "청주서원구",
+    "displayRegionName": "청주서원구",
+    "urlRegionKey": "청주서원구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "cheongju-서원구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-흥덕구-official",
+    "parentRegionName": "청주시",
+    "officialRegionName": "청주흥덕구",
+    "displayRegionName": "청주흥덕구",
+    "urlRegionKey": "청주흥덕구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "cheongju-흥덕구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-청원구-official",
+    "parentRegionName": "청주시",
+    "officialRegionName": "청주청원구",
+    "displayRegionName": "청주청원구",
+    "urlRegionKey": "청주청원구",
+    "keywordVariant": "official",
+    "regionType": "구",
+    "isIndexable": true,
+    "regionId": "cheongju-청원구",
+    "originalType": "district",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-상당구-용암-official",
+    "parentRegionName": "청주시 상당구",
+    "officialRegionName": "용암동",
+    "displayRegionName": "용암동",
+    "urlRegionKey": "용암동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-상당구-용암",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-상당구-방서-official",
+    "parentRegionName": "청주시 상당구",
+    "officialRegionName": "방서동",
+    "displayRegionName": "방서동",
+    "urlRegionKey": "방서동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-상당구-방서",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-서원구-산남-official",
+    "parentRegionName": "청주시 서원구",
+    "officialRegionName": "산남동",
+    "displayRegionName": "산남동",
+    "urlRegionKey": "산남동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-서원구-산남",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-서원구-분평-official",
+    "parentRegionName": "청주시 서원구",
+    "officialRegionName": "분평동",
+    "displayRegionName": "분평동",
+    "urlRegionKey": "분평동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-서원구-분평",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-서원구-성화-official",
+    "parentRegionName": "청주시 서원구",
+    "officialRegionName": "성화동",
+    "displayRegionName": "성화동",
+    "urlRegionKey": "성화동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-서원구-성화",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-서원구-개신-official",
+    "parentRegionName": "청주시 서원구",
+    "officialRegionName": "개신동",
+    "displayRegionName": "개신동",
+    "urlRegionKey": "개신동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-서원구-개신",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-흥덕구-복대-official",
+    "parentRegionName": "청주시 흥덕구",
+    "officialRegionName": "복대동",
+    "displayRegionName": "복대동",
+    "urlRegionKey": "복대동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-흥덕구-복대",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-흥덕구-가경-official",
+    "parentRegionName": "청주시 흥덕구",
+    "officialRegionName": "가경동",
+    "displayRegionName": "가경동",
+    "urlRegionKey": "가경동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-흥덕구-가경",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-흥덕구-비하-official",
+    "parentRegionName": "청주시 흥덕구",
+    "officialRegionName": "비하동",
+    "displayRegionName": "비하동",
+    "urlRegionKey": "비하동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-흥덕구-비하",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-흥덕구-오송-official",
+    "parentRegionName": "청주시 흥덕구",
+    "officialRegionName": "오송읍",
+    "displayRegionName": "오송읍",
+    "urlRegionKey": "오송읍",
+    "keywordVariant": "lowerRegion",
+    "regionType": "읍",
+    "isIndexable": true,
+    "regionId": "cheongju-흥덕구-오송",
+    "originalType": "eup",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-청원구-율량-official",
+    "parentRegionName": "청주시 청원구",
+    "officialRegionName": "율량동",
+    "displayRegionName": "율량동",
+    "urlRegionKey": "율량동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-청원구-율량",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-청원구-사천-official",
+    "parentRegionName": "청주시 청원구",
+    "officialRegionName": "사천동",
+    "displayRegionName": "사천동",
+    "urlRegionKey": "사천동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "cheongju-청원구-사천",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "cheongju-청원구-오창-official",
+    "parentRegionName": "청주시 청원구",
+    "officialRegionName": "오창읍",
+    "displayRegionName": "오창읍",
+    "urlRegionKey": "오창읍",
+    "keywordVariant": "lowerRegion",
+    "regionType": "읍",
+    "isIndexable": true,
+    "regionId": "cheongju-청원구-오창",
+    "originalType": "eup",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-1b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  }
 ];

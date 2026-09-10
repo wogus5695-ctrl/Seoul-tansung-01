@@ -234,21 +234,27 @@ function App() {
 
     const chungcheongMetroGroups = {
       '대전권': { label: '대전광역시', cities: {} },
-      '세종권': { label: '세종특별자치시', cities: {} }
+      '세종권': { label: '세종특별자치시', cities: {} },
+      '충북권': { label: '충청북도 (청주시)', cities: {} }
     };
 
     list.forEach(r => {
-      if (r.metro !== '대전' && r.metro !== '세종') return;
-      const metroKey = r.metro === '대전' ? '대전권' : '세종권';
+      if (r.metro !== '대전' && r.metro !== '세종' && r.metro !== '충북') return;
+      const metroKey = r.metro === '대전' ? '대전권' : (r.metro === '세종' ? '세종권' : '충북권');
       const group = chungcheongMetroGroups[metroKey];
-      const cityKey = r.metro === '대전' ? '대전시' : '세종시';
+      const cityKey = r.metro === '대전' ? '대전시' : (r.metro === '세종' ? '세종시' : '청주시');
       if (!group.cities[cityKey]) {
         group.cities[cityKey] = {
           name: cityKey,
           districts: {}
         };
       }
-      const distKey = r.metro === '대전' ? (r.groupName && r.groupName !== '대전시' ? r.groupName : '시 단위') : '전체';
+      let distKey = '전체';
+      if (r.metro === '대전') {
+        distKey = (r.groupName && r.groupName !== '대전시') ? r.groupName : '시 단위';
+      } else if (r.metro === '충북') {
+        distKey = (r.groupName && r.groupName !== '청주시') ? r.groupName : '시 단위';
+      }
       if (!group.cities[cityKey].districts[distKey]) {
         group.cities[cityKey].districts[distKey] = {
           name: distKey,
@@ -388,13 +394,13 @@ function App() {
       });
 
       // 2. Breadcrumb schema
-      const isChung = parsedKeyword?.region?.metro === '대전' || parsedKeyword?.region?.metro === '세종' || parsedKeyword?.region?.metro === '충청';
+      const isChung = parsedKeyword?.region?.metro === '대전' || parsedKeyword?.region?.metro === '세종' || parsedKeyword?.region?.metro === '충북' || parsedKeyword?.region?.metro === '충남' || parsedKeyword?.region?.metro === '충청';
       schemas.push({
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         'itemListElement': [
           { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
-          { '@type': 'ListItem', 'position': 2, 'name': isChung ? '대전·세종 지역별 안내' : '수도권 지역별 안내', 'item': isChung ? `${defaultSiteUrl}/sitemap-chungcheong` : `${defaultSiteUrl}/sitemap-seoul` },
+          { '@type': 'ListItem', 'position': 2, 'name': isChung ? '충청권 지역별 안내' : '수도권 지역별 안내', 'item': isChung ? `${defaultSiteUrl}/sitemap-chungcheong` : `${defaultSiteUrl}/sitemap-seoul` },
           { '@type': 'ListItem', 'position': 3, 'name': `${regionName} ${taskName}`, 'item': generateAbsoluteDynamicUrl(defaultSiteUrl, parsedKeyword.region.urlRegion, parsedKeyword.service.keyword) }
         ]
       });
@@ -425,8 +431,8 @@ function App() {
         'url': `${defaultSiteUrl}/privacy-policy`
       });
     } else if (path === '/sitemap-chungcheong') {
-      titleStr = `대전·세종 탄성코트 시공 지역별 페이지 안내 | 바름공간`;
-      descStr = `대전광역시, 세종특별자치시 주요 구·동 단위의 탄성코트 전문 시공 서비스 페이지 안내 목록입니다.`;
+      titleStr = `충청권 탄성코트 시공 지역별 페이지 안내 | 바름공간`;
+      descStr = `대전광역시, 세종특별자치시 및 충청북도 청주시 주요 구·동 단위의 탄성코트 전문 시공 서비스 페이지 안내 목록입니다.`;
 
       schemas.push({
         '@context': 'https://schema.org',
@@ -441,7 +447,7 @@ function App() {
         '@type': 'BreadcrumbList',
         'itemListElement': [
           { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
-          { '@type': 'ListItem', 'position': 2, 'name': '대전·세종 지역별 안내', 'item': `${defaultSiteUrl}/sitemap-chungcheong` }
+          { '@type': 'ListItem', 'position': 2, 'name': '충청권 지역별 안내', 'item': `${defaultSiteUrl}/sitemap-chungcheong` }
         ]
       });
     } else if (path === '/sitemap-seoul') {
@@ -684,14 +690,14 @@ function App() {
             </span>
             <h1 style={{ marginTop: '8px', marginBottom: '16px', fontSize: '2.5rem' }}>
               {isChungcheongHub ? (
-                <>대전·세종 탄성코트<br />지역별 페이지 안내</>
+                <>충청권 탄성코트<br />지역별 페이지 안내</>
               ) : (
                 <>수도권 탄성코트·줄눈시공<br />지역별 페이지 안내</>
               )}
             </h1>
             <p style={{ opacity: 0.8, maxWidth: '720px', lineHeight: 1.6, fontSize: '1.05rem' }}>
               {isChungcheongHub
-                ? '대전광역시 및 세종특별자치시 주요 구·동 단위의 탄성코트 서비스 페이지를 확인할 수 있습니다.'
+                ? '대전광역시, 세종특별자치시 및 충청북도 청주시 주요 구·동 단위의 탄성코트 서비스 페이지를 확인할 수 있습니다.'
                 : '서울·경기·인천 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지를 확인할 수 있습니다.'}
             </p>
           </div>
