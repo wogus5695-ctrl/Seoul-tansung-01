@@ -219,7 +219,15 @@ export default async function handler(req, res) {
 
     let seoContent = '<div style="padding: 40px; max-width: 1200px; margin: 0 auto; font-family: sans-serif;">';
     seoContent += '<h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px;">서울·인천·경기 탄성코트·줄눈시공 지역별 페이지 안내</h1>';
-    seoContent += '<p style="color: #666; margin-bottom: 40px;">서울·인천·경기 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지 안내 목록입니다.</p>';
+    seoContent += '<p style="color: #666; margin-bottom: 30px;">서울·인천·경기 주요 시·구·읍·면·동 단위의 탄성코트 및 줄눈시공 서비스 페이지 안내 목록입니다.</p>';
+
+    // Region Hub Cross-Navigation CTA
+    seoContent += '<div style="background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 6px; padding: 20px; margin-bottom: 40px;">';
+    seoContent += '<div style="font-weight: bold; font-size: 0.95rem; color: #183f35; margin-bottom: 12px;">지역별 통합 페이지</div>';
+    seoContent += '<div style="display: flex; gap: 12px; flex-wrap: wrap;">';
+    seoContent += '<a href="/sitemap-seoul" style="display: inline-block; padding: 10px 20px; background: #183f35; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.95rem;">서울 · 경기 · 인천 (현재 페이지)</a>';
+    seoContent += '<a href="/sitemap-chungcheong" style="display: inline-block; padding: 10px 20px; background: #fff; color: #333; text-decoration: none; border: 1px solid #ccc; border-radius: 4px; font-weight: 600; font-size: 0.95rem;">대전 · 세종 · 충청 &rarr;</a>';
+    seoContent += '</div></div>';
 
     for (const metroKey of Object.keys(metroGroups)) {
       const metro = metroGroups[metroKey];
@@ -319,7 +327,15 @@ export default async function handler(req, res) {
 
     let seoContent = '<div style="padding: 40px; max-width: 1200px; margin: 0 auto; font-family: sans-serif;">';
     seoContent += '<h1 style="font-size: 2rem; color: #183f35; margin-bottom: 20px;">대전·세종 탄성코트 시공 지역별 페이지 안내</h1>';
-    seoContent += '<p style="color: #666; margin-bottom: 40px;">대전광역시 및 세종특별자치시 주요 구·동 단위의 탄성코트 전문 시공 서비스 안내 목록입니다.</p>';
+    seoContent += '<p style="color: #666; margin-bottom: 30px;">대전광역시 및 세종특별자치시 주요 구·동 단위의 탄성코트 전문 시공 서비스 안내 목록입니다.</p>';
+
+    // Region Hub Cross-Navigation CTA
+    seoContent += '<div style="background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 6px; padding: 20px; margin-bottom: 40px;">';
+    seoContent += '<div style="font-weight: bold; font-size: 0.95rem; color: #183f35; margin-bottom: 12px;">지역별 통합 페이지</div>';
+    seoContent += '<div style="display: flex; gap: 12px; flex-wrap: wrap;">';
+    seoContent += '<a href="/sitemap-seoul" style="display: inline-block; padding: 10px 20px; background: #fff; color: #333; text-decoration: none; border: 1px solid #ccc; border-radius: 4px; font-weight: 600; font-size: 0.95rem;">&larr; 서울 · 경기 · 인천</a>';
+    seoContent += '<a href="/sitemap-chungcheong" style="display: inline-block; padding: 10px 20px; background: #183f35; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.95rem;">대전 · 세종 · 충청 (현재 페이지)</a>';
+    seoContent += '</div></div>';
 
     for (const metroKey of Object.keys(chungcheongGroups)) {
       const metro = chungcheongGroups[metroKey];

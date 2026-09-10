@@ -723,6 +723,90 @@ function App() {
             ))}
           </div>
 
+          {/* Region Hub Cross-Navigation */}
+          <div style={{
+            backgroundColor: 'var(--white)',
+            border: '1px solid var(--sand-beige)',
+            borderRadius: '6px',
+            padding: '20px',
+            marginBottom: '32px',
+            textAlign: 'left'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '8px',
+              marginBottom: '14px'
+            }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--forest-green-main)' }}>
+                지역별 통합 페이지
+              </span>
+              <span style={{ fontSize: '0.8rem', color: '#777' }}>
+                원하시는 권역을 선택하시면 해당 지역 허브 페이지로 이동합니다.
+              </span>
+            </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isDesktop ? 'repeat(2, 1fr)' : '1fr 1fr',
+              gap: '12px'
+            }}>
+              <a
+                href="/sitemap-seoul"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '12px 18px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  fontWeight: !isChungcheongHub ? '700' : '600',
+                  textDecoration: 'none',
+                  backgroundColor: !isChungcheongHub ? 'var(--forest-green-main)' : 'var(--white)',
+                  color: !isChungcheongHub ? 'var(--white)' : 'var(--charcoal-text)',
+                  border: !isChungcheongHub ? '1px solid var(--forest-green-main)' : '1px solid var(--sand-beige)',
+                  boxShadow: !isChungcheongHub ? '0 2px 6px rgba(24, 63, 53, 0.15)' : 'none',
+                  textAlign: 'center',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>서울 · 경기 · 인천</span>
+                {!isChungcheongHub && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.78rem', opacity: 0.9, backgroundColor: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '3px' }}>
+                    현재 페이지
+                  </span>
+                )}
+              </a>
+              <a
+                href="/sitemap-chungcheong"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '12px 18px',
+                  borderRadius: '4px',
+                  fontSize: '0.95rem',
+                  fontWeight: isChungcheongHub ? '700' : '600',
+                  textDecoration: 'none',
+                  backgroundColor: isChungcheongHub ? 'var(--forest-green-main)' : 'var(--white)',
+                  color: isChungcheongHub ? 'var(--white)' : 'var(--charcoal-text)',
+                  border: isChungcheongHub ? '1px solid var(--forest-green-main)' : '1px solid var(--sand-beige)',
+                  boxShadow: isChungcheongHub ? '0 2px 6px rgba(24, 63, 53, 0.15)' : 'none',
+                  textAlign: 'center',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>대전 · 세종 · 충청</span>
+                {isChungcheongHub && (
+                  <span style={{ marginLeft: '8px', fontSize: '0.78rem', opacity: 0.9, backgroundColor: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '3px' }}>
+                    현재 페이지
+                  </span>
+                )}
+              </a>
+            </div>
+          </div>
+
           {/* Real-time search filters */}
           <div style={{
             backgroundColor: 'var(--light-sand)',
