@@ -1619,5 +1619,185 @@ export const chungcheongRegions = [
     "expansionBatch": "chungcheong-batch-2a-2026",
     "expansionGroup": "chungcheong-2026",
     "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "chungju-official",
+    "parentRegionName": "충청북도",
+    "officialRegionName": "충주시",
+    "displayRegionName": "충주시",
+    "urlRegionKey": "충주시",
+    "keywordVariant": "official",
+    "regionType": "시",
+    "isIndexable": true,
+    "regionId": "chungju",
+    "originalType": "city",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "chungju-호암-official",
+    "parentRegionName": "충청북도 충주시",
+    "officialRegionName": "호암동",
+    "displayRegionName": "호암동",
+    "urlRegionKey": "호암동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "chungju-호암",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "chungju-칠금-official",
+    "parentRegionName": "충청북도 충주시",
+    "officialRegionName": "칠금동",
+    "displayRegionName": "칠금동",
+    "urlRegionKey": "칠금동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "chungju-칠금",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "chungju-연수-official",
+    "parentRegionName": "충청북도 충주시",
+    "officialRegionName": "연수동",
+    "displayRegionName": "연수동",
+    "urlRegionKey": "충주연수동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "chungju-연수",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "seosan-official",
+    "parentRegionName": "충청남도",
+    "officialRegionName": "서산시",
+    "displayRegionName": "서산시",
+    "urlRegionKey": "서산시",
+    "keywordVariant": "official",
+    "regionType": "시",
+    "isIndexable": true,
+    "regionId": "seosan",
+    "originalType": "city",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "seosan-예천-official",
+    "parentRegionName": "충청남도 서산시",
+    "officialRegionName": "예천동",
+    "displayRegionName": "예천동",
+    "urlRegionKey": "예천동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "seosan-예천",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "seosan-석림-official",
+    "parentRegionName": "충청남도 서산시",
+    "officialRegionName": "석림동",
+    "displayRegionName": "석림동",
+    "urlRegionKey": "석림동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "seosan-석림",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "dangjin-official",
+    "parentRegionName": "충청남도",
+    "officialRegionName": "당진시",
+    "displayRegionName": "당진시",
+    "urlRegionKey": "당진시",
+    "keywordVariant": "official",
+    "regionType": "시",
+    "isIndexable": true,
+    "regionId": "dangjin",
+    "originalType": "city",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "dangjin-수청-official",
+    "parentRegionName": "충청남도 당진시",
+    "officialRegionName": "수청동",
+    "displayRegionName": "수청동",
+    "urlRegionKey": "당진수청동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "dangjin-수청",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
+  },
+  {
+    "id": "dangjin-원당-official",
+    "parentRegionName": "충청남도 당진시",
+    "officialRegionName": "원당동",
+    "displayRegionName": "원당동",
+    "urlRegionKey": "당진원당동",
+    "keywordVariant": "lowerRegion",
+    "regionType": "동",
+    "isIndexable": true,
+    "regionId": "dangjin-원당",
+    "originalType": "dong",
+    "allowedServiceFamilies": [
+      "elasticCoating"
+    ],
+    "expansionBatch": "chungcheong-batch-2b-2026",
+    "expansionGroup": "chungcheong-2026",
+    "sitemapGroup": "chungcheong"
   }
 ];

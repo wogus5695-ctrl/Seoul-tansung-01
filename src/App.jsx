@@ -235,15 +235,15 @@ function App() {
     const chungcheongMetroGroups = {
       '대전권': { label: '대전광역시', cities: {} },
       '세종권': { label: '세종특별자치시', cities: {} },
-      '충북권': { label: '충청북도 (청주시)', cities: {} },
-      '충남권': { label: '충청남도 (천안·아산)', cities: {} }
+      '충북권': { label: '충청북도 (청주·충주)', cities: {} },
+      '충남권': { label: '충청남도 (천안·아산·서산·당진)', cities: {} }
     };
 
     list.forEach(r => {
       if (r.metro !== '대전' && r.metro !== '세종' && r.metro !== '충북' && r.metro !== '충남') return;
       const metroKey = r.metro === '대전' ? '대전권' : (r.metro === '세종' ? '세종권' : (r.metro === '충북' ? '충북권' : '충남권'));
       const group = chungcheongMetroGroups[metroKey];
-      const cityKey = r.metro === '대전' ? '대전시' : (r.metro === '세종' ? '세종시' : (r.metro === '충북' ? '청주시' : (r.city || '충남')));
+      const cityKey = r.city || (r.metro === '대전' ? '대전시' : (r.metro === '세종' ? '세종시' : (r.metro === '충북' ? '청주시' : '충남')));
       if (!group.cities[cityKey]) {
         group.cities[cityKey] = {
           name: cityKey,
@@ -254,7 +254,7 @@ function App() {
       if (r.metro === '대전') {
         distKey = (r.groupName && r.groupName !== '대전시') ? r.groupName : '시 단위';
       } else if (r.metro === '충북') {
-        distKey = (r.groupName && r.groupName !== '청주시') ? r.groupName : '시 단위';
+        distKey = (r.groupName && r.groupName !== cityKey) ? r.groupName : '시 단위';
       } else if (r.metro === '충남') {
         distKey = (r.groupName && r.groupName !== cityKey) ? r.groupName : '시 단위';
       }

@@ -157,6 +157,10 @@ function buildIndexes() {
       } else {
         groupName = '청주시';
       }
+    } else if (lookupId.startsWith('chungju')) {
+      metro = '충북';
+      city = '충주시';
+      groupName = '충주시';
     } else if (lookupId.startsWith('cheonan')) {
       metro = '충남';
       city = '천안시';
@@ -171,6 +175,14 @@ function buildIndexes() {
       metro = '충남';
       city = '아산시';
       groupName = '아산시';
+    } else if (lookupId.startsWith('seosan')) {
+      metro = '충남';
+      city = '서산시';
+      groupName = '서산시';
+    } else if (lookupId.startsWith('dangjin')) {
+      metro = '충남';
+      city = '당진시';
+      groupName = '당진시';
     }
 
     const entry = {
@@ -186,7 +198,23 @@ function buildIndexes() {
       displayName: item.displayRegionName,
       urlRegion: item.urlRegionKey,
       parentRegionName: item.parentRegionName || metro,
-      districtName: (metro === '대전') ? ((item.regionType === '구') ? '대전시' : groupName) : ((metro === '세종') ? '세종시' : ((metro === '충북') ? ((item.regionType === '구' || item.regionType === '시') ? '청주시' : (item.parentRegionName || groupName)) : ((metro === '충남') ? ((item.regionType === '시') ? '충청남도' : ((item.regionType === '구') ? '천안시' : groupName)) : (item.parentRegionName ? item.parentRegionName.split(' ')[1] || groupName : groupName)))),
+      districtName: (metro === '대전') 
+        ? ((item.regionType === '구') ? '대전시' : groupName) 
+        : ((metro === '세종') 
+          ? '세종시' 
+          : ((metro === '충북') 
+            ? ((item.regionType === '시' && item.officialRegionName === '충주시') 
+              ? '충청북도' 
+              : ((item.regionType === '구' || item.regionType === '시') 
+                ? '청주시' 
+                : (item.parentRegionName && item.parentRegionName.includes('충주시') ? '충주시' : (item.parentRegionName || groupName)))) 
+            : ((metro === '충남') 
+              ? ((item.regionType === '시') 
+                ? '충청남도' 
+                : ((item.regionType === '구') 
+                  ? '천안시' 
+                  : (item.parentRegionName && item.parentRegionName.includes('서산시') ? '서산시' : (item.parentRegionName && item.parentRegionName.includes('당진시') ? '당진시' : groupName)))) 
+              : (item.parentRegionName ? item.parentRegionName.split(' ')[1] || groupName : groupName)))),
       aliases: [],
       collisionResolved: true,
       requiresCollisionReview: false,
