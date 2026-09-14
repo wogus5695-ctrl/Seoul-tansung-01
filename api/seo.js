@@ -455,7 +455,7 @@ export default async function handler(req, res) {
       const customDim = thumbnailDimensions[kParam] || { width: 1200, height: 1200 };
       const seoThumbnailUrl = customThumb 
         ? `https://www.barumspace.co.kr${customThumb}`
-        : 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v2.jpg';
+        : 'https://www.barumspace.co.kr/images/seo/bareumgonggan-search-thumbnail-v3.jpg';
 
       // Construct Shared Schema JSON-LD (Service, BreadcrumbList, FAQPage)
       const defaultSiteUrl = 'https://www.barumspace.co.kr';
