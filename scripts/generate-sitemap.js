@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { getActiveRegions, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from '../src/data/regionResolver.js';
 import { serviceKeywords } from '../src/data/serviceKeywords.js';
+import { isDynamicIndexable } from '../src/data/indexPolicy.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,13 +28,15 @@ async function generateSitemap() {
   urls.push(`${SITE_URL}/sitemap-chungcheong`);
   urls.push(`${SITE_URL}/privacy-policy`);
 
-  // 3. Dynamic keywords combinations using correct urlRegion token
+  // 3. Dynamic keywords combinations using correct urlRegion token (filtered by index policy)
   let count = 0;
   activeRegions.forEach(reg => {
     const allowedServices = getAllowedServicesForRegion(reg);
     allowedServices.forEach(tk => {
-      urls.push(generateAbsoluteDynamicUrl(SITE_URL, reg.urlRegion, tk.keyword));
-      count++;
+      if (isDynamicIndexable(reg, tk)) {
+        urls.push(generateAbsoluteDynamicUrl(SITE_URL, reg.urlRegion, tk.keyword));
+        count++;
+      }
     });
   });
 
