@@ -6,6 +6,7 @@ import { buildV2Content, buildV3Content } from '../src/data/seoV2/contentBuilder
 import { buildV2InternalLinks, buildV3InternalLinks } from '../src/data/seoV2/linkEngine.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
 import { thumbnailTestMap, thumbnailDimensions, testBKeywords } from '../src/data/thumbnailTestMap.js';
+import { getDynamicIndexPolicy } from '../src/data/indexPolicy.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -518,9 +519,12 @@ export default async function handler(req, res) {
         }))
       });
 
+      // Determine dynamic SEO robots policy (Indexable surface pruning: Capital Elastic only)
+      const dynamicRobots = getDynamicIndexPolicy(matchedRegion, matchedService);
+
       // Construct and Inject all 17 target SEO tags + JSON-LD
       const seoTags = `
-<meta name="robots" content="index, follow" />
+<meta name="robots" content="${dynamicRobots}" />
 <link rel="canonical" href="${cleanUrl}" />
 <link rel="image_src" href="${seoThumbnailUrl}" />
 <meta property="og:type" content="website" />
