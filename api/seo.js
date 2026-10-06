@@ -6,7 +6,7 @@ import { buildV2Content, buildV3Content } from '../src/data/seoV2/contentBuilder
 import { buildV2InternalLinks, buildV3InternalLinks } from '../src/data/seoV2/linkEngine.js';
 import { seoulRegions } from '../src/data/seoulRegions.js';
 import { thumbnailTestMap, thumbnailDimensions, testBKeywords } from '../src/data/thumbnailTestMap.js';
-import { getDynamicIndexPolicy } from '../src/data/indexPolicy.js';
+import { getDynamicIndexPolicy, isDynamicIndexable } from '../src/data/indexPolicy.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -262,8 +262,10 @@ export default async function handler(req, res) {
             seoContent += '<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.6; font-size: 0.85rem;">';
             const allowedServices = getAllowedServicesForRegion(reg);
             allowedServices.forEach(k => {
-              const dynUrl = generateDynamicUrl(reg.urlRegion, k.keyword);
-              seoContent += '<li><a href="' + dynUrl + '" style="color: #0076ff; text-decoration: none;">' + reg.displayName + ' ' + k.keyword + '</a></li>';
+              if (isDynamicIndexable(reg, k)) {
+                const dynUrl = generateDynamicUrl(reg.urlRegion, k.keyword);
+                seoContent += '<li><a href="' + dynUrl + '" style="color: #0076ff; text-decoration: none;">' + reg.displayName + ' ' + k.keyword + '</a></li>';
+              }
             });
             seoContent += '</ul></div>';
           });
@@ -295,8 +297,8 @@ export default async function handler(req, res) {
     html = html.replace(/<meta property="og:title" content=".*?" \/>/, '<meta property="og:title" content="' + hubTitle + '" />');
     html = html.replace(/<meta property="og:description" content=".*?" \/>/, '<meta property="og:description" content="' + hubDesc + '" />');
 
-    // Inject canonical & og:url tags
-    html = html.replace('</head>', '<link rel="canonical" href="' + hubCanonical + '" />\n<meta property="og:url" content="' + hubCanonical + '" />\n</head>');
+    // Inject robots noindex, follow, canonical & og:url tags
+    html = html.replace('</head>', '<meta name="robots" content="noindex, follow" />\n<link rel="canonical" href="' + hubCanonical + '" />\n<meta property="og:url" content="' + hubCanonical + '" />\n</head>');
 
     // Fetch all active production regions
     const activeList = getActiveRegions();

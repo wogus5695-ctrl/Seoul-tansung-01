@@ -21,6 +21,7 @@ import { getSeoEngineVersion } from './data/seoV2/featureFlag';
 import { getFaqV2ListForTask } from './data/seoV2/faqRegistry';
 import { buildV3Content } from './data/seoV2/contentBuilder';
 import { parseAndValidateK, getActiveRegions, ENABLE_CAPITAL_REGION_EXPANSION, generateDynamicUrl, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from './data/regionResolver';
+import { getDynamicIndexPolicy, isDynamicIndexable } from './data/indexPolicy';
 import { thumbnailTestMap, testBKeywords } from './data/thumbnailTestMap';
 import { incheonRegions } from './data/incheonRegions';
 import { gyeonggiRegions } from './data/gyeonggiRegions';
@@ -349,6 +350,9 @@ function App() {
       descStr = '요청하신 시공 정보 또는 지역명이 정확하지 않습니다.';
       updateMetaTag('meta[name="robots"]', 'content', 'noindex, nofollow');
     } else if (parsedKeyword) {
+      const robotsPolicy = getDynamicIndexPolicy(parsedKeyword.region, parsedKeyword.service);
+      updateMetaTag('meta[name="robots"]', 'content', robotsPolicy);
+
       const regionName = parsedKeyword.region.name;
       const taskName = parsedKeyword.service.keyword;
       const isShort = parsedKeyword.region.id.endsWith('-short');
@@ -438,6 +442,7 @@ function App() {
     } else if (path === '/sitemap-chungcheong') {
       titleStr = `충청권 탄성코트 시공 지역별 페이지 안내 | 바름공간`;
       descStr = `대전광역시, 세종특별자치시 및 충청북도 청주시 주요 구·동 단위의 탄성코트 전문 시공 서비스 페이지 안내 목록입니다.`;
+      updateMetaTag('meta[name="robots"]', 'content', 'noindex, follow');
 
       schemas.push({
         '@context': 'https://schema.org',
@@ -975,7 +980,9 @@ function App() {
                       Object.keys(city.districts).forEach(dk => {
                         childCount += city.districts[dk].regions.length;
                         city.districts[dk].regions.forEach(r => {
-                          keywordLinkCount += getAllowedServicesForRegion(r).length;
+                          const services = getAllowedServicesForRegion(r);
+                          const activeServices = isChungcheongHub ? services : services.filter(s => isDynamicIndexable(r, s));
+                          keywordLinkCount += activeServices.length;
                         });
                       });
 
@@ -1050,7 +1057,10 @@ function App() {
                                           const isRegionMatched = reg.displayName.includes(regionSearch) || reg.officialName.includes(regionSearch);
                                           if (!isRegionMatched) return null;
 
-                                          const allowedServices = getAllowedServicesForRegion(reg);
+                                          const rawAllowedServices = getAllowedServicesForRegion(reg);
+                                          const allowedServices = isChungcheongHub
+                                            ? rawAllowedServices
+                                            : rawAllowedServices.filter(tk => isDynamicIndexable(reg, tk));
                                           const isDongOpen = !!openDistricts[`dong-${reg.id}`];
 
                                           return (
