@@ -13,6 +13,9 @@ import {
   SEOContentSection
 } from './components/Common';
 import { PrivacyPolicyPage } from './components/PrivacyPolicy';
+import { GuideHubPage } from './components/GuideHubPage';
+import { GuideDetailPage } from './components/GuideDetailPage';
+import { getArticleBySlug, isArticlePublished } from './data/editorial/publicationGate';
 
 // Ingest datasets
 import { seoulRegions } from './data/seoulRegions';
@@ -481,6 +484,87 @@ function App() {
           { '@type': 'ListItem', 'position': 2, 'name': '서울 지역별 안내', 'item': `${defaultSiteUrl}/sitemap-seoul` }
         ]
       });
+    } else if (path === '/guide') {
+      titleStr = '탄성코트 시공 가이드 | 바름공간';
+      descStr = '탄성코트 및 베란다탄성코트 시공 전 확인해야 할 선택 기준과 상담·시공 정보를 안내합니다.';
+      updateMetaTag('meta[name="robots"]', 'content', 'noindex, follow');
+
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        'name': titleStr,
+        'description': descStr,
+        'url': `${defaultSiteUrl}/guide`
+      });
+
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
+          { '@type': 'ListItem', 'position': 2, 'name': '시공 가이드', 'item': `${defaultSiteUrl}/guide` }
+        ]
+      });
+    } else if (path.startsWith('/guide/')) {
+      const guideSlug = path.replace('/guide/', '').trim();
+      const article = getArticleBySlug(guideSlug);
+
+      if (article && isArticlePublished(article)) {
+        titleStr = `${article.title} | 바름공간`;
+        descStr = article.metaDescription;
+        updateMetaTag('meta[name="robots"]', 'content', 'index, follow');
+
+        schemas.push({
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          'headline': article.title,
+          'description': article.metaDescription,
+          'datePublished': article.publishedAt,
+          'dateModified': article.modifiedAt || article.publishedAt,
+          'mainEntityOfPage': {
+            '@type': 'WebPage',
+            '@id': `${defaultSiteUrl}/guide/${article.slug}`
+          },
+          'author': {
+            '@type': 'Organization',
+            'name': siteConfig.brandName
+          },
+          'publisher': {
+            '@type': 'Organization',
+            'name': siteConfig.brandName,
+            'url': defaultSiteUrl
+          }
+        });
+
+        schemas.push({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          'itemListElement': [
+            { '@type': 'ListItem', 'position': 1, 'name': '홈', 'item': defaultSiteUrl },
+            { '@type': 'ListItem', 'position': 2, 'name': '시공 가이드', 'item': `${defaultSiteUrl}/guide` },
+            { '@type': 'ListItem', 'position': 3, 'name': article.title, 'item': `${defaultSiteUrl}/guide/${article.slug}` }
+          ]
+        });
+
+        if (Array.isArray(article.faqs) && article.faqs.length > 0) {
+          schemas.push({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            'mainEntity': article.faqs.map(f => ({
+              '@type': 'Question',
+              'name': f.q,
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': f.a
+              }
+            }))
+          });
+        }
+      } else {
+        titleStr = '페이지를 찾을 수 없습니다 | 바름공간';
+        descStr = '요청하신 가이드 글이 존재하지 않거나 비공개 상태입니다.';
+        updateMetaTag('meta[name="robots"]', 'content', 'noindex, follow');
+      }
     } else {
       // Main Page schemas
       schemas.push({
@@ -554,6 +638,16 @@ function App() {
     if (!isKeywordInvalid) {
       if (parsedKeyword) {
         canonicalUrl = generateAbsoluteDynamicUrl(siteConfig.siteUrl, parsedKeyword.region.urlRegion, parsedKeyword.service.keyword);
+      } else if (path === '/guide') {
+        canonicalUrl = `${siteConfig.siteUrl}/guide`;
+      } else if (path.startsWith('/guide/')) {
+        const guideSlug = path.replace('/guide/', '').trim();
+        const article = getArticleBySlug(guideSlug);
+        if (article && isArticlePublished(article)) {
+          canonicalUrl = `${siteConfig.siteUrl}/guide/${article.slug}`;
+        } else {
+          canonicalUrl = '';
+        }
       } else {
         canonicalUrl = siteConfig.siteUrl + (path === '/' ? '' : path);
       }
@@ -671,6 +765,15 @@ function App() {
   const renderContent = () => {
     if (path === '/privacy-policy') {
       return <PrivacyPolicyPage onNavigate={navigate} />;
+    }
+
+    if (path === '/guide') {
+      return <GuideHubPage onNavigate={navigate} />;
+    }
+
+    if (path.startsWith('/guide/')) {
+      const guideSlug = path.replace('/guide/', '').trim();
+      return <GuideDetailPage slug={guideSlug} onNavigate={navigate} />;
     }
 
     if (isKeywordInvalid) {

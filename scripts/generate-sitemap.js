@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { getActiveRegions, generateAbsoluteDynamicUrl, getAllowedServicesForRegion } from '../src/data/regionResolver.js';
 import { serviceKeywords } from '../src/data/serviceKeywords.js';
 import { isDynamicIndexable } from '../src/data/indexPolicy.js';
+import { getSitemapEligibleArticles } from '../src/data/editorial/publicationGate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,14 @@ async function generateSitemap() {
         count++;
       }
     });
+  });
+
+  // 4. Approved Editorial Articles (Publication Gate Filtered)
+  let editorialCount = 0;
+  const sitemapArticles = getSitemapEligibleArticles();
+  sitemapArticles.forEach(art => {
+    urls.push(`${SITE_URL}/guide/${art.slug}`);
+    editorialCount++;
   });
 
   // Construct XML standard wrapper

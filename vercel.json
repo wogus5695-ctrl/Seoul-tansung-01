@@ -2,6 +2,9 @@
   "functions": {
     "api/seo.js": {
       "includeFiles": "dist/**"
+    },
+    "api/guide.js": {
+      "includeFiles": "dist/**"
     }
   },
   "routes": [
@@ -27,6 +30,14 @@
     {
       "src": "/sitemap-chungcheong",
       "dest": "/api/seo"
+    },
+    {
+      "src": "/guide",
+      "dest": "/api/guide"
+    },
+    {
+      "src": "/guide/(.*)",
+      "dest": "/api/guide"
     },
     {
       "src": "/",
