@@ -1,4 +1,4 @@
-// Automated test & regression audit script for STEP RSS-10.
+// Automated test & regression audit script for STEP RSS-12.
 // Uses Node.js native assert to avoid third-party test dependencies.
 
 import assert from 'assert';
@@ -48,13 +48,13 @@ function testGuideRequest(pathname) {
 
 async function runAudit() {
   console.log('======================================================================');
-  console.log('[STEP RSS-10] GANGSEO DISTRICT BATCH FINAL PRODUCTION RELEASE AUDIT');
+  console.log('[STEP RSS-12] SEONGBUK DISTRICT BATCH FINAL PRODUCTION RELEASE AUDIT');
   console.log('======================================================================\n');
 
   // 1. Editorial Registry Count
   const allArticles = getAllArticles();
-  console.log(`1. Total Editorial Articles: ${allArticles.length} (Expected: 24)`);
-  assert.strictEqual(allArticles.length, 24, 'Editorial entries must be exactly 24 (12 Nowon + 12 Gangseo)');
+  console.log(`1. Total Editorial Articles: ${allArticles.length} (Expected: 36)`);
+  assert.strictEqual(allArticles.length, 36, 'Editorial entries must be exactly 36 (12 Nowon + 12 Gangseo + 12 Seongbuk)');
 
   // 2. Uniqueness Checks
   const editorialIds = new Set();
@@ -118,30 +118,30 @@ async function runAudit() {
 
   console.log(`3. Invalid Region Targets: ${invalidRegions} (Expected: 0)`);
   console.log(`   Invalid Service Targets: ${invalidServices} (Expected: 0)`);
-  console.log(`   Total Related Landing Targets: ${totalRelatedLandings} (Expected: 24)`);
+  console.log(`   Total Related Landing Targets: ${totalRelatedLandings} (Expected: 36)`);
   console.log(`   Non-indexable Related Landings: ${nonIndexableRelatedLandings} (Expected: 0)`);
   assert.strictEqual(invalidRegions, 0);
   assert.strictEqual(invalidServices, 0);
-  assert.strictEqual(totalRelatedLandings, 24);
+  assert.strictEqual(totalRelatedLandings, 36);
   assert.strictEqual(nonIndexableRelatedLandings, 0);
 
-  // 4. Publication Gate Safety Verification (All 24 Published)
+  // 4. Publication Gate Safety Verification (All 36 Published)
   const publishedArticles = getPublishedArticles();
   const rssArticles = getRssEligibleArticles();
   const sitemapArticles = getSitemapEligibleArticles();
   const releaseCandidates = allArticles.filter(a => a.contentStatus === 'approved' && !isArticlePublished(a));
 
   console.log(`4. Publication Gate Status:`);
-  console.log(`   Published Count: ${publishedArticles.length} (Expected: 24)`);
+  console.log(`   Published Count: ${publishedArticles.length} (Expected: 36)`);
   console.log(`   Approved Release Candidates: ${releaseCandidates.length} (Expected: 0)`);
-  console.log(`   RSS Eligible Count: ${rssArticles.length} (Expected: 24)`);
-  console.log(`   Sitemap Eligible Count: ${sitemapArticles.length} (Expected: 24)`);
-  assert.strictEqual(publishedArticles.length, 24, 'Published count must be exactly 24');
+  console.log(`   RSS Eligible Count: ${rssArticles.length} (Expected: 36)`);
+  console.log(`   Sitemap Eligible Count: ${sitemapArticles.length} (Expected: 36)`);
+  assert.strictEqual(publishedArticles.length, 36, 'Published count must be exactly 36');
   assert.strictEqual(releaseCandidates.length, 0, 'Release candidates must be 0 after full release');
-  assert.strictEqual(rssArticles.length, 24, 'RSS eligible count must be exactly 24');
-  assert.strictEqual(sitemapArticles.length, 24, 'Sitemap eligible count must be exactly 24');
+  assert.strictEqual(rssArticles.length, 36, 'RSS eligible count must be exactly 36');
+  assert.strictEqual(sitemapArticles.length, 36, 'Sitemap eligible count must be exactly 36');
 
-  // Verify all 24 have approved content status and isPublished = true
+  // Verify all 36 have approved content status and isPublished = true
   allArticles.forEach(a => {
     assert.strictEqual(a.contentStatus, 'approved', `Article ${a.slug} must have contentStatus 'approved'`);
     assert.strictEqual(a.isPublished, true, `Article ${a.slug} must be isPublished: true`);
@@ -155,7 +155,7 @@ async function runAudit() {
   let missingCreatedAt = 0;
   let invalidTimezone = 0;
   let futureTimestamps = 0;
-  const nowThreshold = new Date('2026-10-27T15:00:00+09:00').getTime();
+  const nowThreshold = new Date('2026-10-28T11:00:00+09:00').getTime();
 
   allArticles.forEach((a) => {
     // 1. createdAt must exist
@@ -187,12 +187,12 @@ async function runAudit() {
   });
 
   console.log(`   createdAt Missing: ${missingCreatedAt} (Expected: 0)`);
-  console.log(`   createdAt Unique Count: ${createdSet.size} (Expected: 24)`);
+  console.log(`   createdAt Unique Count: ${createdSet.size} (Expected: 36)`);
   console.log(`   Invalid Timezone: ${invalidTimezone} (Expected: 0)`);
   console.log(`   Future Timestamps: ${futureTimestamps} (Expected: 0)`);
   console.log(`   Date / Time Policy Audit: ALL PASS`);
 
-  // 5. RSS.xml Verification (24 Items: 12 Nowon + 12 Gangseo)
+  // 5. RSS.xml Verification (36 Items: 12 Nowon + 12 Gangseo + 12 Seongbuk)
   const rssPath = path.join(__dirname, '../public/rss.xml');
   assert.ok(fs.existsSync(rssPath), 'public/rss.xml must exist');
   const rssContent = fs.readFileSync(rssPath, 'utf-8');
@@ -205,16 +205,16 @@ async function runAudit() {
 
   const itemCountMatches = rssContent.match(/<item>/g) || [];
   console.log(`5. RSS.xml Check:`);
-  console.log(`   Item Count: ${itemCountMatches.length} (Expected: 24)`);
-  assert.strictEqual(itemCountMatches.length, 24, 'RSS Item count must be exactly 24');
+  console.log(`   Item Count: ${itemCountMatches.length} (Expected: 36)`);
+  assert.strictEqual(itemCountMatches.length, 36, 'RSS Item count must be exactly 36');
 
-  // Verify all 24 articles appear in RSS
+  // Verify all 36 articles appear in RSS
   allArticles.forEach(art => {
     assert.ok(rssContent.includes(`/guide/${art.slug}`), `RSS must contain ${art.slug}`);
   });
-  console.log('   RSS.xml Quality Check: ALL PASS (All 24 items present and verified)');
+  console.log('   RSS.xml Quality Check: ALL PASS (All 36 items present and verified)');
 
-  // 6. Sitemap.xml Verification (5,871 = 5,844 dynamic + 3 static + 24 editorial)
+  // 6. Sitemap.xml Verification (5,883 = 5,844 dynamic + 3 static + 36 editorial)
   const sitemapPath = path.join(__dirname, '../public/sitemap.xml');
   const sitemapContent = fs.readFileSync(sitemapPath, 'utf-8');
   const sitemapLocs = (sitemapContent.match(/<loc>(.*?)<\/loc>/g) || []).map(l => l.replace(/<\/?loc>/g, ''));
@@ -223,20 +223,20 @@ async function runAudit() {
   const editorialSitemap = sitemapLocs.filter(u => u.includes('/guide/'));
 
   console.log(`6. Sitemap.xml Check:`);
-  console.log(`   Total URLs: ${sitemapLocs.length} (Expected: 5871)`);
+  console.log(`   Total URLs: ${sitemapLocs.length} (Expected: 5883)`);
   console.log(`   Dynamic URLs: ${dynamicSitemap.length} (Expected: 5844)`);
   console.log(`   Static URLs: ${staticSitemap.length} (Expected: 3)`);
-  console.log(`   Editorial Article URLs: ${editorialSitemap.length} (Expected: 24)`);
-  assert.strictEqual(sitemapLocs.length, 5871);
+  console.log(`   Editorial Article URLs: ${editorialSitemap.length} (Expected: 36)`);
+  assert.strictEqual(sitemapLocs.length, 5883);
   assert.strictEqual(dynamicSitemap.length, 5844);
   assert.strictEqual(staticSitemap.length, 3);
-  assert.strictEqual(editorialSitemap.length, 24);
+  assert.strictEqual(editorialSitemap.length, 36);
 
-  // Verify all 24 articles appear in Sitemap
+  // Verify all 36 articles appear in Sitemap
   allArticles.forEach(art => {
     assert.ok(sitemapContent.includes(`/guide/${art.slug}`), `Sitemap must contain ${art.slug}`);
   });
-  console.log('   Sitemap.xml Quality Check: ALL PASS (All 24 articles present and verified)');
+  console.log('   Sitemap.xml Quality Check: ALL PASS (All 36 articles present and verified)');
 
   // 7. Guide SSR Runtime Tests
   console.log(`7. Guide SSR Runtime Tests:`);
@@ -248,14 +248,14 @@ async function runAudit() {
   assert.ok(hubRes.html.includes('<meta name="robots" content="noindex, follow" />'), 'Hub must have noindex, follow');
   assert.ok(hubRes.html.includes(`<link rel="canonical" href="${SITE_URL}/guide" />`), 'Hub must have self-canonical');
   
-  // All 24 articles must appear in Guide Hub
+  // All 36 articles must appear in Guide Hub
   allArticles.forEach(art => {
     assert.ok(hubRes.html.includes(`/guide/${art.slug}`), `Hub must contain link for ${art.slug}`);
   });
-  console.log(`   Guide Hub: All 24 articles present and verified`);
+  console.log(`   Guide Hub: All 36 articles present and verified`);
 
-  // 7-B: Direct SSR Sweep of all 24 Articles
-  console.log(`   Sweeping all 24 Articles direct SSR requests:`);
+  // 7-B: Direct SSR Sweep of all 36 Articles
+  console.log(`   Sweeping all 36 Articles direct SSR requests:`);
   for (const art of allArticles) {
     const artRes = await testGuideRequest(`/guide/${art.slug}`);
     assert.strictEqual(artRes.statusCode, 200, `Article ${art.slug} must return 200`);
@@ -274,7 +274,7 @@ async function runAudit() {
       assert.ok(artRes.html.includes(tgt.relativeUrl), `Article ${art.slug} must contain related landing link: ${tgt.relativeUrl}`);
     });
   }
-  console.log(`   All 24 Articles verified 200 with index, follow, self-canonical, and valid schema: PASS`);
+  console.log(`   All 36 Articles verified 200 with index, follow, self-canonical, and valid schema: PASS`);
 
   // 8. Baseline Verification
   const activeRegions = getActiveRegions();
@@ -332,7 +332,7 @@ async function runAudit() {
   assert.strictEqual(chungHubLinks, 600);
 
   console.log('\n====================================================');
-  console.log('ALL RSS-10 FINAL PRODUCTION RELEASE CHECKS PASSED PERFECTLY!');
+  console.log('ALL RSS-12 FINAL PRODUCTION RELEASE CHECKS PASSED PERFECTLY!');
   console.log('====================================================');
 }
 
